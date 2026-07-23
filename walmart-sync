@@ -17,7 +17,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-BIN = Path.home() / "bin"
+TOOLS = Path.home() / "src" / "tools"
 SHARED = Path.home() / "src" / "relationship-shared"
 CFG_PATH = Path(__file__).with_suffix(".json")
 TOOLS_REPO_LABEL = "~/src/tools"
@@ -101,7 +101,7 @@ def walmart_sync_specs(cfg):
     exact = set(cfg.get("managed_exact", []))
     prefixes = [p.rstrip("/") + "/" for p in cfg.get("managed_prefixes", [])]
     for item in cfg["mirror_items"]:
-        dst = item["bin_rel"]
+        dst = item["tools_rel"]
         if item["is_dir"]:
             prefixes.append(dst.rstrip("/") + "/")
         else:
@@ -122,7 +122,7 @@ def is_managed(path: str, exact, prefixes):
 
 def block_if_managed_changes(cfg, action_label: str):
     exact, prefixes = walmart_sync_specs(cfg)
-    status = run_git(BIN, "status", "--porcelain")
+    status = run_git(TOOLS, "status", "--porcelain")
     dirty = parse_porcelain_paths(status.stdout)
     managed = [p for p in dirty if is_managed(p, exact, prefixes)]
     if not managed:
@@ -163,8 +163,8 @@ def check_consistency(cfg, verbose=False):
     all_ok = True
     for item in cfg["mirror_items"]:
         src = SHARED / item["shared_rel"]
-        dst = BIN / item["bin_rel"]
-        label = item["bin_rel"]
+        dst = TOOLS / item["tools_rel"]
+        label = item["tools_rel"]
         if not src.exists():
             print(c(YELLOW, f"  [warn] missing in shared: {item['shared_rel']}"))
             continue
@@ -192,7 +192,7 @@ def check_consistency(cfg, verbose=False):
 
 def iter_mirror_files(cfg):
     for item in cfg["mirror_items"]:
-        dst = BIN / item["bin_rel"]
+        dst = TOOLS / item["tools_rel"]
         if not dst.exists():
             continue
         for f in (collect_files(dst) if item["is_dir"] else [dst]):
@@ -204,7 +204,7 @@ def check_portability(cfg, verbose=False):
     compiled = compile_patterns(cfg["internal_patterns"])
     all_ok = True
     for f in iter_mirror_files(cfg):
-        rel = f.relative_to(BIN)
+        rel = f.relative_to(TOOLS)
         hits = grep_patterns(f, compiled)
         if hits:
             print(c(RED, f"  [leak] {rel}"))
@@ -222,7 +222,7 @@ def check_ref_integrity(cfg, verbose=False):
     exempt = set(cfg["ref_integrity_exempt"])
     all_ok = True
     for f in iter_mirror_files(cfg):
-        rel = str(f.relative_to(BIN))
+        rel = str(f.relative_to(TOOLS))
         if rel in exempt:
             if verbose:
                 print(c(GREEN, f"  [ok] {rel} (exempt)"))
@@ -245,7 +245,7 @@ def check_ref_integrity(cfg, verbose=False):
 def check_personal_only(cfg):
     all_ok = True
     for rel in sorted(cfg["personal_only"]):
-        dst = BIN / rel
+        dst = TOOLS / rel
         if not dst.exists():
             print(c(YELLOW, f"  [warn] missing personal-only item: {rel}"))
             continue
@@ -266,13 +266,13 @@ def do_sync(cfg, dry_run=False):
     print(c(CYAN, f"Pre-sync pull sequence: shared, then {TOOLS_REPO_LABEL}"))
     if not pull_repo(SHARED, "~/src/relationship-shared"):
         return False
-    if not pull_repo(BIN, TOOLS_REPO_LABEL):
+    if not pull_repo(TOOLS, TOOLS_REPO_LABEL):
         return False
 
     changed = []
     for item in cfg["mirror_items"]:
         src = SHARED / item["shared_rel"]
-        dst = BIN / item["bin_rel"]
+        dst = TOOLS / item["tools_rel"]
         if not src.exists():
             print(c(YELLOW, f"  [skip] missing in shared: {item['shared_rel']}"))
             continue
@@ -283,10 +283,10 @@ def do_sync(cfg, dry_run=False):
         else:
             in_sync = dst.exists() and src.read_bytes() == dst.read_bytes()
         if in_sync:
-            print(f"  [=] {item['bin_rel']}")
+            print(f"  [=] {item['tools_rel']}")
             continue
-        changed.append(item["bin_rel"])
-        print(c(YELLOW, f"  [→] {item['bin_rel']}") + (" (would copy)" if dry_run else " (copying)"))
+        changed.append(item["tools_rel"])
+        print(c(YELLOW, f"  [→] {item['tools_rel']}") + (" (would copy)" if dry_run else " (copying)"))
         if dry_run:
             continue
         dst.parent.mkdir(parents=True, exist_ok=True)
@@ -305,7 +305,7 @@ def do_sync(cfg, dry_run=False):
     compiled = compile_patterns(cfg["internal_patterns"])
     leak = False
     for rel in changed:
-        p = BIN / rel
+        p = TOOLS / rel
         files = collect_files(p) if p.is_dir() else [p]
         for f in files:
             if not f.is_file():
@@ -313,7 +313,7 @@ def do_sync(cfg, dry_run=False):
             hits = grep_patterns(f, compiled)
             if hits:
                 leak = True
-                show = str(f.relative_to(BIN))
+                show = str(f.relative_to(TOOLS))
                 print(c(RED, f"  [leak] {show}"))
                 for ln, line, label in hits[:10]:
                     print(f"    L{ln} [{label}]: {line[:120]}")
@@ -331,8 +331,8 @@ def do_push(cfg):
     if not block_if_managed_changes(cfg, "push"):
         return False
 
-    remote, branch = detect_upstream(BIN)
-    ahead_r = run_git(BIN, "rev-list", "--count", "HEAD@{upstream}..HEAD")
+    remote, branch = detect_upstream(TOOLS)
+    ahead_r = run_git(TOOLS, "rev-list", "--count", "HEAD@{upstream}..HEAD")
     if ahead_r.returncode != 0:
         print(c(RED, "Cannot determine upstream; set one first."))
         return False
@@ -343,7 +343,7 @@ def do_push(cfg):
 
     exempt = set(cfg["portability_push_exempt"])
     compiled = compile_patterns(cfg["internal_patterns"])
-    diff_r = run_git(BIN, "diff", "-U0", "HEAD@{upstream}..HEAD")
+    diff_r = run_git(TOOLS, "diff", "-U0", "HEAD@{upstream}..HEAD")
     leaks = []
     current_file = "(unknown)"
     skip = False
@@ -368,7 +368,7 @@ def do_push(cfg):
         return False
 
     print(c(CYAN, f"Pushing {TOOLS_REPO_LABEL} to {remote}/{branch}…"))
-    r = run_git(BIN, "push", remote, branch, capture=False)
+    r = run_git(TOOLS, "push", remote, branch, capture=False)
     if r.returncode != 0:
         print(c(RED + BOLD, "Push failed."))
         return False
@@ -427,7 +427,7 @@ def main():
     if not on_work and not explicit_audit:
         if not block_if_managed_changes(cfg, "pull"):
             sys.exit(1)
-        sys.exit(0 if pull_repo(BIN, TOOLS_REPO_LABEL) else 1)
+        sys.exit(0 if pull_repo(TOOLS, TOOLS_REPO_LABEL) else 1)
 
     sys.exit(0 if run_audit(cfg, args) else 1)
 

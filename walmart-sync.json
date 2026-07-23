@@ -1,17 +1,17 @@
 {
   "mirror_items": [
-    { "shared_rel": ".wibey/skills/ailert", "bin_rel": ".wibey/skills/ailert", "is_dir": true },
-    { "shared_rel": ".wibey/skills/clipboard-read", "bin_rel": ".wibey/skills/clipboard-read", "is_dir": true },
-    { "shared_rel": ".wibey/skills/converge", "bin_rel": ".wibey/skills/converge", "is_dir": true },
-    { "shared_rel": ".wibey/skills/doc-audit", "bin_rel": ".wibey/skills/doc-audit", "is_dir": true },
-    { "shared_rel": ".wibey/commands/continue.md", "bin_rel": ".wibey/commands/continue.md", "is_dir": false },
-    { "shared_rel": ".wibey/commands/plando.md", "bin_rel": ".wibey/commands/plando.md", "is_dir": false },
-    { "shared_rel": ".wibey/commands/tdd.md", "bin_rel": ".wibey/commands/tdd.md", "is_dir": false },
-    { "shared_rel": "docs/AnchorDoc.md", "bin_rel": ".wibey/docs/AnchorDoc.md", "is_dir": false },
-    { "shared_rel": "docs/StatusVocabulary.md", "bin_rel": ".wibey/docs/StatusVocabulary.md", "is_dir": false },
-    { "shared_rel": "docs/IncidentRCA.md", "bin_rel": ".wibey/docs/IncidentRCA.md", "is_dir": false },
-    { "shared_rel": "docs/templates/Project.md", "bin_rel": ".wibey/docs/templates/Project.md", "is_dir": false },
-    { "shared_rel": "docs/templates/Incident.md", "bin_rel": ".wibey/docs/templates/Incident.md", "is_dir": false }
+    { "shared_rel": ".wibey/skills/ailert", "tools_rel": ".wibey/skills/ailert", "is_dir": true },
+    { "shared_rel": ".wibey/skills/clipboard-read", "tools_rel": ".wibey/skills/clipboard-read", "is_dir": true },
+    { "shared_rel": ".wibey/skills/converge", "tools_rel": ".wibey/skills/converge", "is_dir": true },
+    { "shared_rel": ".wibey/skills/doc-audit", "tools_rel": ".wibey/skills/doc-audit", "is_dir": true },
+    { "shared_rel": ".wibey/commands/continue.md", "tools_rel": ".wibey/commands/continue.md", "is_dir": false },
+    { "shared_rel": ".wibey/commands/plando.md", "tools_rel": ".wibey/commands/plando.md", "is_dir": false },
+    { "shared_rel": ".wibey/commands/tdd.md", "tools_rel": ".wibey/commands/tdd.md", "is_dir": false },
+    { "shared_rel": "docs/AnchorDoc.md", "tools_rel": ".wibey/docs/AnchorDoc.md", "is_dir": false },
+    { "shared_rel": "docs/StatusVocabulary.md", "tools_rel": ".wibey/docs/StatusVocabulary.md", "is_dir": false },
+    { "shared_rel": "docs/IncidentRCA.md", "tools_rel": ".wibey/docs/IncidentRCA.md", "is_dir": false },
+    { "shared_rel": "docs/templates/Project.md", "tools_rel": ".wibey/docs/templates/Project.md", "is_dir": false },
+    { "shared_rel": "docs/templates/Incident.md", "tools_rel": ".wibey/docs/templates/Incident.md", "is_dir": false }
   ],
   "personal_only": [
     ".wibey/skills/ftm",
