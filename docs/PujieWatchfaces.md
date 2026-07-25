@@ -143,6 +143,145 @@ The visible helper function starts with non-leap-year month lengths, so this loo
 
 This screenshot matches the `2023.11.14` note that Infovore included **Unix time**.
 
+## Pujie built-in Sun/Moon objects (`2026.07.24`)
+
+Current conclusion: the **Pujie-supplied** sun/moon rise/set values appear accurate enough to trust directly.
+
+Implication:
+
+- custom/inlined astronomy rise/set calculations are **not needed** for current watchface behavior
+- `PujieUtils.js` should remain focused on cached body-cycle/orrery support and other custom helpers
+- watchface expressions should prefer `[sun_obj]` / `[moon_obj]` for rise/set/event display
+
+### `[moon_obj]`
+
+Observed fields in the Pujie Moon object:
+
+- `next_rise`
+- `next_set`
+- `rise`
+- `set`
+- `culmination`
+- `first_quarter`
+- `altitude`
+- `azimuth`
+- `distance`
+- `fraction`
+- `phase`
+- `closest_phase`
+- `isSet`
+- `moonlight_min`
+- `min_to_rise`
+- `min_to_set`
+
+Observed event-object structure (used by `next_rise`, `next_set`, `rise`, `set`, `culmination`, `first_quarter`, and likely similar event fields):
+
+- `day`
+- `month`
+- `year`
+- `hour24`
+- `hour12`
+- `hour`
+- `minutes`
+- `ampm`
+- `unix_minutes`
+- `time`
+
+Observed Moon values from screenshots:
+
+- `next_rise.time = "17:07"`
+- `next_set.time = "2:17"`
+- `rise.time = "17:07"`
+- `set.time = "1:34"`
+- `altitude = -3.69`
+- `azimuth = 122.03`
+- `distance = 405286.0732213476`
+- `fraction = 0.82`
+- `phase = 129.12`
+- `closest_phase = "waxing gibbous"`
+- `isSet = true`
+- `moonlight_min = 508`
+- `min_to_rise = 22`
+- `min_to_set = 572`
+
+Interpretation:
+
+- `next_rise` / `next_set` are the next upcoming crossing events, even if they occur on different calendar days.
+- `rise` / `set` appear to be the rise/set events associated with the current local day/context, not necessarily the same as the next upcoming event.
+- `azimuth` and `altitude` are directly useful for “where is it now?” style watchface semantics.
+- `phase` is numeric phase angle; `closest_phase` is the human-readable bucket.
+
+### `[sun_obj]`
+
+Observed fields in the Pujie Sun object:
+
+- `next_rise`
+- `next_set`
+- `rise`
+- `set`
+- `culmination`
+- `altitude`
+- `azimuth`
+- `distance`
+
+Observed event-object structure matches Moon event objects:
+
+- `day`
+- `month`
+- `year`
+- `hour24`
+- `hour12`
+- `hour`
+- `minutes`
+- `ampm`
+- `unix_minutes`
+- `time`
+
+Observed Sun values from screenshots:
+
+- `next_rise.time = "6:07"`
+- `next_set.time = "20:23"`
+- `rise.time = "6:06"`
+- `set.time = "20:23"`
+- `culmination.time = "13:15"`
+- `altitude = 40.95`
+- `azimuth = 264.19`
+
+Interpretation:
+
+- Pujie’s Sun rise/set times align with the values you expect on-device.
+- `culmination` is especially useful if you want the orrery semantics to center on daily-cycle milestones instead of pure compass direction.
+- The one-minute difference between `rise` and `next_rise` in the screenshot is a reminder that `next_*` and same-day event fields are related but not identical concepts.
+
+## Orrery daily-cycle semantics (`2026.07.25`)
+
+Desired meaning of the watchface body position:
+
+- `0deg` = culmination / highest daily crossing
+- `90deg` = setting
+- `180deg` = anti-culmination / lowest daily crossing
+- `270deg` = rising
+
+Implications:
+
+- **Azimuth is not the right driver** for the orrery ring. Azimuth answers “which compass direction is the body in right now?”, not “where is it in its rise/culminate/set cycle?”
+- **Raw hour angle is also not sufficient** as the final display angle. `15 * hourAngle` correctly gives `0deg` at culmination and `180deg` at anti-culmination, but it only puts rise/set at `270deg/90deg` for bodies whose rise/set happen exactly 6 hours from transit. The Moon and planets do not obey that simplification.
+- The right display quantity is a derived **cycle angle**: keep hour angle as the physical state variable, then remap it through the body's actual rise/set anchors for that date.
+
+Current implementation direction:
+
+- keep cached per-body `hourAngles` as the base “hours since culmination” table
+- add cached per-body `setHourAngles` so each body/date has its own setting anchor
+- derive `riseHourAngle = 24 - setHourAngle`
+- expose `cycleAngleOf(body, localDate)` / `orreryAngleOf(...)` to map the body into the watchface semantic above
+- expose `sunCycleAngleOf([sun_obj], nowDate)` / `sunCycleAngleOfNow()` so the Sun can use the same semantic without embedding a large Pujie expression
+- continue using Pujie-native `[sun_obj]` / `[moon_obj]` for displayed Sun/Moon rise/set text and event metadata
+
+This cleanly separates two ideas that were previously blurred together:
+
+- **astronomical state**: hour angle, azimuth, altitude, rise/set events
+- **watchface display semantic**: one ring angle whose quadrants mean culminate / set / anti-culminate / rise
+
 ## Other related artifact
 
 ### `~/My Drive/Pujie Watch Face Baseline Features V2.gdoc`
