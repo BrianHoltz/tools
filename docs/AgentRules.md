@@ -203,6 +203,8 @@ Before using the current date for anything, run `date "+%Y-%m-%d %H:%M %Z"`. Run
 With these modifications:
 
 - Use **periods** as date component separators instead of hyphens (e.g. `2026.03.27` not `2026-03-27`). Periods prevent unwanted line breaks in cramped table layouts, are analogous to decimal points, save space in variable-width fonts, and cannot be confused with ranges.
+- When space allows, append day of week e.g. 2026.07.27.Mon
+- When year serves no purpose (e.g. grep'ing), you may use 07.27.Mon
 - Use hyphens as range indicators instead of slashes (e.g. `2026.03.01-2026.03.27` not `2026-03-01/2026-03-27`). Slashes read like ratios or alternatives, not ranges.
 - Use &gt;yyyy or &lt;yyyy instead of aft/bef if space is tight or you want to prevent line wraps in Markdown prose. Use >yyyy and <yyyy in data values.
 
