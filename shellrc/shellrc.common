@@ -3,13 +3,32 @@
 # Sourced by both ~/bin/zshrc and ~/bin/bash_profile
 # One-time host setup: bash ~/bin/shellrc/setup.sh [-n]
 
+if [ -n "${SHELLRC_COMMON_LOADED-}" ]; then
+    return 0
+fi
+SHELLRC_COMMON_LOADED=1
+
+path_prepend() {
+    case ":$PATH:" in
+        *":$1:"*) ;;
+        *) PATH="$1${PATH:+:$PATH}" ;;
+    esac
+}
+
+path_append() {
+    case ":$PATH:" in
+        *":$1:"*) ;;
+        *) PATH="${PATH:+$PATH:}$1" ;;
+    esac
+}
+
 # --- Java ---
 if [ -d /Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home ]; then
     export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
 elif command -v /usr/libexec/java_home >/dev/null 2>&1; then
     export JAVA_HOME=$(/usr/libexec/java_home 2>/dev/null)
 fi
-[ -n "$JAVA_HOME" ] && export PATH="$JAVA_HOME/bin:$PATH"
+[ -n "$JAVA_HOME" ] && path_prepend "$JAVA_HOME/bin"
 
 # --- jenv (must come after JAVA_HOME so shims take precedence) ---
 if command -v jenv > /dev/null 2>&1; then
@@ -21,19 +40,14 @@ if command -v jenv > /dev/null 2>&1; then
 fi
 
 # --- User scripts ---
-export PATH="$HOME/bin:$PATH"
+path_prepend "$HOME/.local/bin"
+path_prepend "$HOME/bin"
 
 # --- Homebrew tools (shared for zsh + bash) ---
 if command -v brew >/dev/null 2>&1; then
     _brew_prefix="$(brew --prefix)"
-    case ":$PATH:" in
-        *":$_brew_prefix/opt/rsync/bin:"*) ;;
-        *) export PATH="$_brew_prefix/opt/rsync/bin:$PATH" ;;
-    esac
-    case ":$PATH:" in
-        *":$_brew_prefix/bin:"*) ;;
-        *) export PATH="$_brew_prefix/bin:$PATH" ;;
-    esac
+    path_prepend "$_brew_prefix/opt/rsync/bin"
+    path_prepend "$_brew_prefix/bin"
     unset _brew_prefix
 fi
 
@@ -56,17 +70,17 @@ ssh-add ~/.ssh/app_id.rsa 2>/dev/null
 
 # --- Sledge ---
 export SLEDGE_BIN="$HOME/.sledge/bin"
-export PATH="${PATH}:${SLEDGE_BIN}"
+path_append "$SLEDGE_BIN"
 
 # --- Kafka ---
-export PATH="${PATH}:/opt/homebrew/opt/kafka/bin"
+path_append "/opt/homebrew/opt/kafka/bin"
 
 # --- Wibey CLI ---
-export PATH="$HOME/.local/bin:$PATH"
 export BUN_INSTALL_CACHE_DIR="$HOME/.local/share/bun/cache"
 
 # --- VS Code CLI ---
-export PATH="/Applications/Visual Studio Code.app/Contents/Resources/app/bin:$PATH"
+path_append "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+path_append "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 
 # --- Python aliases ---
 if command -v python3 >/dev/null 2>&1; then

@@ -3,6 +3,9 @@
 # Minimal .bashrc for Copilot terminal blindness fix
 # Full version backed up in ~/tmp/shellArchive20260306/
 # IntelliJ/Copilot terminal: minimal prompt, clear screen after each command
+if [ -z "${SHELLRC_COMMON_LOADED-}" ] && [ -f ~/.shellrc.common ]; then
+    . ~/.shellrc.common
+fi
 if [[ -n "$TERMINAL_EMULATOR" || -n "$INTELLIJ_ENVIRONMENT_READER" ]]; then
     PS1='$ '
     set +o noclobber
