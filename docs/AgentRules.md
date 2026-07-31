@@ -11,7 +11,7 @@ When both apply, read both. If they conflict, AgentRules.md loses to AGENTS.md o
 
 ## Table of Contents
 
-- [The Four Commandments](#the-four-commandments)
+- [The Six Commandments](#the-six-commandments)
 - [~/bin/ structure](#bin-structure)
   - [~/bin/ vs relationship-shared/](#bin-vs-relationship-shared)
 - [Write Rules](#write-rules)
@@ -35,7 +35,7 @@ When both apply, read both. If they conflict, AgentRules.md loses to AGENTS.md o
   - [Wibey Skills — ~/bin/.wibey/ Directory](#wibey-skills----binwibey-directory)
     - [Project-Level Commands](#project-level-commands)
 
-## The Five Commandments
+## The Six Commandments
 
 1. **Don't Ramble**: From sections to words, cut or condense until meaning changes.
 2. **Don't Repeat**: This is so important that I'm self-consciously repeating it. Cut everything that performs helpfulness without delivering it, or completeness without informing. If what you're writing already exists elsewhere, then omit it or link it, don't repeat it.
@@ -155,7 +155,7 @@ Run `~/bin/safewrite -h` for full options. Run `~/bin/fhold -h` for the fhold ME
 
 ### Other file operation rules
 
-- Never `rm` directly on user files — use `trash` or `mv ~/.Trash/`. **Exception: `/tmp/` and `tmp/` may be deleted with plain `rm` — no `trash`, no confirmation, no hesitation (see [Four Commandments](#the-four-commandments)).**
+- Never `rm` directly on user files — use `trash` or `mv ~/.Trash/`. **Exception: `/tmp/` and `tmp/` may be deleted with plain `rm` — no `trash`, no confirmation, no hesitation (see [Six Commandments](#the-six-commandments)).**
 - Duplicate/conflicting files: ASK which to keep before deleting either
 - No VCS changes unless you're certain the user wants them
 - Commit granularity: independent changes → separate commits; interdependent → one commit
