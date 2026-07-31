@@ -41,7 +41,7 @@ When both apply, read both. If they conflict, AgentRules.md loses to AGENTS.md o
 2. **Don't Repeat**: This is so important that I'm self-consciously repeating it. Cut everything that performs helpfulness without delivering it, or completeness without informing. If what you're writing already exists elsewhere, then omit it or link it, don't repeat it.
 3. **Don't Clobber**: Every file write must follow the [Write Rules](#write-rules).
 4. **Don't Quit**: Do not give up on the best tool for the job: if it is missing or broken or needs auth, invest in getting it to work, and fallback only when repair fails and user is unresponsive, and state the fallback + reason.
-5. **Don't Spam**: Ask permission before communicating with other humans, e.g. via Slack, Jira, email, or Github comments/approvals. But just use normal caution when doing other git or Confluence operations. And don't spam on every draft comms not to send it without approval.
+5. **Don't Spam**: Ask permission before communicating with other humans, e.g. via Slack, Jira, email, or Github comments/approvals. But just use normal caution when doing other git or Confluence operations. And don't spam in docs reminding agents what the rules are.
 6. **Don't Count**: Never label things sequentially, e.g. with numbers or letters. It's opaque and brittle and lazy. Use names. Exceptions may be granted for sequences that are long or immutable.
 
 ## ~/bin structure
