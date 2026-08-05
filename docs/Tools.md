@@ -8,7 +8,7 @@
 | Score                          | 28.5              | 20.5 ⚙️     | 19.5                    |
 | IDE                            | 2026.2            | 1.125.1       | 3.10.17                 |
 | VSCode engine                  | —                | —            | 1.105.1                 |
-| Wibey                          | 1.0.21            | 1.0.18 ⚙️   | 1.0.18 ⚙️              |
+| Wibey                          | 1.0.24            | 1.0.18 ⚙️   | 1.0.18 ⚙️             |
 | └ parallel agents             | ✅                | ✅            | ✅                      |
 | └ enqueue next prompt         | ❌                | ✅            | ✅                      |
 | └ context += @ file           | ✅                | 🟡<100KB      | 🟡<100KB                |
