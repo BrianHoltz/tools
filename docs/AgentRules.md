@@ -11,7 +11,7 @@ When both apply, read both. If they conflict, AgentRules.md loses to AGENTS.md o
 
 ## Table of Contents
 
-- [The Four Commandments](#the-four-commandments)
+- [The Six Commandments](#the-six-commandments)
 - [~/bin/ structure](#bin-structure)
   - [~/bin/ vs relationship-shared/](#bin-vs-relationship-shared)
 - [Write Rules](#write-rules)
@@ -35,7 +35,7 @@ When both apply, read both. If they conflict, AgentRules.md loses to AGENTS.md o
   - [Wibey Skills — ~/bin/.wibey/ Directory](#wibey-skills----binwibey-directory)
     - [Project-Level Commands](#project-level-commands)
 
-## The Five Commandments
+## The Six Commandments
 
 1. **Don't Ramble**: From sections to words, cut or condense until meaning changes.
 2. Seriously, don't ramble: Cut everything that performs helpfulness without delivering it, or completeness without informing.
