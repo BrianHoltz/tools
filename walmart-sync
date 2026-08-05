@@ -136,9 +136,15 @@ def block_if_managed_changes(cfg, action_label: str):
     return False
 
 
-def pull_repo(repo: Path, label: str):
+def pull_repo(repo: Path, label: str, cfg=None, check_managed_only=False):
     status = run_git(repo, "status", "--porcelain")
     dirty = parse_porcelain_paths(status.stdout)
+
+    # If checking managed files only (for shared repo), filter to mirror items
+    if check_managed_only and cfg:
+        exact, prefixes = walmart_sync_specs(cfg)
+        dirty = [p for p in dirty if is_managed(p, exact, prefixes)]
+
     if dirty:
         print(c(RED + BOLD, f"⚠ Commit-first policy: cannot pull {label} with local changes."))
         print(c(RED, "Commit these files first, then rerun walmart-sync:"))
@@ -264,7 +270,7 @@ def do_sync(cfg, dry_run=False):
     if not block_if_managed_changes(cfg, "sync"):
         return False
     print(c(CYAN, f"Pre-sync pull sequence: shared, then {TOOLS_REPO_LABEL}"))
-    if not pull_repo(SHARED, "~/src/relationship-shared"):
+    if not pull_repo(SHARED, "~/src/relationship-shared", cfg=cfg, check_managed_only=True):
         return False
     if not pull_repo(TOOLS, TOOLS_REPO_LABEL):
         return False
