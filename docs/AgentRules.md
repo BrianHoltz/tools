@@ -50,6 +50,7 @@ The canonical source of this file is `~/bin/docs/AgentRules.md`, version-control
 
 - `~/.claude/CLAUDE.md` — read by Claude Code CLI (and Wibey at Walmart)
 - `~/.cursor/cursorrules` — read by Cursor
+- `~/.code_puppy/AGENTS.md` — read by Code Puppy. Code Puppy has no single CLAUDE.md-style entrypoint; it concatenates three AGENTS.md layers into every session's system prompt — global (`~/.code_puppy/AGENTS.md`, this file), project (`<CWD>/.code_puppy/AGENTS.md`), and repo-root fallback (`./AGENTS.md`) — so this symlink is what makes AgentRules.md load automatically, every session, every repo, with no action needed from the user or the agent. If the user references "the Commandments", "AgentRules", or anything from this file, it is already in context via this path — never say you can't find it or ask where it lives.
 - `.github/copilot-instructions.md` symlink in each repo root — read by GitHub Copilot (VS Code). GitHub Copilot does NOT read `~/.claude/CLAUDE.md`; it only reads this file from the open repo root.
 
 **Canonical-vs-adapter rule:** personal agent machinery lives canonically in the `tools` repo at `~/src/tools/`, exposed locally at `~/bin/`. Home-directory special folders such as `~/.claude/commands/`, `~/.claude/CLAUDE.md`, `~/.cursor/cursorrules`, and `~/.wibey/commands/` are adapter/install locations. Workspace-local `.github/` trees are also adapters for GitHub Copilot. Do **not** treat `~/IdeaProjects/Personal/.github/skills/` or any other workspace-local `.github/skills/` directory as a primary source of truth.
