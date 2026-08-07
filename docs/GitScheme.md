@@ -138,6 +138,9 @@ IDE project at `~/IdeaProjects/Personal/`:
 **First-class indexing requirement:**
 Every content root listed above must be loaded as an IDEA module and indexed as a first-class citizen. Files outside loaded content roots will not appear in IDEA's **Find Files**, navigation, or Copilot context. If a file (e.g. `GitScheme.md`) is missing from Find Files, verify its real directory is a loaded content root and is not excluded.
 
+**No overlapping exclusions:**
+A module that owns a parent directory must not exclude a path that is another module's content root. For example, if `src.iml` claims `~/src` and excludes `~/src/tools`, while `tools.iml` claims `~/src/tools` as its own content root, IDEA will not index `~/src/tools`. Exclusions must be scoped so they do not hide sibling module roots.
+
 **`~/bin` is not a content root or git repo:**
 `~/bin` is a legacy symlink to `~/src/tools` retained only for `$PATH` and scripts that expect executables at `~/bin/`. It must never be used as an IDEA content root, VCS root, or git working tree. All IDE indexing and git operations must use the real path `~/src/tools`.
 
