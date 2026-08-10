@@ -38,10 +38,10 @@ When both apply, read both. If they conflict, AgentRules.md loses to AGENTS.md o
 ## The Six Commandments
 
 1. **Don't Ramble**: From sections to words, cut or condense until meaning changes.
-2. Seriously, don't ramble: Cut everything that performs helpfulness without delivering it, or completeness without informing.
+2. **Don't Repeat**: This is so important that I'm self-consciously repeating it. Cut everything that performs helpfulness without delivering it, or completeness without informing. If what you're writing already exists elsewhere, then omit it or link it, don't repeat it.
 3. **Don't Clobber**: Every file write must follow the [Write Rules](#write-rules).
 4. **Don't Quit**: Do not give up on the best tool for the job: if it is missing or broken or needs auth, invest in getting it to work, and fallback only when repair fails and user is unresponsive, and state the fallback + reason.
-5. **Don't Spam**: Ask permission before communicating with other humans, e.g. via Slack, Jira, email, or Github comments/approvals. But just use normal caution when doing other git or Confluence operations. And don't spam on every draft comms not to send it without approval.
+5. **Don't Spam**: Ask permission before communicating with other humans, e.g. via Slack, Jira, email, or Github comments/approvals. But just use normal caution when doing other git or Confluence operations. And don't spam in docs reminding agents what the rules are.
 6. **Don't Count**: Never label things sequentially, e.g. with numbers or letters. It's opaque and brittle and lazy. Use names. Exceptions may be granted for sequences that are long or immutable.
 
 ## ~/bin structure
@@ -156,7 +156,7 @@ Run `~/bin/safewrite -h` for full options. Run `~/bin/fhold -h` for the fhold ME
 
 ### Other file operation rules
 
-- Never `rm` directly on user files — use `trash` or `mv ~/.Trash/`. **Exception: `/tmp/` and `tmp/` may be deleted with plain `rm` — no `trash`, no confirmation, no hesitation (see [Four Commandments](#the-four-commandments)).**
+- Never `rm` directly on user files — use `trash` or `mv ~/.Trash/`. **Exception: `/tmp/` and `tmp/` may be deleted with plain `rm` — no `trash`, no confirmation, no hesitation (see [Six Commandments](#the-six-commandments)).**
 - Duplicate/conflicting files: ASK which to keep before deleting either
 - No VCS changes unless you're certain the user wants them
 - Commit granularity: independent changes → separate commits; interdependent → one commit
@@ -204,6 +204,8 @@ Before using the current date for anything, run `date "+%Y-%m-%d %H:%M %Z"`. Run
 With these modifications:
 
 - Use **periods** as date component separators instead of hyphens (e.g. `2026.03.27` not `2026-03-27`). Periods prevent unwanted line breaks in cramped table layouts, are analogous to decimal points, save space in variable-width fonts, and cannot be confused with ranges.
+- When space allows, append day of week e.g. 2026.07.27.Mon
+- When year serves no purpose (e.g. grep'ing), you may use 07.27.Mon
 - Use hyphens as range indicators instead of slashes (e.g. `2026.03.01-2026.03.27` not `2026-03-01/2026-03-27`). Slashes read like ratios or alternatives, not ranges.
 - Use &gt;yyyy or &lt;yyyy instead of aft/bef if space is tight or you want to prevent line wraps in Markdown prose. Use >yyyy and <yyyy in data values.
 

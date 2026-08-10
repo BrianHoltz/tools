@@ -12,8 +12,6 @@ for _scala_bin in /opt/homebrew/Cellar/scala@2.12/2.12.19/bin /usr/local/Cellar/
     [ -d "$_scala_bin" ] && export PATH="$_scala_bin:$PATH" && break
 done
 unset _scala_bin
-# Added by Toolbox App
-export PATH="$PATH:$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 source ~/.shellrc.common
 # Source interactive settings if present
 if [ -f ~/.bashrc ]; then . ~/.bashrc; fi

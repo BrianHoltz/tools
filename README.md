@@ -33,6 +33,7 @@ All files in `shellrc/` are symlinked into `~/`:
 - **`zprofile`** / **`zshrc`** — zsh login / interactive config
 - **`bash_profile`** / **`bashrc`** — bash login / interactive config
 - **`setup.sh`** — initial Mac provisioning script
+- **`python`** / **`pip`** — lightweight shims in repo root that forward to `python3` / `pip3`
 
 ### File & Media Tools
 

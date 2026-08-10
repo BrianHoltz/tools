@@ -115,9 +115,11 @@ brew install \
 
 (`gh` installed in Bootstrap.)
 
+- `python` and `pip` are provided by shims in `~/bin`; they forward to `python3` and `pip3` so agents can call the shorter names directly.
 - `d2` — text-to-diagram CLI (used for architecture docs)
 - `rdiff-backup` — incremental backup utility
 - `parallel` — GNU parallel (used in scripts)
+- Helpful extras to consider for agent workflows: `uv`, `fd`, `fzf`, and `yq`.
 
 ```sh
 # Optional: CDP browser automation deps (if using a browser automation script)

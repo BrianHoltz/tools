@@ -16,6 +16,3 @@ unset _scala_bin
 
 # Intel Homebrew compat (/usr/local/bin)
 export PATH="$PATH:/usr/local/bin"
-
-# Added by Toolbox App
-export PATH="$PATH:$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
