@@ -87,7 +87,24 @@ Score rubric
 IDEA keybinding overrides (defaults shown in table, actual bindings below):
 
 - ⚠️ **zoom** `^⌥=` / `^⌥-` (`ZoomInIdeAction` / `ZoomOutIdeAction`) → remapped to `⌘=` / `⌘-`. Displaced `CollapseRegion` / `ExpandRegion` (fold/unfold) — unbound and unneeded.
-- ⚠️ **open file** `⇧⌘O` (`GotoFile`) → remapped to `⌘P`. Displaced `FileChooser.TogglePathBar` from `⌘P` — unneeded.
+-  **open file** `⇧⌘O` (`GotoFile`) → remapped to `⌘P`. Displaced `FileChooser.TogglePathBar` from `⌘P` — unneeded.
+
+### IDEA — Code Puppy tool window font size
+
+Code Puppy (JetBrains plugin) scales its webview text from **IDEA's UI font size**. It reads
+`UIUtil.getLabelFont().getSize()` and sets JCEF `CefBrowser.setZoomLevel()` so the app's base
+13px styling ends up matching the UI label font.
+
+What this means in practice:
+
+- If you want the Code Puppy window **one point bigger**, bump the UI font size by 1:
+  Preferences → Appearance & Behavior → Appearance → enable **Use custom font** (if needed) →
+  increase **Size**.
+- If you want Code Puppy to **match Markdown preview / Wibey tool windows**, make the UI font
+  size match your editor font size (Preferences → Editor → Font).
+- There is no per-tool-window font setting; this is global UI font. (If you don’t want the whole
+  IDE bigger, you’re into "open DevTools and inject CSS" territory.)
+
 
 ### Keybindings (swapped from defaults in VS Code and Cursor)
 
