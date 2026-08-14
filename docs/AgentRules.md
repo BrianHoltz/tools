@@ -107,7 +107,7 @@ Skills useful on both laptops live canonically in relationship-shared (team owns
 
 **Re-read immediately before each write.** The file may have changed. In permit mode, `safewrite` exit 3 enforces this. In reviewed mode, re-read right before each Edit/Write call.
 
-Think about whether a change you encounter might be intentional and recent. When a file has a small change of unknown origin, assume the human user made it deliberately and considers it important — do not silently revert or overwrite it.
+**Don't revert ambiguous changes.** If you encounter a change in a doc or file and there is a non-trivial chance it was the user's deliberate choice, do not revert it — full stop. This applies even if the change looks wrong, inconsistent, out of place, or contrary to what you were about to write yourself. Default assumption for any small change of unknown origin: the human user made it deliberately and considers it important. Investigate or ask before undoing it; never silently revert or overwrite it back to the prior state.
 
 Three rules for how to write:
 
