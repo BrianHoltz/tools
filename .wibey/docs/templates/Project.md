@@ -46,12 +46,13 @@ Verbatim excerpt of selected Tasks rows: recent completions and upcoming work. U
 - [Tasks](#tasks)
 - [Active Work](#active-work)
 - [Draft Next Comms](#draft-next-comms) *(optional)*
-- [Undecided Questions](#undecided-questions)
+- [Pending Decisions](#pending-decisions)
+- [Pending Investigations](#pending-investigations)
 - [Ad Hoc Sections](#ad-hoc-sections)
 - [Interfaces](#interfaces)
 - [Engineering Considerations](#engineering-considerations)
 - [Context](#context)
-- [Decided Questions](#decided-questions)
+- [Decisions](#decisions)
 - [Appendices](#appendices)
 - [Evidence](#evidence)
 - [Work Log](#work-log)
@@ -66,7 +67,9 @@ The Tasks table is a **planning device**: the list of things we must not forget 
 - Do not include time estimates unless explicitly asked. Agents are usually too pessimistic about their own speed and too optimistic about humans.
 - Agents and humans keep finer-grained session state in [Active Work](#active-work).
 
-Status glyphs and meanings: see [StatusVocabulary.md](../StatusVocabulary.md). Format: no space between glyph and date (`✅03.14`); dates in MM.DD; glyph + date in Status column.
+Status glyphs and meanings: see [StatusVocabulary.md](../StatusVocabulary.md). Format: no space between glyph and date (`07.14`); dates in MM.DD; glyph + date in Status column.
+
+**Unstarted tasks have a blank Status cell — never use `⬜` or any other placeholder.** Blank IS the correct status for work that hasn’t started. Add a Note only when the blank cell could mislead — e.g. a task that looks redundant with an existing row but is genuinely distinct, or one that is out-of-scope until a predecessor completes. If nothing would be misunderstood, leave Notes blank too.
 
 **Follow-on work** (tech debt, known gaps, future improvements explicitly out of scope) goes at the bottom of this table with "Follow-on." prefix in the Notes column. No status glyph — follow-on tasks were never in scope, so they have no lifecycle state. Point to Jira tickets or TODOs in code where applicable. If a follow-on item blocks or is blocked by something, it's not follow-on — it's a real task; move it up.
 
@@ -95,11 +98,13 @@ The mutable present: fine-grained subtasks and cached state for whichever [Tasks
 
 *Optional.* Pre-composed outbound communications — stakeholder status updates, PR announcements, release notifications, team posts. Each draft is a `###` sub-heading with target, a `Status: DRAFT` or `Status: READY` line, and the message body in a blockquote. When a draft is sent, delete it from here entirely and record one Work Log entry with the destination and message URL.
 
-## Undecided Questions
+## Pending Decisions
 
-Unresolved decisions or questions that need an *answer* from your own team — not an action, and not a response from another team. If resolving a question requires doing something, that doing is a Task; the question stays here until answered. If a question turns out to need an external answer, *convert* it: remove it from here, create a Draft Next Comms entry, and mark any blocking Task 🛑 — never leave a question in both places. Every question that blocks a Task must have a corresponding ▶️ (or 🛑) row in the Tasks table. Move to Decided Questions once answered — never delete.
+Unresolved choices your team must make — "Should we do X?" or "Which approach?" If resolving requires doing something, that doing is a Task; the question stays here until answered. If a question turns out to need an external answer, *convert* it: remove it from here, create a Draft Next Comms entry, and mark any blocking Task 🛑 — never leave a question in both places. Every decision that blocks a Task must have a corresponding ▶️ (or 🛑) row in the Tasks table. Move to Decisions once answered — never delete.
 
-See [Decided Questions](#decided-questions) for resolved items.
+## Pending Investigations
+
+Empirical unknowns *we can answer ourselves* — "Does this approach work?" or "What is the actual performance?" Record specific, named questions. You control the investigation through analysis, testing, measurement, or code review. Minor clarifications from other teams are fine; the core work is ours. When completed: findings are absorbed into doc edits (Task notes, Interfaces, Engineering Considerations, Work Log). No archive needed.
 
 ## Ad Hoc Sections
 
@@ -179,10 +184,9 @@ Cross-cutting concerns that any reviewer or on-call engineer would want to know.
 
 *Optional. Definitions of terms, acronyms, or system components specific to this project. Define inline if brief; add an entry here if the explanation is longer than a parenthetical.*
 
-## Decided Questions
+## Decisions
 
-- Resolved questions archived for context. Each entry states what was decided, why, and when.
-- By default, Decided Questions should be all and only the questions that were previously in Undecided Questions. Do not add questions here that were never open: those are just decisions, and belong in the narrative sections or appendices. Do not remove questions when closing them: move them here verbatim and add the resolution.
+Team decisions archived for audit trail. Each entry states what was decided, why, and when. Move entries here verbatim from Pending Decisions; do not delete. By default, Decisions should be all and only the choices that were previously in Pending Decisions. Do not add decisions here that were never pending: those belong in the narrative sections or appendices.
 
 ## Appendices
 

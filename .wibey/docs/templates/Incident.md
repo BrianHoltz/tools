@@ -33,7 +33,8 @@
 - [Tasks](#tasks)
 - [Active Work](#active-work)
 - [Draft Next Comms](#draft-next-comms)
-- [Undecided Questions](#undecided-questions)
+- [Pending Decisions](#pending-decisions)
+- [Pending Investigations](#pending-investigations)
 - [Symptoms](#symptoms)
 - [Scope](#scope)
 - [Diagnosis](#diagnosis)
@@ -42,7 +43,7 @@
 - [Learnings](#learnings)
 - [Action Items](#action-items)
 - [Context](#context)
-- [Decided Questions](#decided-questions)
+- [Decisions](#decisions)
 - [Evidence](#evidence)
 - [Work Log](#work-log)
 
@@ -62,11 +63,15 @@ Current sub-steps, blockers, and partial results for the in-progress thread. Mut
 
 ## Draft Next Comms
 
-Pre-composed messages ready to send — Slack replies, Jira comments, emails. Each draft is a `###` sub-heading with target, a `Status: DRAFT` or `Status: READY` line, and the message body in a blockquote. Include an [incident doc](link) reference in every draft. When a draft is sent, delete it from here entirely and record one Work Log entry with the destination and Slack `ts` or message URL.
+Pre-composed messages ready to send — Slack replies, Jira comments, emails. Each draft is a `###` sub-heading with target and the message body as plain text. No blockquote formatting — the section heading makes the context obvious, and `>` prefix causes pasting problems. Include an [incident doc](link) reference in every draft. When a draft is sent, delete it from here entirely and record one Work Log entry with the destination and Slack `ts` or message URL.
 
-## Undecided Questions
+## Pending Decisions
 
-Unresolved decisions your team needs to make — distinct from investigative leads (which belong in [Diagnosis → Pending Investigations](#diagnosis)) and external blockers (which belong in [Draft Next Comms](#draft-next-comms)). If a question turns out to need an external answer, *convert* it: remove it from here, create a Draft Next Comms entry, and mark any blocking task 🛑 — never leave a question in both places. Move to Decided Questions once resolved — never delete.
+Unresolved choices your team must make — "Should we do X?" or "Which approach?" If resolving requires doing something, that doing is a Task; the question stays here until answered. If a question turns out to need an external answer, *convert* it: remove it from here, create a Draft Next Comms entry, and mark any blocking Task 🛑 — never leave a question in both places. Every decision that blocks a Task must have a corresponding ▶️ (or 🛑) row in the Tasks table. Move to Decisions once answered — never delete.
+
+## Pending Investigations
+
+Empirical unknowns *we can answer ourselves* — "What is the state of X?" or "Did Y happen?" Record specific, named questions that don't require external teams to answer. You control the investigation through logs, testing, measurement, or analysis. Minor clarifications from other teams are fine; the core work is ours. When completed: findings are absorbed into doc edits (Scope, Task notes, Evidence, Work Log). No archive needed.
 
 ## Symptoms
 
@@ -84,6 +89,8 @@ Documents the footprint of the incident across five dimensions: impact, systems,
 
 ## Diagnosis
 
+Structured record of the investigation's epistemic state regarding causation. What could be causing this incident, and what is the leading theory?
+
 ### Differential Diagnosis
 
 Candidate causes ranked by probability, highest first. P% is a betting odd — the likelihood this theory is a significant contributor to the incident. Theories need not sum to 100% (causes may overlap or be non-exclusive). Update probabilities as evidence arrives; reordering is a claim that must be justifiable from the Work Log.
@@ -95,13 +102,7 @@ Status glyphs: ▶️ Active · ⏭️ Queued · ✅ Ruled out
 
 Ruled-out rows stay in the table as an investigation record. When a theory is ruled out, log how and why in the Work Log. Do not delete rows.
 
-### Pending Investigations
-
-Investigative threads not yet pursued, ordered by diagnostic value — the check that would most update the Differential Diagnosis runs first. Each entry states what to check and what each outcome would mean for the Differential Diagnosis.
-
-*Format: Check [X] — if [outcome A], supports/rules in theory N; if [outcome B], rules out theory M.*
-
-When a thread completes: remove it from here, update the relevant Differential Diagnosis row's P% and Status, and log the finding in Work Log.
+*Note: What you don't yet know (empirical unknowns) belongs in the top-level [Pending Investigations](#pending-investigations) section. Diagnosis is for causation hypotheses, not for general unknowns.*
 
 ### Cause
 
@@ -171,9 +172,11 @@ Definitions of terms, acronyms, and system components specific to this incident.
 - **Quote or link official definitions first.** If the term is defined in `shared/docs/` (or wherever you keep your shared docs) (e.g., `CatalogIDs.md`, `CatalogRelationships.md`, a `repos/<service>.md`), quote or paraphrase from there and link to the source rather than writing a new definition from scratch. This keeps terminology consistent across all incident docs.
 - **Add new terms back to shared/docs/.** If you define a concept here that belongs in a shared doc (a new acronym, a system component, a platform behavior), add it there too. Incident docs are ephemeral; `shared/docs/` (or wherever you keep your shared docs) is the long-lived reference.
 
-## Decided Questions
+## Decisions
 
-Resolved entries from [Undecided Questions](#undecided-questions). Move entries here verbatim; add the resolution and date. Do not delete — the record of what we decided and why is part of the investigation audit trail.
+Team decisions archived for audit trail. Each entry states what was decided, why, and when. Move entries here verbatim from Pending Decisions; do not delete — the record of what we decided is part of the investigation audit trail. Do not add decisions here that were never pending: those belong in the narrative sections or appendices.
+
+*Note: Ruled-out investigative theories do not become Decisions — their closure path is the Work Log (how they were eliminated) and the Differential Diagnosis table (their status preserved as record).*
 
 ## Evidence
 

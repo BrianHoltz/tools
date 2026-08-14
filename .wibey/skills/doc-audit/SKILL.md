@@ -22,7 +22,8 @@ Consolidated reference for documentation authoring, project document formatting,
 - [Rules About Pending Work](#rules-about-pending-work)
   - [Tasks Pipeline](#tasks-pipeline)
   - [Where Pending Work Lives](#where-pending-work-lives)
-  - [Cross-References for Pending Work](#cross-references-for-pending-work)
+  - [Where Pending Questions Live](#where-pending-questions-live)
+  - [Cross-References for Pending Work/Questions](#cross-references-for-pending-workquestions)
 - [Doc Audit Checklist](#doc-audit-checklist) — run on every non-trivial edit
   - [Task Creep Audit](#task-creep-audit)
   - [When to Audit](#when-to-audit)
@@ -71,8 +72,9 @@ Organize mortal docs with the following sections:
 | Tasks            | ●       | ○                   | —    |
 | Active Work      | ●       | ○                   | —    |
 | Draft Next Comms    | ○       | ●                   | ○    |
-| Undecided Questions | ○       | ○                   | ○    |
-| Decided Questions   | ○       | ○                   | ○    |
+| Pending Investigations | ○       | ●                   | ○    |
+| Pending Decisions | ○       | ○                   | ○    |
+| Decisions        | ○       | ○                   | ○    |
 | Diagnosis           | —       | ●                   | —    |
 | Evidence            | ●       | ●                   | ●    |
 | Work Log         | ●       | ●                   | ○    |
@@ -102,9 +104,10 @@ Two variants depending on doc type:
 
 The following rules apply to the project variant:
 
-- **Status rows are verbatim copies of Tasks rows** — never paraphrased or reworded
+- **Status rows are verbatim copies of Tasks rows** — never paraphrased or reworded. This includes the Status *cell*: copy only the glyph+date (or blank, for unstarted rows) that appears in the Tasks table. Never append extra links, annotations, or follow-up notes to the excerpt's Status cell that aren't in the source Tasks row — that content belongs in the Notes column, not bolted onto the glyph.
 - Excerpt includes: all ▶️ in-progress tasks; completed tasks: all from the last 2 business days, plus enough older ones to reach exactly 2 total — no more; the next 2 upcoming tasks by priority
-- Sort order: completed rows first (newest date first), then not-completed rows that have a date in the Status column (newest first), then not-completed rows with no date
+- **Not-yet-started rows have a blank Status cell — in both the Tasks table and the Status section.** Never fill with `⬜` or any other placeholder. Blank IS the correct status for work that has not yet entered its lifecycle. (Per [StatusVocabulary.md](../../../docs/StatusVocabulary.md): `⬜ UNSTARTED` is reserved for contexts where blank would be ambiguous, such as a mixed-use dashboard. Task tables are never that context.)
+- **Sort order — group first, preserve order within group:** (1) completed rows, (2) ▶️ in-progress rows, (3) not-yet-started rows — in that order, with no interleaving. **Within each group, preserve the rows' existing relative order** (position already encodes priority per [Task Discipline Rules](#task-discipline-rules) — don't invent a secondary sort key like date). A resort operation must never reorder two rows that were already in the same group relative to each other.
 - Update whenever Tasks change: new tasks, completions, blockers, phase transitions
 - **Never backdate status changes** — reflect what is true now
 
@@ -150,7 +153,7 @@ Acceptable columns (not all required):
 
 - **Never add a task and mark it complete in the same work session.** Work already finished when the task would be written belongs in the Work Log, not the task table.
 - **Never backfill completed work into Tasks.** Completed rows stay in the table (useful record), but Tasks is forward-looking only. If work was completed before the task was planned, it belongs in Work Log.
-- **Future work appears only in task lists, Undecided Questions, Draft Next Comms, and TODOs.** No "Critical/Important/Urgent/Deprioritized" labels — use order. No capitalized exclamations (Bug, Gap, Pending, Next). No ⚠️ in task tables — see [Cross-References for Pending Work](#cross-references-for-pending-work) for the ⚠️ antipattern rule.
+- **Future work appears only in Tasks, Draft Next Comms, Pending Decisions, Pending Investigations, and TODOs.** No "Critical/Important/Urgent/Deprioritized" labels — use order. No capitalized exclamations (Bug, Gap, Pending, Next). No ⚠️ in task tables — see [Cross-References for Pending Work/Questions](#cross-references-for-pending-workquestions) for the ⚠️ antipattern rule.
 
 ### Active Work
 
@@ -169,16 +172,18 @@ Holds **only unsent** outbound communications (Slack replies, email drafts, PR c
 - **When a draft is sent: delete it from this section entirely.** Add one Work Log entry recording when and to whom it was sent (and the Slack `ts` or message URL if available). That is the complete record.
 - **On audit: any entry with `Status: SENT` or any other indication it was sent is a violation.** Remove it immediately — the section must contain only unsent drafts.
 - **Cross-reference with blocked Tasks:** If a draft is blocking a Task (the Task cannot proceed until the external party responds), the blocked task's Notes column must name the draft (`📤 Draft: [draft heading](#draft-next-comms)`) and the draft must name the blocked task (`🛑 blocks Task: <task name>`).
+- **Never append a "do not send without approval" (or "review before sending", etc.) annotation to a draft.** The `Status: DRAFT`/`Status: READY` line already means unsent; the requirement to get approval before contacting other humans is a standing global agent rule (not a per-draft warning to restate). Adding it anyway is noise — same category as writing "don't `rm -rf $HOME`" next to every `rm` command.
 
 ### Diagnosis
 
-**Incident docs only.** Structured record of the investigation's current epistemic state. Three subsections:
+**Incident docs only.** Structured record of the investigation's epistemic state regarding causation. Two subsections:
 
 - **Differential Diagnosis** — ranked table of candidate causes (Theory | P% | Status). P% is a betting odd on the theory being a significant contributor; need not sum to 100%. Ordered highest probability first; reordering is a claim that must be justifiable from the Work Log. Status glyphs: ▶️ Active · ⏭️ Queued · ✅ Ruled out. Ruled-out rows stay in the table as a record of losing bets — do not delete; log the reasoning in Work Log. P% on ruled-out rows stays at its last active value: the historical weight is informative. *(Exception to the prose falsified-hypothesis deletion rule in [Temporal Writing Rules](#temporal-writing-rules): that rule applies to narrative prose, not to Differential Diagnosis table rows, which are a structured record.)*
-- **Pending Investigations** — investigative threads not yet pursued, ordered by diagnostic value (the check that would most update the Differential Diagnosis runs first). Each entry states what to check and what each outcome would mean for which theory. When a thread completes: remove it, update the Differential Diagnosis row's P% and Status, log the finding in Work Log.
 - **Cause** — withheld from the template; add only when a theory is Leading: tested against named alternatives with none falsifying it. Never create speculatively. Distinguish the proximate trigger (immediate cause) from the systemic root cause (underlying condition). Use "supported by [†]" for each supporting claim and "leading" to characterize the overall theory. When written, update Status to `🎯 DIAGNOSED`. See [IncidentRCA.md](../../../docs/IncidentRCA.md#counterfactual-analysis) for the counterfactual methodology.
 
-Ruled-out theories never reach Decided Questions — their closure path is the Work Log (how they were eliminated) and the Differential Diagnosis table (their P% and ✅ status preserved as record). Decided Questions is for team decisions only.
+*Note: Pending investigative threads belong in the top-level [Pending Investigations](#pending-investigations) section, not here. Diagnosis is for the epistemic state of causation (what could cause this?), while Pending Investigations captures what we don't yet know (what can we answer ourselves?).*
+
+Ruled-out theories never reach Decisions — their closure path is the Work Log (how they were eliminated) and the Differential Diagnosis table (their P% and ✅ status preserved as record). Decisions is for team choices only.
 
 ### Evidence
 
@@ -245,7 +250,7 @@ Omit any field that genuinely doesn't apply; include as many as possible.
 - **14:32:** Pulled PR #582, found race condition in auth middleware lock ordering
 - **15:02:** Added mutex lock to fix race; unit tests updated and passing
 - **15:32:** Ran full test suite; 2 flaky timeouts (unrelated), otherwise green
-- **16:01:** Created PR #589 for review; ready for staging tomorrow
+- **16:01:** Created PR #589 for review; ready for STG tomorrow
 ```
 
 Heading: `### MM.DD Dow Title of The Day's Work` (prefix YYYY at year boundaries: `### 2026.03.16 Sun ...`)
@@ -279,32 +284,34 @@ Tasks flow through the document deterministically: Tasks → Status + Active Wor
 
 ### Where Pending Work Lives
 
-ALL pending work can be found in two task containers, one outbound queue, one question log, or under two inline flags. Pending work must NEVER be stored/marked in any other way e.g. BUG, Urgent, Next.
-
-**Two Containers For Tasks:**
-
 - **Tasks** — planned work with defined scope; search here when deciding what to do next
 - **Active Work** — in-progress subtasks/blockers; search here when resuming an interrupted session
-
-**One Outbound Queue:**
-
-- **Draft Next Comms** — unsent communications waiting to be sent to other teams or stakeholders. Use when you are waiting for an answer or decision from *outside* your team. If that wait is blocking a Task, the blocked task and the draft must name each other — see [Cross-References for Pending Work](#cross-references-for-pending-work).
-
-**One Question Log:**
-
-- **Undecided Questions** — unresolved decisions or questions that need an *answer* from your own team — not an action, and not a response from another team. If resolving a question requires doing something, that doing is a Task; the question stays in Undecided Questions until answered. If a question turns out to need an external answer, *convert* it: remove it from Undecided Questions, create a Draft Next Comms entry, and mark any blocking Task 🛑. Never leave the question in both places. Every Undecided Question that blocks a Task must have a corresponding ▶️ (or 🛑) row in the Tasks table. Move to Decided Questions once answered — never delete. *Incident exception: investigative leads (threads to pursue, not decisions to make) belong in [Diagnosis → Pending Investigations](#diagnosis) instead.*
-
-**Two Flags For Inline Placeholders:**
-
 - **TODO** — low-priority work items that block no other work; can be used as code/doc comments. If it blocks something, it's a Task. TODOs are never links.
-- **TBD** — placeholder for a value waiting to be filled in; use inline where the value will live. TBDs are never links.
 
-### Cross-References for Pending Work
+### Where Pending Questions Live
 
-When pending work is *mentioned* outside its canonical section, it must link back to that section. This prevents invisible dead-ends where a problem is flagged but the reader has no path to the owning entry.
+**External Queries:**
+
+- **Draft Next Comms** — unsent communications waiting to be sent to other teams or stakeholders. Queries we depend on other teams to answer. If blocked Task is waiting for the response, the blocked task and draft must name each other — see [Cross-References for Pending Work/Questions](#cross-references-for-pending-workquestions).
+
+**Team Decisions:**
+
+- **Pending Decisions** — unresolved choices your team must make. "Should we do X?" or "Which approach?" If resolving requires doing something, that doing is a Task; the decision stays here until answered. If a question turns out to need external input, *convert* it: remove it from here, create a Draft Next Comms entry, and mark any blocking Task 🛑. Never leave the question in both places. Every Pending Decision that blocks a Task must have a corresponding ▶️ (or 🛑) row in the Tasks table. Closed by moving to Decisions section — never delete.
+
+**Empirical Investigations:**
+
+- **Pending Investigations** — empirical unknowns *we can answer ourselves*. Record specific, named questions about state, metrics, or facts. You control the investigation through logs, testing, measurement, or analysis. Minor clarifications from other teams are fine; the core work is ours. Minor questions within an investigation don't demote it to Draft Comms — but if *they* control the outcome and you're waiting for their decision, it's Draft Comms instead. When completed: findings are absorbed into doc edits (Task notes, Context, Evidence, Work Log). No archive needed — the knowledge remains in the doc.
+
+**Inline Placeholders:**
+
+- **TBD** — placeholder for unknown value or fact; use inline where the value will live. "Latency budget: TBD", "Customer impact: TBD". TBDs are never links.
+
+### Cross-References for Pending Work/Questions
+
+When pending work or questions are *mentioned* outside their canonical sections, they must link back to that section. This prevents invisible dead-ends where a problem is flagged but the reader has no path to the owning entry.
 
 **Antipattern — lone ⚠️ is forbidden:**
-A ⚠️ glyph used in a table cell, heading, or prose WITHOUT a link to a canonical pending-work entry is an explicit antipattern and must be fixed on audit. The glyph signals a problem; the link points to where it is being tracked. The same rule applies to other problem glyphs (❗, 🔔) used as out-of-section signals.
+A ⚠️ glyph used in a table cell, heading, or prose WITHOUT a link to a canonical pending entry is an explicit antipattern and must be fixed on audit. The glyph signals a problem; the link points to where it is being tracked. The same rule applies to other problem glyphs (❗, 🔔) used as out-of-section signals.
 
 **Standard inline reference forms:**
 
@@ -312,7 +319,8 @@ A ⚠️ glyph used in a table cell, heading, or prose WITHOUT a link to a canon
 | --- | --- |
 | In-progress Task | `▶️ Task: [task name](#tasks)` |
 | Blocked Task | `🛑 Task: [task name](#tasks)` |
-| Undecided Question | `❓ UQ: [question summary](#undecided-questions)` |
+| Pending Decision | `❓ Decision: [question summary](#pending-decisions)` |
+| Pending Investigation | `🔍 Investigation: [question summary](#pending-investigations)` |
 | Draft Next Comms item | `📤 Draft: [draft heading](#draft-next-comms)` |
 | Inline TODO | write `TODO` inline — no link (TODOs are never linked) |
 
@@ -470,10 +478,10 @@ Within a given table or list, each glyph type maps to exactly one footnote. Glyp
 Standard special values:
 
 - **— (emdash)** — not applicable; the concept doesn't apply to this cell.
-- **TBD** — value exists or will arrive naturally; just needs to be filled in at the appropriate time
-- **TODO** — work is needed to produce the value. Blocks nothing, blocked by nothing.
+- **TBD** — value or fact is unknown and will be determined via investigation. Placeholder for pending empirical questions. Blocks nothing alone; work to investigate it may be a Task or Pending Investigation.
+- **TODO** — work is needed to produce the value. Blocks nothing, blocked by nothing. Use for mini-tasks only.
 - **?** — unknown whether the value can, should, or does exist
-- **⚠️** — alarming situation; must link to a canonical pending-work entry (a Task row, an Open Question, a Draft Next Comms item, or an inline TODO). A lone ⚠️ with no such link is a forbidden antipattern — see [Cross-References for Pending Work](#cross-references-for-pending-work).
+- **⚠️** — alarming situation; must link to a canonical pending entry (a Task row, Pending Decision, Pending Investigation, a Draft Next Comms item, or an inline TODO). A lone ⚠️ with no such link is a forbidden antipattern — see [Cross-References for Pending Work/Questions](#cross-references-for-pending-workquestions).
 - **blank cell** — only for visual spacing/grouping (e.g. subheader rows). Otherwise use emdash, ?, or TBD.
 - **^^^** — same link/value as the row above
 
