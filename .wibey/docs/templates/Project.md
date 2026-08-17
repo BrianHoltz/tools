@@ -28,21 +28,11 @@
   - Stg: `YYYY.MM.DD.Dow`
   - Prod: `YYYY.MM.DD.Dow`
 
-## Status
-
-*(Selected verbatim rows from [Tasks](#tasks) table)*
-
-Verbatim excerpt of selected Tasks rows: recent completions and upcoming work. Update each work session. Rows here must be copy-pasted from the Tasks table, never paraphrased or summarized. The Tasks table is authoritative; Status is a view into it. If you find yourself writing a non-task bullet, it probably should be a Tasks row instead.
-
-<!-- fill in the date you ran doc-audit -->
-*doc-audit: YYYY.MM.DD.Dow*
-
 ## Contents
 
 <!-- AGENT GUIDE: Interfaces and Engineering Considerations do not get sub-bullets in the Contents. Their subsections are standardized and predictable — sub-bullets add noise without aiding navigation. -->
 
 - [Summary](#summary)
-- [Status](#status)
 - [Tasks](#tasks)
 - [Active Work](#active-work)
 - [Draft Next Comms](#draft-next-comms) *(optional)*
@@ -75,6 +65,7 @@ Status glyphs and meanings: see [StatusVocabulary.md](../StatusVocabulary.md). F
 
 **Doc updates** (repo docs, playbooks, Confluence) that need doing as a result of this project are tasks — add them to this table. Static doc links belong in [References](#references).
 
+**Jira column rule:** Include the Jira column **only if this project involves two or more tickets.** Single-ticket projects omit this column; the ticket belongs in Summary § Where Tracked instead, not duplicated here. For multi-ticket projects, show only one ticket per row (the most relevant one; others go in Notes if necessary).
 
 | Task         | Jira                                                             | Status | Notes |
 | -------------- | ------------------------------------------------------------------ | -------- | ------- |
@@ -96,7 +87,7 @@ The mutable present: fine-grained subtasks and cached state for whichever [Tasks
 
 ## Draft Next Comms
 
-*Optional.* Pre-composed outbound communications — stakeholder status updates, PR announcements, release notifications, team posts. Each draft is a `###` sub-heading with target, a `Status: DRAFT` or `Status: READY` line, and the message body in a blockquote. When a draft is sent, delete it from here entirely and record one Work Log entry with the destination and message URL.
+*Optional.* Pre-composed outbound communications — stakeholder status updates, PR announcements, release notifications, team posts. Each draft is a `###` sub-heading with target and the message body as plain text. No blockquote formatting — the section heading makes the context obvious, and `>` prefix causes pasting problems. No `Status:` line — the draft's presence in this section already means unsent; delete it when sent instead of relabeling it. Link every claim in the body to the primary source that backs it (see AGENTS.md § Drafting Comms). When a draft is sent, delete it from here entirely and record one Work Log entry with the destination and message URL.
 
 ## Pending Decisions
 

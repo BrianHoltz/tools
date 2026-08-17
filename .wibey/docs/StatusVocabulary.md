@@ -9,11 +9,10 @@
 | ---- | ------------- | ---------------------------------------------------------------------- | --------------------- | -------------------------- | ------------------ | ------------------ | ---------- |
 |      | **Pending**   |                                                                        |                       |                            |                    |                    |            |
 | 🔮   | FUTURE        | Beyond current scope; aspirational or follow-on work                   | —                    | —                         | —                 | —                 | —         |
-| ⬜   | UNSTARTED     | Noted but not started. synonym: BACKLOG. **Do not use in task tables — blank is correct for unstarted rows.** | —                    | —                         | —                 | —                 | —         |
 | 📣   | INVOKED       | Our team notified; our incident doc opened                             | —                    | Triage Initial Assessment  | Acknowledged       | Assigned           | Response   |
 | ➡️ | ROUTED        | Investigation handed off; incident still live                          | Won't Do (reassigned) | —                         | —                 | —                 | —         |
 |      | **Working**   |                                                                        |                       |                            |                    |                    |            |
-| 🕵️ | INVESTIGATING | Actively working root cause. synonym: ENGAGED                          | In Progress           | Investigate                | Investigating      | In Progress        | Response   |
+| 🔬 | INVESTIGATING | Actively working root cause. synonym: ENGAGED                          | In Progress           | Investigate                | Investigating      | In Progress        | Response   |
 | 🎯   | DIAGNOSED     | Root cause confirmed; fix not yet deployed                             | In Progress           | —                         | Identified         | In Progress        | Response   |
 | 🛠️ | FIXING        | Fix underway — PR open, CRQ in flight                                 | In Progress           | Investigate                | —                 | In Progress        | Mitigation |
 | 👀   | UNDER_REVIEW  | Fix is awaiting feedback from another person/team                      | —                    | —                         | —                 | —                 | —         |
@@ -30,6 +29,7 @@
 | ↩️ | ROLLED_BACK   | Deployment reverted as mitigation                                      | In Progress           | Mitigate                   | Investigating      | In Progress        | Mitigation |
 | 🟡   | MITIGATED     | Customer impact reduced; root cause may remain                         | —                    | Mitigated but not Resolved | —                 | In Progress        | Mitigation |
 | 🔭   | MONITORING    | Fix deployed and believed stable; watching metrics before closing      | In Progress           | —                         | Monitoring         | In Progress        | Resolution |
+| 📌   | DEFERRED      | Planned and approved but intentionally scheduled for a later phase/sprint | Backlog               | —                         | —                 | —                 | —         |
 | ✅   | RESOLVED      | Impact gone; root cause addressed (synonyms: CLOSED, DONE)             | Done / Resolved       | Resolved                   | Resolved           | Resolved           | Resolution |
 | 🔵   | AS_DESIGNED   | Behavior matches spec; no fix needed                                   | Won't Fix / Invalid   | —                         | —                 | Resolved (w/ note) | —         |
 | 🔹   | WONT_FIX      | Root cause known; consciously not fixing                               | Won't Fix             | —                         | Resolved (w/ note) | Resolved (w/ note) | —         |
@@ -40,6 +40,35 @@
 - **PD / Statuspage** — [PagerDuty](https://www.pagerduty.com/) on-call alerting (lifecycle: Triggered → Acknowledged → Investigating → Identified → Monitoring → Resolved) combined with Atlassian Statuspage for external status communication.
 - **SN / ITIL** — ServiceNow Incidents ticketing system (lifecycle: New → Assigned → In Progress → On Hold → Resolved → Closed → Canceled; P1 Critical – P5 Very Low). [ITIL](https://en.wikipedia.org/wiki/ITIL) (IT Infrastructure Library) is the industry process standard that ServiceNow implements.
 - **Google SRE** — [Google Site Reliability Engineering](https://sre.google/sre-book/table-of-contents/) uses overlapping lifecycle *phases* rather than discrete states: Detection → Response → Mitigation → Resolution → Post-Incident. Column values indicate which phase each status falls within.
+
+## Task Relationship Markers
+
+Markers appearing in task-table Notes cells to express direct task dependencies. Not a status, but a relationship signal.
+
+| Glyph | Label | Meaning | Usage |
+| --- | --- | --- | --- |
+| **⬆️** | `DEPENDS_ON` | This task depends on one or more prior tasks in the same table. Listed after the marker, comma-separated. | `⬆️ task-name`<br/>`⬆️ task-name-A, task-name-B` |
+
+**Rules:**
+
+- The marker is the **sole source of truth** for task dependencies. Row position is never a signal of dependency.
+- The marker appears **at the start of the Notes cell** for any task with direct dependencies.
+- List only **direct** dependencies by task name (terse, matching the Task column). Indirect dependencies are implicit (i.e., if A→B→C, only C marks B; C does not redundantly mark A).
+- Row order *must respect* declared dependencies (no task before its prerequisites), but position alone never implies a prerequisite relationship. Multiple independent tasks may appear sequentially without dependencies between them.
+- **Agent guardrail:** Never infer dependency from row order. Always check for the `⬆️` marker. For details, see [doc-audit SKILL.md § Task Discipline Rules § Task Dependencies](../../.wibey/skills/doc-audit/SKILL.md#task-dependencies).
+
+**Example:**
+```markdown
+| Task | Status | Notes |
+| --- | --- | --- |
+| Create new AD group | ⏳08.14 | Blocked on org-level check... |
+| Complete SailPoint integration | ⏳08.14 | ⬆️ Create new AD group. Do not submit until group exists... |
+| Register GitHub App | 🔍08.14 | ⬆️ Create new AD group. Must use group name in request... |
+| Check org webhooks | ⏳08.11 | Org-level check (no dependencies). Parallel to above tasks... |
+| Submit GHEC Migration Request | | ⬆️ Complete SailPoint integration, Register GitHub App. Blocked on both... |
+```
+
+Note: "Check org webhooks" appears after "Register GitHub App" but does not depend on it — it is an independent investigation (parallel work). Dependency is declared only by the `⬆️` marker, never inferred from row position.
 
 ## Confidence Ladder
 

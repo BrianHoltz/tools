@@ -26,6 +26,7 @@ Consolidated reference for documentation authoring, project document formatting,
   - [Cross-References for Pending Work/Questions](#cross-references-for-pending-workquestions)
 - [Doc Audit Checklist](#doc-audit-checklist) — run on every non-trivial edit
   - [Task Creep Audit](#task-creep-audit)
+  - [Active Work Hygiene Audit](#active-work-hygiene-audit)
   - [When to Audit](#when-to-audit)
   - [What to Audit](#what-to-audit)
 - [Audit Date Format](#audit-date-format) — format and placement
@@ -98,18 +99,9 @@ Sits at the very top. Always structured bullets — never prose paragraphs. See 
 
 Two variants depending on doc type:
 
-- **Projects**: verbatim selection of rows from the Tasks table — the just-finished, current, and next tasks. Sits near the top for easy scanning. Always a Tasks excerpt, never prose.
+- **Projects**: omit the Status section entirely. The [Tasks](#tasks) table **IS** the status display — keep it wl-sorted and up-to-date so readers can scan it directly for current work. With the sorting discipline (done → in-progress → not-started, preserving order within each group), the Tasks table itself provides clear status visibility without needing a separate excerpt.
 - **Incidents**: a status token from [StatusVocabulary.md](../../../docs/StatusVocabulary.md), optionally qualified with an em-dash (e.g. `INVESTIGATING — root cause undiagnosed`). Updated each session.
 - **Memos**: optional; use when the memo is not yet complete. Applicable tokens: `INVESTIGATING`, `PAUSED`, `DONE`, `UNDER_REVIEW`, `AWAITING`, `BLOCKED`, `CANCELED`. Omit the Status section entirely for memos written and completed in one session.
-
-The following rules apply to the project variant:
-
-- **Status rows are verbatim copies of Tasks rows** — never paraphrased or reworded. This includes the Status *cell*: copy only the glyph+date (or blank, for unstarted rows) that appears in the Tasks table. Never append extra links, annotations, or follow-up notes to the excerpt's Status cell that aren't in the source Tasks row — that content belongs in the Notes column, not bolted onto the glyph.
-- Excerpt includes: all ▶️ in-progress tasks; completed tasks: all from the last 2 business days, plus enough older ones to reach exactly 2 total — no more; the next 2 upcoming tasks by priority
-- **Not-yet-started rows have a blank Status cell — in both the Tasks table and the Status section.** Never fill with `⬜` or any other placeholder. Blank IS the correct status for work that has not yet entered its lifecycle. (Per [StatusVocabulary.md](../../../docs/StatusVocabulary.md): `⬜ UNSTARTED` is reserved for contexts where blank would be ambiguous, such as a mixed-use dashboard. Task tables are never that context.)
-- **Sort order — group first, preserve order within group:** (1) completed rows, (2) ▶️ in-progress rows, (3) not-yet-started rows — in that order, with no interleaving. **Within each group, preserve the rows' existing relative order** (position already encodes priority per [Task Discipline Rules](#task-discipline-rules) — don't invent a secondary sort key like date). A resort operation must never reorder two rows that were already in the same group relative to each other.
-- Update whenever Tasks change: new tasks, completions, blockers, phase transitions
-- **Never backdate status changes** — reflect what is true now
 
 ### Contents
 
@@ -131,7 +123,9 @@ All task lists follow a consistent format:
 
 #### Status Glyphs
 
-See [StatusVocabulary.md](../../../docs/StatusVocabulary.md) for the canonical glyph-to-status mapping.
+**Only use glyphs from [StatusVocabulary.md](../../../docs/StatusVocabulary.md).** That is the canonical, single source of truth for all task statuses. Custom or similar-looking emoji (e.g. ⏳ hourglass, 🔍 magnifying glass) are not permitted — they cause ambiguity and agent confusion. If a glyph from StatusVocab doesn't fit your intended meaning, the meaning itself may need clarification (consult the Meaning column), or the task status needs rethinking.
+
+**Blank Status cell = unstarted.** Never fill with a placeholder glyph. Absence of glyph IS the signal.
 
 #### Format Rules
 
@@ -145,7 +139,7 @@ Acceptable columns (not all required):
 
 - **Task** — terse, permanent title/description designed not to change
 - **LOE** — prior estimated person-days. Only for planning; remove after Jira tickets created. Never log effort after completion.
-- **Jira** — only if &gt;1 ticket exist for this project; terse anchor text linked to ticket
+- **Jira** — **omit unless two or more tickets exist for this project.** When present: terse anchor text linked to ticket. Single-ticket projects have no Jira column — the project tracker belongs in Summary/Where Tracked, not duplicated in every task row. 
 - **Status** — glyph + MM.DD date
 - **Notes** — detailed explanation, blockers, rationale
 
@@ -154,25 +148,91 @@ Acceptable columns (not all required):
 - **Never add a task and mark it complete in the same work session.** Work already finished when the task would be written belongs in the Work Log, not the task table.
 - **Never backfill completed work into Tasks.** Completed rows stay in the table (useful record), but Tasks is forward-looking only. If work was completed before the task was planned, it belongs in Work Log.
 - **Future work appears only in Tasks, Draft Next Comms, Pending Decisions, Pending Investigations, and TODOs.** No "Critical/Important/Urgent/Deprioritized" labels — use order. No capitalized exclamations (Bug, Gap, Pending, Next). No ⚠️ in task tables — see [Cross-References for Pending Work/Questions](#cross-references-for-pending-workquestions) for the ⚠️ antipattern rule.
+- **On audit, sort the Tasks table itself using a three-tier group rule:** (1) completed rows sorted by date (oldest first), (2) ▶️ in-progress rows, (3) not-yet-started rows — **with no interleaving between groups.** Within in-progress and not-yet-started groups, **preserve insertion order.** Never invent a secondary sort key (alphabetical, date, priority labels) within these groups. Position reflects priority and readability, not a signal of dependency.
+
+#### Task Dependencies
+
+**⬆️ DEPENDS_ON is the sole source of truth for task dependencies.** Row order is a *constraint*, not a signal: no task may appear before its declared prerequisites, but tasks in the table need not depend on every task before them.
+
+**⚠️ Agent rule:** Never assume historical row order implies causality. A task appearing after another task does not mean it depends on that prior task. Dependency is always explicit.
+
+Direct task-to-task dependencies are expressed in one place only: the `⬆️ DEPENDS_ON` marker in the Notes cell.
+
+**Task title durability & bolding:** Task titles serve as stable reference targets for dependencies. Choose titles that are:
+- Self-contained (omit project/repo prefixes that would be redundant when referenced)
+- Durable (unlikely to be rephrased; title changes break references)
+- Meaningful (first ≤5 words should make the reference unambiguous)
+
+For example, "Create new AD group" is better than "variant-group-shell: create new AD group" — omit the repo prefix since it's not needed in a reference within the same doc, and use the first few words as the stable target.
+
+**Bold task titles only if they are dependencies for later tasks.** If a task title appears as a `⬆️ DEPENDS_ON` reference in any later task's Notes cell, bold the title in the Task column. If a task has no downstream dependencies, leave it unbolded (normal text). This visual convention signals at a glance which tasks are reference targets and which are leaf nodes.
+
+**Marker rules:**
+- If a task has one or more direct dependencies on prior tasks in the same table, the Notes cell **must start with** the marker followed by a **bold reference** to the first ≤5 words of the target task's title:
+  ```
+  ⬆️ **Create new AD group**. Do not submit until...
+  ⬆️ **Create new AD group**, **Complete SailPoint integration**. Blocked on both...
+  ```
+- The referenced task title in the dependency marker should also be **bold** in the Tasks table, so readers can visually link the reference to the source row.
+- List only direct dependencies; indirect dependencies remain implicit (i.e., if A→B→C and both B and C explicitly mark their immediate prerequisites, the chain is clear).
+- The marker is not a status — it is a relationship signal (see [StatusVocabulary.md § Task Relationship Markers](../../../docs/StatusVocabulary.md#task-relationship-markers)).
+- **Row order must respect dependencies:** If A→B (B depends on A), then A must appear before B in the table. But if C appears before B, C may or may not be a prerequisite of B — that relationship is declared only by the marker, never inferred from position.
+
+**Example:** A task cannot submit a SailPoint integration form until an AD group is provisioned. Other tasks may appear between them without creating a dependency.
+```markdown
+| Task | Status | Notes |
+| --- | --- | --- |
+| **Create new AD group** | 🛑08.14 | Blocked on ServiceNow ticket...
+| **Register GitHub App** | | ⬆️ **Create new AD group**. Must use group name in GARS request... |
+| **Check org webhooks** | 👀08.11 | Org-level check (no dependency on AD group)... |
+| **Complete SailPoint integration** | | ⬆️ **Create new AD group**. Do not submit until group actually exists... |
+```
+
+In this example, "Check org webhooks" comes after the AD group task but does not depend on it — the bold `⬆️` references on the other two tasks make their prerequisites explicit and linkable. The table is ordered for readability and to respect declared dependencies, but position alone never implies a prerequisite relationship.
+
+**Glyph: `⬆️` (up arrow).** Literal and intuitive in top-to-bottom reading order: "the task above" → must complete first. The priority is that the reference is **bold** and matches the source task title exactly so readers can click/search to find the prerequisite.
 
 ### Active Work
 
 Mutable working state for in-progress items. Answers: "What are we doing right now?"
 
-- Reflects only ▶️ (in-progress) tasks
-- Contains subtasks, blockers, partial results, dependencies
+**Scope & Organization:**
+- **ALL and only ▶️ (in-progress) tasks get a subsection here** — one `###` heading per task. No more, no fewer. If a task is in-progress, it has a section; if a task is not in-progress, it has no section.
+- **Active Work heading must match (be verbatim or a prefix of) the task title** — the `###` heading slug must resolve to the task title when linked. Examples:
+  - Task: `**Check repo settings**` → Active Work: `### Check repo settings` ✅
+  - Task: `**Check repo settings** for webhooks` → Active Work: `### Check repo settings` (prefix) ✅
+  - Task: `**Check repo settings** for webhooks` → Active Work: `### Webhook audit` (mismatch) ❌
+  - This makes task-title anchors stable and enables direct linking from Tasks table to Active Work subsections.
+- **Order matches Tasks table order** — subsections appear in the same sequence as their corresponding ▶️ rows in the Tasks table, so readers can navigate between them.
+- **Task titles in Tasks table should link to Active Work** — when a task title is in progress, make the entire title a link to its Active Work subsection: `[**Task Title**](#task-title)`. This enables one-click navigation from planning to execution state.
+
+**Why task titles must be TERSE and DURABLE:**
+- Task titles serve as **anchor identifiers** — they are the only stable reference point between Tasks table and Active Work. Changing a task title after work begins breaks all existing links and makes it impossible to find the corresponding Active Work subsection.
+- **TERSE** — keep titles to ≤5 words if possible; use bold for clarity. No narrative context or qualifiers (dates, statuses, decision rationale) belong in the title.
+- **DURABLE** — once a task title is published, treat it as immutable for the lifetime of the doc session. If you need to add detail, context, or status updates, put them in Notes (Tasks table) or in the Active Work subsection body — never in the title.
+- **When in doubt, Notes not title** — if you're tempted to qualify or expand the title (e.g., "Review [X] before doing [Y]"), that content belongs in the Notes column, not in the title. The title is the label; Notes carry the conditions/context.
+
+**Content Rules:**
+- Contains subtasks, blockers, partial results, dependencies for the in-progress work
 - Next agent or human picks up here after an interruption
-- Cleared when subtasks complete — concluded items move to Work Log, never duplicated
+- Strictly organized by `###` heading per ▶️ task — one section per task, no free-form prose at the top level
+- **DRY with Tasks** — no information here that is not grounded in a ▶️ task row. If you find yourself writing subtasks for work that has no corresponding ▶️ task, add the task first
+
+**Completion & Archival:**
+- **Concluded work moves to Work Log, never to Active Work.** When a ▶️ task completes, clear its subtasks from here and add one terse Work Log entry summarizing what was decided/discovered
+- **Completed work in Active Work is a violation.** Do not mark tasks as "DONE" in Active Work or leave past-tense status updates here. The moment a task is no longer in-progress, remove its section entirely
+- **Once cleared, a completed task has no Active Work subsection** — all its detail lives in the Work Log entry for that session
 
 ### Draft Next Comms
 
 Holds **only unsent** outbound communications (Slack replies, email drafts, PR comments). A draft that has been sent **must not appear here in any form** — not as a full message body, not as a compressed stub, not as a SENT status line.
 
-- Each draft is a `###` sub-heading with target, status line (`Status: DRAFT` or `Status: READY`), and blockquoted message body
+- Each draft is a `###` sub-heading with target and the message body as **plain text — no blockquote.** The `###` heading already makes the context obvious, and a `>` prefix causes pasting problems into Slack/Jira/email.
+- **No `Status:` line, no "DRAFT"/"READY"/"do not send without approval" annotation above the body.** A draft's mere presence in this section already means unsent; the requirement to get approval before contacting other humans is a standing global agent rule (not a per-draft warning to restate). Any such label is noise — same category as writing "don't `rm -rf $HOME`" next to every `rm` command.
+- **Every evidence sentence in the body must be a live link to a primary source** (a tool URL, query result, or code line — never this doc's own Evidence/Diagnosis section, never another of our own repo artifacts). Apply the eyeball test from AGENTS.md § Drafting Comms before finalizing: could a skeptical reader verify the claim in under 10 seconds by clicking the link, with no follow-up question?
 - **When a draft is sent: delete it from this section entirely.** Add one Work Log entry recording when and to whom it was sent (and the Slack `ts` or message URL if available). That is the complete record.
-- **On audit: any entry with `Status: SENT` or any other indication it was sent is a violation.** Remove it immediately — the section must contain only unsent drafts.
-- **Cross-reference with blocked Tasks:** If a draft is blocking a Task (the Task cannot proceed until the external party responds), the blocked task's Notes column must name the draft (`📤 Draft: [draft heading](#draft-next-comms)`) and the draft must name the blocked task (`🛑 blocks Task: <task name>`).
-- **Never append a "do not send without approval" (or "review before sending", etc.) annotation to a draft.** The `Status: DRAFT`/`Status: READY` line already means unsent; the requirement to get approval before contacting other humans is a standing global agent rule (not a per-draft warning to restate). Adding it anyway is noise — same category as writing "don't `rm -rf $HOME`" next to every `rm` command.
+- **On audit: any lingering full message body, compressed stub, or status/sent note for a message that has already gone out is a violation.** Remove it immediately — the section must contain only unsent drafts.
+- **Cross-reference with blocked Tasks:** If a draft is blocking a Task (the Task cannot proceed until the external party responds), the blocked task's Notes column must name the draft (`Draft: [draft heading](#draft-next-comms)`) and the draft must name the blocked task (`blocks Task: <task name>`).
 
 ### Diagnosis
 
@@ -276,11 +336,11 @@ Entry: `- **HH:MM:** Entry text`
 
 ### Tasks Pipeline
 
-Tasks flow through the document deterministically: Tasks → Status + Active Work → Work Log.
+Tasks flow through the document deterministically: Tasks → Active Work → Work Log.
 
-- **Tasks ↔ Status**: Status rows are verbatim copies (never paraphrased)
-- **Tasks ↔ Active Work**: Active Work subtasks relate only to ▶️ tasks
+- **Tasks ↔ Active Work**: Active Work subtasks relate only to ▶️ tasks; once ▶️ tasks complete, details move to Work Log
 - **Active Work ↔ Work Log**: Concluded items are cleared from Active Work (not duplicated)
+- **Tasks**: kept sorted (done → in-progress → not-started) so readers can scan for current status directly; Status section is omitted in projects
 
 ### Where Pending Work Lives
 
@@ -335,8 +395,11 @@ Run in full on every non-trivial edit. All items apply; domain-knowledge items r
 - ✅ For docs with Confluence mirrors: no relative links (they work in markdown/GHE but break in Confluence)
 - ✅ **Mortal docs (projects, incidents, releases, memos) have their required sections**
 - ✅ **For mortal docs with a Tasks table:**
-  - Tasks rows are accurately reflected in Status rows (verbatim copies, not paraphrased)
-  - Active Work subtasks relate only to ▶️ (in-progress) tasks
+  - Tasks table is sorted done → in-progress → not-started, preserving each group's existing relative order (see [Task Discipline Rules](#task-discipline-rules)). A well-sorted Tasks table IS the status display — Status sections are omitted in projects.
+  - Active Work sections match in-progress tasks exactly: one `###` subsection per ▶️ task (no more, no fewer), in the same order as the Tasks table
+  - **Active Work heading matches task title exactly or is a verbatim prefix** — if task is `**Foo bar baz qux**`, then Active Work heading is `### Foo bar baz qux` or `### Foo bar baz` (prefix), never `### Baz qux foo` (reordered) or `### Foo's bar activity` (paraphrased). Task title anchors must be stable and resolvable.
+  - Task titles that are ▶️ in-progress have an anchor link to their Active Work subsection: `[**Task Title**](#task-title)`
+  - Active Work contains only current, mutable state; no completed work descriptions or past-tense status updates
   - Concluded items are cleared from Active Work, moved to Work Log (not duplicated)
   - Current conversation's work is accurately timestamped in Work Log
 - ✅ Endpoints exist and are correct
@@ -357,6 +420,19 @@ Forensic check that the Tasks table has not been used as a work log (invoked on 
 - ✅ Tasks describing work that happened (not work that was scoped)
 
 **Remediation**: Move violating task content to Work Log entries. Keep the task row only if work was genuinely planned in advance; otherwise delete it.
+
+### Active Work Hygiene Audit
+
+Forensic check that Active Work contains only current in-progress state (invoked on demand during doc review, or when a ▶️ task completes). Red flags:
+
+- ❌ **Heading mismatch with task title** — Active Work heading must be verbatim (or a prefix of) the corresponding task title. If task is `**Create new AD group**` but Active Work heading is `### AD group setup (blocked)`, fix the heading to match the task. This preserves anchor stability so task-table links don't break.
+- ❌ **Completed work described in past tense** — "we fixed X", "findings from yesterday", "issue was resolved" belong in Work Log, not Active Work
+- ❌ **Sections for non-▶️ tasks** — if a task is ✅/🎯/🛑/etc., it has no business in Active Work; its content belongs in Work Log or Evidence
+- ❌ **Missing sections for ▶️ tasks** — every in-progress task must have a corresponding subsection; if one is missing, add it immediately
+- ❌ **Out-of-order sections** — Active Work subsections should mirror Tasks table order; reorder them if Tasks table order changes
+- ❌ **Free-form narrative at top level** — all Active Work prose should live under a `###` task-specific heading, never as section-level intro text
+
+**Remediation**: For each violation, remove the violating content from Active Work and place it in Work Log (with a session timestamp). Completed task sections should be deleted entirely, not repurposed or archived. For heading mismatches, rename the `###` heading to match the task title exactly.
 
 ### When to Audit
 
