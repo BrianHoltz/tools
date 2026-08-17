@@ -162,7 +162,11 @@ Run `~/bin/safewrite -h` for full options. Run `~/bin/fhold -h` for the fhold ME
 - No VCS changes unless you're certain the user wants them
 - Commit granularity: independent changes → separate commits; interdependent → one commit
 - **Two-tier commit policy**: mechanical changes (artifacts, formatting) → commit directly; substantive changes (logic, data, content) → `git add` and summarize for user review. User can override with "just commit it".
-- **Commit message provenance**: Every commit made by an agent must include the AI model name and version in a line at the end. Format: `Model: <name>-<version>` (e.g., `Model: claude-haiku-4.5`). This makes agent provenance auditable in `git log`.
+- **Commit message provenance**: Every commit made by an agent must include a provenance trailer block at the end, one line per fact that is actually available in the current session — omit any line whose fact can't be determined, don't guess or invent a value:
+  - `Model: <name>-<version>` (e.g. `Model: claude-sonnet-5`) — always required. Use the resolved model identifier (check the agent's model registry/config, e.g. `~/.code_puppy/models.json`, for what a configured alias like `claude-5-sonnet` actually resolves to) — don't guess a plausible-sounding name.
+  - `Harness: <name> <version>` (e.g. `Harness: code-puppy 0.1.57`, `Harness: wibey <version>`) — the agent runtime/CLI, if its version is discoverable (installed package version, `--version` flag, or config file).
+  - `IDE: <name> <version>` (e.g. `IDE: IntelliJ IDEA 2026.2`, `IDE: VS Code`, `IDE: Code Puppy Desktop`) — the editor/IDE the session is running inside, if detectable (e.g. via environment variables, running process inspection, or app bundle metadata). Version is a bonus, not required, if the IDE doesn't expose one easily.
+  - This makes agent provenance auditable in `git log`: which model, which harness, which IDE produced a given change.
 
 ## Communication Style
 
