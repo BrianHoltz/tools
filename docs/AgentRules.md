@@ -157,7 +157,7 @@ Run `~/bin/safewrite -h` for full options. Run `~/bin/fhold -h` for the fhold ME
 
 ### Other file operation rules
 
-- Never `rm` directly on user files — use `trash` or `mv ~/.Trash/`. **Exception: `/tmp/` and `tmp/` may be deleted with plain `rm` — no `trash`, no confirmation, no hesitation (see [Six Commandments](#the-six-commandments)).**
+- Never `rm` directly on user files — use `trash` or `mv ~/.Trash/`. **Exception: `/tmp/` and `tmp/` may be deleted with plain `rm` — no `trash`, no confirmation, no hesitation (see [Seven Commandments](#the-seven-commandments)).**
 - Duplicate/conflicting files: ASK which to keep before deleting either
 - No VCS changes unless you're certain the user wants them
 - Commit granularity: independent changes → separate commits; interdependent → one commit
@@ -322,6 +322,7 @@ Wibey discovers project-level skills from `<workspace>/.wibey/skills/`. The `~/b
     doc-audit/       SKILL.md            — mirrored
     ftm/             SKILL.md            — personal-only (Family Tree Maker integration)
   commands/
+    avoid-numbering.md — personal-only (admonish agent to scrub sequential labels)
     commitz.md       — personal-only (cluster diffs into commit buckets)
     convo.md         — personal-only (park conversation for Mission Control)
     say.md           — personal-only (text-to-speech output)
@@ -369,7 +370,7 @@ Three checks that `walmart-sync --` audit runs:
 
 **Known pre-existing portability issues:** The SKILL.md files for `ailert`, `clipboard-read`, and `converge`, and the commands `continue`, `plando`, `tdd` all contain GHE provenance links (`gecgithub01.walmart.com`) and `relationship-shared` text references — these shipped with the initial mirror and are already committed to the public repo. To clean them up, strip the provenance block from each file in relationship-shared before re-mirroring, or patch them locally after sync.
 
-**When AgentRules.md mirror lists change**, update `MIRROR_ITEMS` and `PERSONAL_ONLY` in `~/bin/walmart-sync` to match.
+**When AgentRules.md mirror lists change**, update the `mirror_items` and `personal_only` arrays in `~/bin/walmart-sync.json` to match — the policy manifest; `~/bin/walmart-sync` itself is a thin orchestrator with no embedded lists.
 
 Currently mirror-safe skills: `ailert` (with `assets/`), `clipboard-read`, `converge`, `doc-audit`.
 Currently mirror-safe commands: `continue`, `plando`, `tdd`.
