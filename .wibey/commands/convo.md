@@ -1,7 +1,10 @@
 ---
 description: Display a conversation banner
 allowed-tools: Bash, mcp__jetbrains-mcp__open_file_in_editor, mcp__wibey_bridge__wibey_set_conversation_title
+code-puppy-tools: agent_run_shell_command
 ---
+
+**Agent detection (run first):** If you are Code Puppy (no `mcp__jetbrains-mcp__*` or `mcp__wibey_bridge__*` tools in your toolset), you are in **Code Puppy mode**: use `agent_run_shell_command` everywhere this doc says `Bash`, and skip both MCP-only steps entirely (IDE title lookup, `wibey_set_conversation_title`, `open_file_in_editor`) rather than attempting and catching a failure — those tools simply do not exist in this environment. Everything else in this command works identically.
 
 Interpolate values into the template block below and render it as Markdown exactly as shown.
 
@@ -13,7 +16,9 @@ Interpolate values into the template block below and render it as Markdown exact
 
 **Conversation title (`#` line):**
 
-Check whether the current conversation has an official title visible in the IDE or agent history sidebar. Use it verbatim if it is substantive — not a single-prompt echo, not a default like "New Conversation", and not merely the most recent message rephrased. If the official title is good, use it. If you must synthesize a title: generate a terse one-line summary of the whole conversation, then call `mcp__wibey_bridge__wibey_set_conversation_title` with a concise title (2–6 words, ≤60 chars) to set the official IDE conversation title — skip silently if the tool is unavailable.
+**Code Puppy mode:** there is no IDE/agent-history sidebar and no title-setting tool — always synthesize the title directly from conversation content (2–6 words, terse one-line summary of the whole conversation) and render it. Do not attempt to look up or set an official title.
+
+**IDE mode (Wibey/JetBrains):** Check whether the current conversation has an official title visible in the IDE or agent history sidebar. Use it verbatim if it is substantive — not a single-prompt echo, not a default like "New Conversation", and not merely the most recent message rephrased. If the official title is good, use it. If you must synthesize a title: generate a terse one-line summary of the whole conversation, then call `mcp__wibey_bridge__wibey_set_conversation_title` with a concise title (2–6 words, ≤60 chars) to set the official IDE conversation title — skip silently if the tool is unavailable.
 
 **Doc detection (run before rendering):**
 
@@ -40,7 +45,9 @@ DOC_MTIME=$(stat -f "%Sm" -t "%Y.%m.%d.%H%M" "$DOC_PATH" 2>/dev/null)
 echo "display=$DOC_DISPLAY ctime=$DOC_CTIME mtime=$DOC_MTIME"
 ```
 
-Then call `mcp__jetbrains-mcp__open_file_in_editor` with `DOC_PATH` as the `filePath` — skip silently if the tool is unavailable (personal laptop / no IDE connection).
+**Code Puppy mode:** skip this call entirely — there is no JetBrains MCP connection in this environment. The `### Doc:` line in the template is still rendered from the Bash block's output above; only the editor-opening side effect is skipped.
+
+**IDE mode:** call `mcp__jetbrains-mcp__open_file_in_editor` with `DOC_PATH` as the `filePath` — skip silently if the tool is unavailable (personal laptop / no IDE connection).
 
 **Template:**
 
