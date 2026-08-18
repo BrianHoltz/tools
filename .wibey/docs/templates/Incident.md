@@ -22,14 +22,9 @@
   - Routed: *(when the team handed off to the owning team — omit if your team owns the fix)*
   - Resolved: *(when the problem was fixed)*
 
-## Status
-
-*Where things stand right now. Updated each session. Use a token from [StatusVocabulary.md](../StatusVocabulary.md) — optionally qualified with an em-dash (e.g. `INVESTIGATING — root cause undiagnosed`).*
-
 ## Contents
 
 - [Summary](#summary)
-- [Status](#status)
 - [Tasks](#tasks)
 - [Active Work](#active-work)
 - [Draft Next Comms](#draft-next-comms)

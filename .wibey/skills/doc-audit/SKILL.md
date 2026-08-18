@@ -7,7 +7,6 @@ Consolidated reference for documentation authoring, project document formatting,
 - [Immortal vs Mortal Docs](#immortal-vs-mortal-docs) — timeless reference vs time-bound work docs
 - [Mortal Doc Structure](#mortal-doc-structure) — sections, consistency, task tracking
   - [Summary](#summary)
-  - [Status](#status)
   - [Contents](#contents-1)
   - [Tasks](#tasks)
     - [Status Glyphs](#status-glyphs)
@@ -67,7 +66,6 @@ Organize mortal docs with the following sections:
 | Section          | Projects | Incidents, Releases | Memos |
 | ---------------- | -------- | -------------------- | ----- |
 | Summary          | ●       | ●                   | ●    |
-| Status           | ●       | ●                   | ○    |
 | Contents         | ●       | ○                   | ○    |
 | References       | ●       | ○                   | ●    |
 | Tasks            | ●       | ○                   | —    |
@@ -643,6 +641,7 @@ Don't assume shared context — what's obvious to the writer is opaque to the re
 ### Stylistic Restraint
 
 - **Never include parenthetical comments in section headers.** `## Evidence (optional)` or `### Root Cause (Confirmed)` are both violations — parentheticals in headers corrupt search, anchor links, and any downstream tooling that parses headings. Put the qualification in the section body instead.
+- **Never use text styles or parentheses inside section headings, ever.** No bold, italic, code spans, or link markup in a `#`/`##`/`###` heading line — headings are plain text only. This includes the `### [**Task Title**](#anchor)` pattern sometimes seen in Active Work: the heading itself must be plain (`### Task Title`); only the Tasks-table *cell* linking to that heading may use `[**Task Title**](#anchor)` markup. Rationale: markup and parentheticals inside a heading corrupt the anchor slug, break search, and confuse anchor-stability tooling that assumes headings are plain text.
 - **Never insert hard newlines inside a markdown paragraph.** A paragraph is one unbroken line of text. Mid-paragraph newlines produce ragged source that wraps differently in every viewer and causes visual layout bugs in rendered output (e.g. a trailing code-span on a short wrapped line can render as a block). Write the full paragraph on one line; let the editor wrap visually.
 - Avoid wasting space with horizontal rules — trust headings
 - Never use all-caps for emphasis (only when quoting literal all-caps strings)
