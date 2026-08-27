@@ -1,6 +1,6 @@
 ---
 name: continue
-description: Checkpoint state into the active doc, then continue working. Commit, update work log, overwrite active work, append open questions, optionally compact.
+description: Checkpoint state into the active doc, then continue working. Commit, update work log, overwrite active work, append pending investigations, optionally compact.
 ---
 
 > [!NOTE]
@@ -14,7 +14,7 @@ description: Checkpoint state into the active doc, then continue working. Commit
 
 Distill current state into the active doc, commit it, call `/convo`, then keep working. Default behavior: **write → commit → /convo → continue**. Pass `--compact` to run `/compact` after committing. Pass `--no-commit` to update the doc without committing (e.g. mid-task snapshot).
 
-An optional steering prompt can be appended: `/continue [optional prompt]`. If a prompt is provided, incorporate it into the doc before committing — append new subtasks to Active Work, reprioritize if the prompt implies urgency, note any ambiguity in Open Questions — then continue with the merged plan.
+An optional steering prompt can be appended: `/continue [optional prompt]`. If a prompt is provided, incorporate it into the doc before committing — append new subtasks to Active Work, reprioritize if the prompt implies urgency, note any ambiguity in Pending Investigations — then continue with the merged plan.
 
 ## Steps (execute in order — do not skip any step)
 
@@ -25,14 +25,14 @@ Run the Find Existing Anchor Doc protocol from `AnchorDoc.md §Find` (steps F1�
 [GitHub](https://github.com/BrianHoltz/tools/blob/main/.wibey/docs/AnchorDoc.md).)
 If no doc is found: create `aidocs/yyyy-mm-dd/hhmm_CamelCase.md` (use `shared/aidocs/…`
 if a `shared/` symlink exists), seed it with `## Summary`, `## Work Log`,
-`## Active Work`, and `## Open Questions` sections, populate with current state,
+`## Active Work`, and `## Pending Investigations` sections, populate with current state,
 then proceed.
 
 **2. Write the doc.** Update (or create) the following sections:
 
 - **`## Work Log`** — *append* a new timestamped entry (ISO datetime, local timezone). 1–3 sentences: what was done, what was found, what changed. Do not edit previous entries.
 - **`## Active Work`** — *overwrite entirely*. Current state plus what comes next: one sentence on what was just being done, then an ordered list of immediate next subtasks specific enough that a fresh agent with no prior context can resume without asking the user. If a steering prompt was provided, integrate it here — append new tasks or reprioritize as appropriate. If stopping, note "Handoff" and list pickup steps.
-- **`## Open Questions`** — *append* any new unresolved questions or blockers, including ambiguity from a steering prompt. Mark resolved items with ~~strikethrough~~ and a resolution note.
+- **`## Pending Investigations`** — *append* any new unresolved questions or blockers, including ambiguity from a steering prompt. Mark resolved items with ~~strikethrough~~ and a resolution note.
 
 **Quality gate:** Could a fresh agent reading only this doc resume without asking the user anything? If no, add what's missing before proceeding.
 
