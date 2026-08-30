@@ -202,13 +202,16 @@ Before using the current date for anything, run `date "+%Y-%m-%d %H:%M %Z"`. Run
 
 ### Use EDTF for all dates
 
-With these modifications:
+Use EDTF with these modifications, while ensuring that every date sorts
+chronologically as text:
 
 - Use **periods** as date component separators instead of hyphens (e.g. `2026.03.27` not `2026-03-27`). Periods prevent unwanted line breaks in cramped table layouts, are analogous to decimal points, save space in variable-width fonts, and cannot be confused with ranges.
 - When space allows, append day of week e.g. 2026.07.27.Mon
-- When year serves no purpose (e.g. grep'ing), you may use 07.27.Mon
+- When year is not needed (e.g. when obvious from context and not needed as a search target), you may use mm.dd.Dow
 - Use hyphens as range indicators instead of slashes (e.g. `2026.03.01-2026.03.27` not `2026-03-01/2026-03-27`). Slashes read like ratios or alternatives, not ranges.
-- Use &gt;yyyy or &lt;yyyy instead of aft/bef if space is tight or you want to prevent line wraps in Markdown prose. Use >yyyy and <yyyy in data values.
+- Use `yyyy<` for dates after a year and `yyyy>` for dates before a year, so the date itself remains the sortable prefix (e.g. `1900<`, `1900>`).
+- Represent an unknown month or day with `X` (e.g. `1900.XX` or `1900.XX.XX`).
+- Mark an approximate date by appending `c` after the date specification (e.g. `1900c`, `1900.XXc`, or `1900.05.17c`). Put `c` before a trailing `<` or `>` (e.g. `1900c<` or `1900c>`).
 
 ## Documentation
 
