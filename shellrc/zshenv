@@ -1,0 +1,8 @@
+# ~/bin/zshenv — zsh environment for all shells (login, non-login, interactive, non-interactive)
+# Symlink target: ~/.zshenv
+# This file is sourced FIRST by all zsh shells, before .zprofile or .zshrc
+# Use for PATH and environment variables needed everywhere (especially in subshells)
+
+# Ensure ~/.local/bin is in PATH (for user-installed tools like wibey-usage)
+# Do this early before anything else manipulates PATH
+export PATH="$HOME/.local/bin:$PATH"

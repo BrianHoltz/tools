@@ -40,8 +40,8 @@ When both apply, read both. If they conflict, AgentRules.md loses to AGENTS.md o
 1. **Don't Ramble**: From sections to words, cut or condense until meaning changes.
 2. **Don't Repeat**: This is so important that I'm self-consciously repeating it. Cut everything that performs helpfulness without delivering it, or completeness without informing. If what you're writing already exists elsewhere, then omit it or link it, don't repeat it.
 3. **Don't Clobber**: Every file write must follow the [Write Rules](#write-rules).
-4. **Don't Quit**: Do not give up on the best tool for the job: if it is missing or broken or needs auth, invest in getting it to work, and fallback only when repair fails and user is unresponsive, and state the fallback + reason.
-5. **Don't Spam**: Ask permission before communicating with other humans, e.g. via Slack, Jira, email, or Github comments/approvals. But just use normal caution when doing other git or Confluence operations. And don't spam in docs reminding agents what the rules are.
+4. **Don't Quit**: Do not give up on the best tool for the job: if it is missing or broken or needs auth, invest in getting it to work, and fallback only when repair fails and user is unresponsive, and state the fallback + reason. **Auth/credential walls are not yours to route around.** The moment a crucial tool is blocked on login, SSO, or a dead credential: STOP, alert the user immediately (use `ailert` if available; otherwise just say so plainly and stop), and wait. Do not fill the wait with guesswork, alternative-tool spelunking, or "best-effort" workarounds on the underlying task — that is busy-work that wastes everyone's time and risks wrong or wasted changes. The single correct move is asking for the credential/login and stopping until you have it.
+5. **Don't Spam**: Ask permission before communicating with other humans, e.g. via Slack, Jira, email, or Github comments/approvals. But just use normal caution when doing other git or Confluence operations. And don't spam in docs reminding agents what the rules are. When posting on the user's behalf (with permission), sign every message: a separate italicized final line — *Sent for [user] by [Model] in [Harness version] in [IDE version] via [skill version]* — with the skill name linked to its SKILL.md in GHE when a named team skill is responsible. Gather model/harness/IDE versions using the same commands as the standup2jira provenance footer (see `shared/.wibey/skills/standup2jira/SKILL.md` § AI provenance footer). Use the platform's native italics; note that typing `_text_` via CDP into Slack's WYSIWYG compose box renders literally, not as italic.
 6. **Don't Count**: Never label things sequentially, e.g. with numbers or letters. It's opaque and brittle and lazy. Use names. Exceptions may be granted for sequences that are long or immutable.
 7. **Don't Narrate**: Except in designated sections (e.g. work logs), documents should not narrate their history or be self-conscious of previous versions. Omit apologetic or performative text. Documents are timeless; all that matters is whether the text helps the reader.
 
@@ -157,12 +157,16 @@ Run `~/bin/safewrite -h` for full options. Run `~/bin/fhold -h` for the fhold ME
 
 ### Other file operation rules
 
-- Never `rm` directly on user files — use `trash` or `mv ~/.Trash/`. **Exception: `/tmp/` and `tmp/` may be deleted with plain `rm` — no `trash`, no confirmation, no hesitation (see [Six Commandments](#the-six-commandments)).**
+- Never `rm` directly on user files — use `trash` or `mv ~/.Trash/`. **Exception: `/tmp/` and `tmp/` may be deleted with plain `rm` — no `trash`, no confirmation, no hesitation (see [Seven Commandments](#the-seven-commandments)).**
 - Duplicate/conflicting files: ASK which to keep before deleting either
 - No VCS changes unless you're certain the user wants them
 - Commit granularity: independent changes → separate commits; interdependent → one commit
 - **Two-tier commit policy**: mechanical changes (artifacts, formatting) → commit directly; substantive changes (logic, data, content) → `git add` and summarize for user review. User can override with "just commit it".
-- **Commit message provenance**: Every commit made by an agent must include the AI model name and version in a line at the end. Format: `Model: <name>-<version>` (e.g., `Model: claude-haiku-4.5`). This makes agent provenance auditable in `git log`.
+- **Commit message provenance**: Every commit made by an agent must include a provenance trailer block at the end, one line per fact that is actually available in the current session — omit any line whose fact can't be determined, don't guess or invent a value:
+  - `Model: <name>-<version>` (e.g. `Model: claude-sonnet-5`) — always required. Use the resolved model identifier (check the agent's model registry/config, e.g. `~/.code_puppy/models.json`, for what a configured alias like `claude-5-sonnet` actually resolves to) — don't guess a plausible-sounding name.
+  - `Harness: <name> <version>` (e.g. `Harness: code-puppy 0.1.57`, `Harness: wibey <version>`) — the agent runtime/CLI, if its version is discoverable (installed package version, `--version` flag, or config file).
+  - `IDE: <name> <version>` (e.g. `IDE: IntelliJ IDEA 2026.2`, `IDE: VS Code`, `IDE: Code Puppy Desktop`) — the editor/IDE the session is running inside, if detectable (e.g. via environment variables, running process inspection, or app bundle metadata). Version is a bonus, not required, if the IDE doesn't expose one easily.
+  - This makes agent provenance auditable in `git log`: which model, which harness, which IDE produced a given change.
 
 ## Communication Style
 
@@ -206,6 +210,7 @@ Use EDTF with these modifications, while ensuring that every date sorts
 chronologically as text:
 
 - Use **periods** as date component separators instead of hyphens (e.g. `2026.03.27` not `2026-03-27`). Periods prevent unwanted line breaks in cramped table layouts, are analogous to decimal points, save space in variable-width fonts, and cannot be confused with ranges.
+- **Exception: filenames and directory names use hyphens** (e.g. `2026-03-27`, not `2026.03.27`). The periods rationale above (line-wrap avoidance, range disambiguation) doesn't apply to filenames; hyphens instead avoid a trailing dot ambiguous with a file extension and match the sortable `YYYY-MM-DD` convention already established across `aidocs/`, `memos/`, `releases/`, and `incidents/`. Prose dates inside those same files still use periods.
 - When space allows, append day of week e.g. 2026.07.27.Mon
 - When year is not needed (e.g. when obvious from context and not needed as a search target), you may use mm.dd.Dow
 - Use hyphens as range indicators instead of slashes (e.g. `2026.03.01-2026.03.27` not `2026-03-01/2026-03-27`). Slashes read like ratios or alternatives, not ranges.
@@ -321,6 +326,7 @@ Wibey discovers project-level skills from `<workspace>/.wibey/skills/`. The `~/b
     doc-audit/       SKILL.md            — mirrored
     ftm/             SKILL.md            — personal-only (Family Tree Maker integration)
   commands/
+    avoid-numbering.md — personal-only (admonish agent to scrub sequential labels)
     commitz.md       — personal-only (cluster diffs into commit buckets)
     convo.md         — personal-only (park conversation for Mission Control)
     say.md           — personal-only (text-to-speech output)
@@ -368,7 +374,7 @@ Three checks that `walmart-sync --` audit runs:
 
 **Known pre-existing portability issues:** The SKILL.md files for `ailert`, `clipboard-read`, and `converge`, and the commands `continue`, `plando`, `tdd` all contain GHE provenance links (`gecgithub01.walmart.com`) and `relationship-shared` text references — these shipped with the initial mirror and are already committed to the public repo. To clean them up, strip the provenance block from each file in relationship-shared before re-mirroring, or patch them locally after sync.
 
-**When AgentRules.md mirror lists change**, update `MIRROR_ITEMS` and `PERSONAL_ONLY` in `~/bin/walmart-sync` to match.
+**When AgentRules.md mirror lists change**, update the `mirror_items` and `personal_only` arrays in `~/bin/walmart-sync.json` to match — the policy manifest; `~/bin/walmart-sync` itself is a thin orchestrator with no embedded lists.
 
 Currently mirror-safe skills: `ailert` (with `assets/`), `clipboard-read`, `converge`, `doc-audit`.
 Currently mirror-safe commands: `continue`, `plando`, `tdd`.
