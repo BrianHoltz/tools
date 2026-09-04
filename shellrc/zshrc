@@ -43,3 +43,6 @@ alias code-puppy="$HOME/.code-puppy-venv/bin/code-puppy"
 #mcp-cli:binary path
 export MCP_CLI_BIN=/Users/b0h0166/.mcp-cli/bin
 export PATH="${PATH}:${MCP_CLI_BIN}"
+
+# Added by Code Puppy installer on Tue Sep  1 13:35:09 PDT 2026
+alias pup="$HOME/.code-puppy-venv/bin/pup"
