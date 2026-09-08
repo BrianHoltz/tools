@@ -200,6 +200,7 @@ Run `~/bin/safewrite -h` for full options. Run `~/bin/fhold -h` for the fhold ME
 - After recovering a missing artifact, store it in the canonical local archive path immediately and verify the file content before concluding.
 - Avoid opening VS Code integrated browser tabs for agent work unless the user explicitly wants a human-view-only tab. Those tabs clutter the IDE and may not expose screenshot or DOM access to the agent.
 - If a VS Code browser tab was opened only for agent investigation and a CDP-capable browser is available, switch to CDP and stop adding more IDE tabs.
+- **Every CDP tab must open inside your own dedicated top-level browser window** — the one whose leftmost tab is your identification page. Commands such as `tab new`, direct `open`, and `curl /json/new` silently open tabs in whichever window the browser currently considers focused, which is almost never yours. Use whatever session-aware tab-creation helper your browser setup checklist provides (e.g., `cdp_ensure_tab`). This is the #1 cause of work executing invisibly in the wrong window.
 
 ## Inferring Intended Files
 
