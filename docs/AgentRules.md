@@ -175,6 +175,7 @@ Run `~/bin/safewrite -h` for full options. Run `~/bin/fhold -h` for the fhold ME
 - No VCS changes unless you're certain the user wants them
 - Commit granularity: independent changes → separate commits; interdependent → one commit
 - **Two-tier commit policy**: mechanical changes (artifacts, formatting) → commit directly; substantive changes (logic, data, content) → `git add` and summarize for user review. User can override with "just commit it".
+- **PR Approval Boundary — CRITICAL**: **Never commit to a branch that has an open PR with any approvals, even if changes seem mechanical or trivial.** Approvals represent a user checkpoint where the reviewer has signed off on the diff they saw. Any commit after that point (1) invalidates the approval, (2) sneaks changes past the reviewer, or (3) forces a new review cycle. This includes auto-commits from skills (snyk-fix, code formatters, etc.) — check PR status before triggering them. If changes are needed to an approved PR, ask the user explicitly: "This PR has X approval(s). Should I commit these changes, or would you prefer to request changes manually?"
 - **Commit message provenance**: Every commit made by an agent must include a provenance trailer block at the end, one line per fact that is actually available in the current session — omit any line whose fact can't be determined, don't guess or invent a value:
   - `Model: <name>-<version>` (e.g. `Model: claude-sonnet-5`) — always required. Use the resolved model identifier (check the agent's model registry/config, e.g. `~/.code_puppy/models.json`, for what a configured alias like `claude-5-sonnet` actually resolves to) — don't guess a plausible-sounding name.
   - `Harness: <name> <version>` (e.g. `Harness: code-puppy 0.1.57`, `Harness: wibey <version>`) — the agent runtime/CLI, if its version is discoverable (installed package version, `--version` flag, or config file).
@@ -200,6 +201,7 @@ Run `~/bin/safewrite -h` for full options. Run `~/bin/fhold -h` for the fhold ME
 - After recovering a missing artifact, store it in the canonical local archive path immediately and verify the file content before concluding.
 - Avoid opening VS Code integrated browser tabs for agent work unless the user explicitly wants a human-view-only tab. Those tabs clutter the IDE and may not expose screenshot or DOM access to the agent.
 - If a VS Code browser tab was opened only for agent investigation and a CDP-capable browser is available, switch to CDP and stop adding more IDE tabs.
+- **Every CDP tab must open inside your own dedicated top-level browser window** — the one whose leftmost tab is your identification page. Commands such as `tab new`, direct `open`, and `curl /json/new` silently open tabs in whichever window the browser currently considers focused, which is almost never yours. Use whatever session-aware tab-creation helper your browser setup checklist provides (e.g., `cdp_ensure_tab`). This is the #1 cause of work executing invisibly in the wrong window.
 
 ## Inferring Intended Files
 
@@ -234,6 +236,8 @@ chronologically as text:
 ## Documentation
 
 For documentation authoring, planning docs, status/task/work-log hygiene, evidence conventions, and doc audits, use the doc-audit skill as the shared reference. On the work laptop, it is at `shared/.wibey/skills/doc-audit/SKILL.md` (team repo). It is **not** in `~/bin/.wibey/` because it contains Walmart-internal URLs (gecgithub01, Jira keys, service names) that would be exposed in a public GitHub push.
+
+**Document length is not a team policy.** Do not impose, mention, or enforce an arbitrary line-count ceiling on code or documentation. Keep a file cohesive, readable, and maintainable; split it only when separation improves those qualities or the content has genuinely distinct ownership. Model selection and context budgeting are not reasons to mutilate a coherent document.
 
 For questions about the personal Git/repo/workspace layout, consult `~/bin/docs/GitScheme.md` first. It is the authoritative cross-laptop reference for the `home` monorepo, `~/My Drive`, `~/lpscc`, and how `~/src/tools` plus the `~/bin` symlink fit into that scheme. Use `~/bin/docs/GitScheme_RCA.md` for the 2026.07 recovery incident and rationale behind the current layout.
 
