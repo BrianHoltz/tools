@@ -32,13 +32,19 @@ ln -sfn ~/Google\ Drive/Shared\ drives/LP\ SCC\ Financial ~/lpscc
 mkdir -p ~/.wibey/commands
 for f in ~/bin/.wibey/commands/*.md; do ln -f "$f" ~/.wibey/commands/; done
 
-# VS Code + Copilot
+# Editor choice — install either IntelliJ IDEA or VS Code
+# Option A: IntelliJ IDEA (recommended)
+brew install --cask jetbrains-toolbox
+# Open JetBrains Toolbox and install IntelliJ IDEA Community or Ultimate.
+# In IDEA: Tools → Create Command-line Launcher, then use `idea --wait`.
+
+# Option B: VS Code
 brew install --cask visual-studio-code
 code --install-extension github.copilot
 code --install-extension github.copilot-chat
 ```
 
-Open `code ~/bin/docs/NewMacSetup.md` — VS Code picks up the `gh` session for Copilot sign-in automatically.
+Open `~/bin/docs/NewMacSetup.md` in the editor you selected. VS Code picks up the `gh` session for Copilot sign-in automatically; in IntelliJ, install the GitHub Copilot plugin and sign in with GitHub.
 
 ## Copilot: Core Apps
 
@@ -49,7 +55,6 @@ brew install --cask \
   google-chrome \
   firefox \
   cursor \
-  jetbrains-toolbox \
   stats \
   tableplus \
   github \
@@ -59,7 +64,6 @@ brew install --cask \
   google-drive
 ```
 
-- After JetBrains Toolbox: install IntelliJ IDEA Community or Ultimate from Toolbox UI
 - `stats` — menu bar CPU/RAM/disk/network; auto-launches at login
 - Google Drive — launches at login automatically after install
 
@@ -93,7 +97,9 @@ brew install --cask vysor
 ```sh
 git config --global user.name "Brian Holtz"
 git config --global user.email "brianholtz1965@gmail.com"
-git config --global core.editor "code --wait"
+# Use the launcher for the editor selected above:
+git config --global core.editor "idea --wait"  # IntelliJ IDEA
+# git config --global core.editor "code --wait"  # VS Code
 git config --global pull.rebase true
 ```
 
@@ -127,7 +133,9 @@ brew install \
 # playwright install chromium
 ```
 
-## Copilot: VS Code Extensions
+## Copilot: VS Code Alternative
+
+Skip this section when using IntelliJ IDEA.
 
 ```sh
 # Core workflow (Copilot already installed)
@@ -153,7 +161,9 @@ code --install-extension johnpapa.vscode-peacock
 
 Install same extensions in Cursor via `cursor --install-extension <id>`.
 
-## Copilot: VS Code / Cursor Settings
+## Copilot: VS Code / Cursor Settings (VS Code Alternative)
+
+Skip this section when using IntelliJ IDEA.
 
 Add to `~/Library/Application Support/Code/User/settings.json`
 (and `~/Library/Application Support/Cursor/User/settings.json`):
@@ -216,7 +226,9 @@ These patches survive extension installs but are overwritten on extension *updat
 
 After patching either extension: `⇧⌘P` → Developer: Reload Window.
 
-## Copilot: IntelliJ IDEA Settings
+## Copilot: IntelliJ IDEA Settings (Recommended)
+
+Skip the VS Code sections above when using IntelliJ IDEA. Install the GitHub Copilot plugin from Settings → Plugins, then sign in with GitHub.
 
 Paths below use `<version>` for the IDEA version directory (e.g. `IntelliJIdea2025.3`).
 
