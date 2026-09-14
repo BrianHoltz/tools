@@ -233,6 +233,12 @@ chronologically as text:
 - Represent an unknown month or day with `X` (e.g. `1900.XX` or `1900.XX.XX`).
 - Mark an approximate date by appending `c` after the date specification (e.g. `1900c`, `1900.XXc`, or `1900.05.17c`). Put `c` before a trailing `<` or `>` (e.g. `1900c<` or `1900c>`).
 
+### Human-readable durations
+
+Format durations as compact `NdNhNmXs`, omitting zero-valued leading units. Use
+a decimal part for seconds only when the total duration is under one minute;
+round seconds to whole numbers for durations of one minute or longer.
+
 ## Documentation
 
 For documentation authoring, planning docs, status/task/work-log hygiene, evidence conventions, and doc audits, use the doc-audit skill as the shared reference. On the work laptop, it is at `shared/.wibey/skills/doc-audit/SKILL.md` (team repo). It is **not** in `~/bin/.wibey/` because it contains Walmart-internal URLs (gecgithub01, Jira keys, service names) that would be exposed in a public GitHub push.
