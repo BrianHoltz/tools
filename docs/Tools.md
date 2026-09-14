@@ -1,5 +1,14 @@
 # AI/IDE Toolchain
 
+## Local Modifications in Use
+
+- **Code Puppy JetBrains** — adds editable conversation titles in the transcript and History menu, plus a suggested attachment for the focused editor file or selection.
+- **Wibey JetBrains** — supports persistent editable conversation titles, editable queued follow-up prompts, focused-editor file/selection context, and automatic quota snapshots for the usage dashboard.
+- **Zaaack Markdown Editor for VS Code and Cursor** — adds multipanel editing, outline navigation, find, anchor links, and dark-theme/readability improvements.
+- **TypeDown for VS Code and Cursor** — compacts prose, table, and list spacing; preserves editor focus and cursor position through paste.
+- **Shuzijun Markdown Editor for IntelliJ IDEA** — improves body-text readability and supplies the JCEF dependency required by IDEA 2026.2.
+- **IntelliJ IDEA MCP Server plugin** — prevents MCP connections from stealing focus to the Services tool window.
+
 ## IDEs
 
 
