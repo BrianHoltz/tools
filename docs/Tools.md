@@ -14,17 +14,17 @@
 
 | Feature                        | IDEA              | VS Code       | Cursor                  |
 | ------------------------------ | ----------------- | ------------- | ----------------------- |
-| Score                          | 28.5              | 20.5 ⚙️     | 19.5                    |
+| Score                          | 33.5              | 20.5          | 19.5                    |
 | IDE                            | 2026.2            | 1.135.0       | 3.17.21                 |
 | VSCode engine                  | —                | —            | 1.105.1                 |
-| Wibey                          | 1.0.26            | 1.0.20 ⚙️   | 1.0.18 ⚙️             |
+| Wibey                          | 1.0.27            | 1.0.20        | 1.0.18                  |
 | └ parallel agents             | ✅                | ✅            | ✅                      |
 | └ enqueue next prompt         | ❌                | ✅            | ✅                      |
 | └ context += @ file           | ✅                | 🟡<100KB      | 🟡<100KB                |
 | └ context += selection        | ✅ cmd-' pill     | ✅ cmd-L pill | 🟡 cmd-L pill via Agent |
-| └ image paste                 | ✅ ⚙️           | ✅            | ✅                      |
-| └ convo title edit            | ✅✅ ⚙️         | ✅            | ✅                      |
-| └ convo title auto            | first prompt ⚙️ | last prompt   | last prompt             |
+| └ image paste                 | ✅                | ✅            | ✅                      |
+| └ convo title edit            | ✅✅              | ✅            | ✅                      |
+| └ convo title auto            | ✅                | ✅            | ✅                      |
 | └ convo search                | ✅                | ✅            | ✅                      |
 | └ convo timestamps            | ✅                | ✅            | ✅                      |
 | └ convo bookmark              | ✅                | ✅            | ✅                      |
@@ -52,9 +52,9 @@
 Score rubric
 
 - Glyph values: ✅✅ = 2 pts, ✅ = 1 pt, 🟡 / ✔️ = 0.5 pts, ❌ / ? = 0 pts, ❌❌ = −1 pt
-- ⚙️ suffix = capability provided by a local patch (`~/bin/patches/`); reapply after extension update
 - Version/text-only cells (version numbers, descriptive text) = excluded
 - Copilot rows excluded from IDE score
+- **IDEA patches (baked-in as of 2026.07.17):** image-paste-fix + conversation-title-features are merged into local `brian/local-combined` build (Wibey 1.0.27). Scores reflect working features; ⚙️ notation removed. Recount after IDE/extension updates.
 - Editor score: each IDE gets the maximum score achievable by any editor available to it
   - IDEA: native WYSIWYG editor (8.0 pts); beats viewer (7.0) and shuzijun (3.5)
   - VS Code: typedown (3.5 pts); zaaack broken ~2026.06.01 (was 7 pts w/ patch)
@@ -132,6 +132,7 @@ Extension command IDs:
 
 ## Top Frictions
 
+- **All IDEA patches currently applied and stable** (verified 2026.07.17). Wibey 1.0.27 from `brian/local-combined` ships with both PRs merged (image-paste-fix + conversation-title-features). Stable baseline for this system; update that branch to stay current as patches are upstreamed.
 - Parallel Wibey agents now available in all three IDEs (as of 2026.06).
 - Top silly frictions: let me buffer up my next prompt, and make it super-easy to reference the current file and selection.
   - Wibey allows enqueuing the next prompt while busy in VS Code and Cursor, but not in IDEA. Allowing this in IDEA would give 30% of the value of parallel agents. I don't like interrupting agents to add their next prompt and then tell them to first finish the previous one.
