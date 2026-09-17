@@ -343,7 +343,6 @@ Line-height, table padding, list spacing, and focus bug patches. Full procedure:
 - **Superior features: search/find, git, debug, database, http, yaml preview**
 - **Currently on 2026.2 GA/stable** (build 262.8665.258, released 2026.07.16; installed on Walmart laptop 2026.07.16). The 2026.2 EAP (auto-updated ~2026.06.27) has now shipped as stable — the config dir (`IntelliJIdea2026.2`) carried over from EAP → GA, so all EAP-era JAR patches survived the upgrade. The two 2026.2 breaking changes still require JAR patches (see ToolMods.md).
 - **Patch audit 2026.07.17 (Walmart laptop, 2026.2 GA):** verified all fixes present in the running build — JCEF remote disabled (`idea.vmoptions`), Shuzijun `com.intellij.modules.jcef` depends + 13px font (`markdown-editor-2.0.5.jar`), MCP Server Services-panel suppression (`mcpserver.jar`), keymap overrides (`macOS copy.xml`), and the patched Wibey plugin `1.0.23.jar` from `brian/local-combined` (image-paste `setupClipboardPaste`/`handleImagePaste` + session-title fields all confirmed via `javap`). The one gap — the "Allow Edits to Sensitive Files" dialog suppression (`idea.readonly.fragments.notification.enabled=false`) missing from `early-access-registry.txt` — was reapplied (IDEA quit first; file method). All patches now applied.
-- *Terminal Blindness observed on personal laptop in IDEA; not observed on Walmart laptop as of 2026.04.04.*
 - *command-approval constipation*
 - *Parallel agents now supported (as of 2026.06)*
 - *Cannot paste file/line reference!?*
@@ -355,24 +354,9 @@ Line-height, table padding, list spacing, and focus bug patches. Full procedure:
   - **Built-in profiler and memory analysis**
   - *Expensive ($249/yr commercial, $169 w/ AI Assistant)*
 
-### Terminal Blindness (IDEA Copilot)
-
-This issue occurs mainly in GitHub Copilot in Intellij IDEA. Terminal output detection can fail, causing commands to appear to produce no output even though their output is visible in the terminal.
-
-- **Where observed:** reproducible on personal laptop; **never observed on Walmart laptop** so far (as of 2026.04.04)
-- **Root cause (plugin behavior):** `TerminalUtils.collectTerminalOutput()` computes `commandStartY = cursorY + historyLinesCount + cmdLines - 1` and reads `getText().drop(commandStartY)`. Over time, `cursorY` drifts toward `screenHeight`; once `commandStartY` exceeds available text lines, output capture goes blank.
-- **SOTA workaround status (applied):**
-  - `~/bin/bash_profile`: `BASH_SILENCE_DEPRECATION_WARNING=1`
-  - `~/bin/bashrc`: JetBrains block sets `set +o noclobber`
-  - `~/bin/bashrc`: JetBrains block sets `PROMPT_COMMAND='printf "\e[H\e[2J"'`
-  - `~/bin/bash_profile`: JetBrains sessions preserve `.bashrc` `PROMPT_COMMAND` (no override in history block)
-- **Do not use `\e[3J`:** JediTerm clears both scrollback and screen, which destroys output before Copilot can read it.
-- **Limitations:** `\e[H\e[2J` is not perfect; drift can recur after enough commands. Running `clear` resets drift.
-- **Fallback:** redirect command output to `tmp/YYYYMMDD_HHMMSS_agent.out`, then read the file directly and mirror it with `cat` or `tail` in terminal.
-
 ### IDEA Keybindings
 
-IDEA keybinding overrides are stored in `~/Library/Application Support/JetBrains/IntelliJIdea2025.3/keymaps/macOS copy.xml`. Edit this file to add standard bindings:
+IDEA keybinding overrides are stored in `~/Library/Application Support/JetBrains/IntelliJIdea2026.2/keymaps/macOS copy.xml`. Edit this file to add standard bindings:
 
 - **Zoom**: `⌘=` / `⌘-` (remapped from `^⌥=` / `^⌥-`)
   - Action IDs: `ZoomInIdeAction` / `ZoomOutIdeAction`
