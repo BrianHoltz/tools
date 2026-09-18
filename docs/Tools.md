@@ -11,6 +11,8 @@
 
 ### Local Build Artifact Rule
 
+This is the canonical personal policy for local IDE/plugin artifacts.
+
 Every locally built IDE/plugin artifact must be copied to `~/Downloads/` for installation and review. Keep the canonical build output in its repository's normal release folder, but treat the Downloads copy as the human-facing local build.
 
 Name each Downloads artifact `<product>-<version>-yyyy.mm.dd.Dow.hhmm-<blah>.<ext>`. The timestamp is the actual build-completion time; `<blah>` is a lowercase, hyphen-free description of the newest included fix, shorter than 10 characters. Example: `code-puppy-jetbrains-0.23.0-2026.09.18.Fri.1146-imgpaste.zip`.
