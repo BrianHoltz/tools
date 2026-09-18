@@ -2,7 +2,9 @@
 
 *Generated 2026.04.28 from work MacBook inventory. Filtered: Walmart-only tools excluded.*
 
-## Manual: Bootstrap
+## Human setup
+
+### Bootstrap (before Copilot Agent)
 
 ```sh
 # Homebrew
@@ -19,6 +21,7 @@ gh auth login
 mkdir -p ~/src
 git clone git@github.com:BrianHoltz/tools.git ~/src/tools
 ln -sfn ~/src/tools ~/bin
+mkdir -p ~/.claude
 ln -sf ~/bin/docs/AgentRules.md ~/.claude/CLAUDE.md
 ln -sf ~/bin/shellrc/zprofile ~/.zprofile
 ln -sf ~/bin/shellrc/zshrc ~/.zshrc
@@ -32,15 +35,48 @@ ln -sfn ~/Google\ Drive/Shared\ drives/LP\ SCC\ Financial ~/lpscc
 mkdir -p ~/.wibey/commands
 for f in ~/bin/.wibey/commands/*.md; do ln -f "$f" ~/.wibey/commands/; done
 
-# VS Code + Copilot
+# Editor choice — install either IntelliJ IDEA or VS Code
+# Option A: IntelliJ IDEA (recommended)
+brew install --cask jetbrains-toolbox
+# Open JetBrains Toolbox and install IntelliJ IDEA Community or Ultimate.
+# In IDEA: Tools → Create Command-line Launcher, then use `idea --wait`.
+
+# Option B: VS Code
 brew install --cask visual-studio-code
 code --install-extension github.copilot
 code --install-extension github.copilot-chat
 ```
 
-Open `code ~/bin/docs/NewMacSetup.md` — VS Code picks up the `gh` session for Copilot sign-in automatically.
+### Finish editor setup manually
 
-## Copilot: Core Apps
+For the IntelliJ IDEA option:
+
+- Open **IntelliJ IDEA → Settings** (`⌘,`) → **Plugins**.
+- Select **Marketplace**, search for **GitHub Copilot**, and click **Install**.
+- Without restarting, search for **Shuzijun Markdown Editor** and click **Install**.
+- Restart IntelliJ IDEA when prompted.
+- Open **Tools → GitHub Copilot → Login to GitHub** and complete the browser authorization.
+
+For the VS Code option, the bootstrap commands install the Copilot extensions. Open `~/bin/docs/NewMacSetup.md` in the editor you selected and confirm Copilot is signed in.
+
+### Additional apps requiring human installation
+
+- Kindle — App Store
+- Family Tree Maker — https://mackiev.com/ftm/
+- OBSBOT Center — https://www.obsbot.com/download
+- YiHomeMacInt — App Store
+- Reolink for Mac — https://reolink.com/software-and-manual/
+- World of Tanks Blitz — App Store
+
+### Hand off to Copilot Agent
+
+After the selected editor and Copilot are working, use Copilot Agent inside that editor to run the robot setup section below. Do not start that section until the human setup above is complete.
+
+## Copilot Agent setup
+
+The remaining command-based setup can be run by Copilot Agent inside the selected editor. The agent should skip any step that does not apply to the chosen editor.
+
+### Core apps
 
 All install correctly via brew — no web downloads needed.
 
@@ -49,7 +85,6 @@ brew install --cask \
   google-chrome \
   firefox \
   cursor \
-  jetbrains-toolbox \
   stats \
   tableplus \
   github \
@@ -59,11 +94,10 @@ brew install --cask \
   google-drive
 ```
 
-- After JetBrains Toolbox: install IntelliJ IDEA Community or Ultimate from Toolbox UI
 - `stats` — menu bar CPU/RAM/disk/network; auto-launches at login
 - Google Drive — launches at login automatically after install
 
-## Copilot: Additional Apps
+### Additional apps
 
 ```sh
 brew install --cask claude
@@ -79,25 +113,18 @@ brew install --cask emacs-app
 brew install --cask vysor
 ```
 
-## Manual: Additional Apps
-
-- Kindle — App Store
-- Family Tree Maker — https://mackiev.com/ftm/
-- OBSBOT Center — https://www.obsbot.com/download
-- YiHomeMacInt — App Store
-- Reolink for Mac — https://reolink.com/software-and-manual/
-- World of Tanks Blitz — App Store
-
-## Copilot: Shell / Git Config
+### Shell / Git config
 
 ```sh
 git config --global user.name "Brian Holtz"
 git config --global user.email "brianholtz1965@gmail.com"
-git config --global core.editor "code --wait"
+# Use the launcher for the editor selected above:
+git config --global core.editor "idea --wait"  # IntelliJ IDEA
+# git config --global core.editor "code --wait"  # VS Code
 git config --global pull.rebase true
 ```
 
-## Copilot: Core CLI
+### Core CLI
 
 ```sh
 brew install \
@@ -127,7 +154,9 @@ brew install \
 # playwright install chromium
 ```
 
-## Copilot: VS Code Extensions
+### VS Code alternative
+
+Skip this section when using IntelliJ IDEA.
 
 ```sh
 # Core workflow (Copilot already installed)
@@ -153,7 +182,9 @@ code --install-extension johnpapa.vscode-peacock
 
 Install same extensions in Cursor via `cursor --install-extension <id>`.
 
-## Copilot: VS Code / Cursor Settings
+### VS Code / Cursor settings (VS Code alternative)
+
+Skip this section when using IntelliJ IDEA.
 
 Add to `~/Library/Application Support/Code/User/settings.json`
 (and `~/Library/Application Support/Cursor/User/settings.json`):
@@ -198,7 +229,7 @@ Add to `~/Library/Application Support/Code/User/keybindings.json`
 
 Result: `⌥⇧⌘M` opens TypeDown, `^⌥⌘M` opens Zaaack, `⇧⌘V` opens MPE side preview.
 
-## Copilot: Extension Patches
+### Extension patches
 
 These patches survive extension installs but are overwritten on extension *update* — reapply after each update.
 
@@ -216,7 +247,9 @@ These patches survive extension installs but are overwritten on extension *updat
 
 After patching either extension: `⇧⌘P` → Developer: Reload Window.
 
-## Copilot: IntelliJ IDEA Settings
+### IntelliJ IDEA settings (recommended)
+
+Skip the VS Code sections above when using IntelliJ IDEA. Copilot should already be installed and signed in during the manual bootstrap above.
 
 Paths below use `<version>` for the IDEA version directory (e.g. `IntelliJIdea2025.3`).
 
@@ -255,13 +288,13 @@ idea.readonly.fragments.notification.enabled
 false
 ```
 
-Restart IDEA after adding. **Shuzijun Markdown Editor** (install plugin first, then patch):
+Restart IDEA after adding. If the human setup installed **Shuzijun Markdown Editor**, Copilot Agent can apply its patch:
 
 - JAR: `~/Library/Application Support/JetBrains/<version>/plugins/markdown-editor/lib/markdown-editor-*.jar`
 - Extract `vditor/style.css`, add `font-size: 13px !important` to `.vditor .vditor-reset`, `.vditor-sv`, `.vditor-ir`; repack with `jar uf`; restart IDEA
 - Full patch details: `docs/Tools.md` § Shuzijun Markdown Editor Patches
 
-## Copilot: Claude Code
+### Claude Code
 
 ```sh
 npm install -g @anthropic-ai/claude-code
@@ -271,7 +304,7 @@ npm install -g @anthropic-ai/claude-code
 - Expose skills per workspace via `.wibey/skills/<name>/SKILL.md` symlinks into `~/bin/wibey/skills/`
 - Usage dashboard: install via `/install usage-dashboard` in a session; apply UTC timezone patches from `docs/Tools.md` § usage-dashboard
 
-## Copilot: Media & AI
+### Media & AI
 
 ```sh
 brew install ffmpeg
@@ -281,7 +314,7 @@ brew install openai-whisper   # pulls pytorch, numpy, etc. — takes a while
 - `ffmpeg` — pulls x264, x265, lame, opus, dav1d, libvpx, svt-av1, sdl2 automatically
 - `openai-whisper` — local speech-to-text; also installs pytorch + openblas as deps
 
-## Copilot: Optional
+### Optional
 
 Containers:
 
@@ -296,11 +329,13 @@ Bun:
 brew install oven-sh/bun/bun
 ```
 
-## Notes
+## Reference
+
+### Notes
 
 - `brew list` on work Mac = deps-included; only manually install the named formulae above (deps pull automatically)
 
-## 2026.04.28 Run Status (Copilot)
+### 2026.04.28 Run Status (Copilot)
 
 Completed in this run:
 
@@ -319,7 +354,7 @@ Manual-only items still outside Copilot automation scope:
 - App Store / vendor installs in "Manual: Additional Apps"
 - JetBrains Toolbox follow-up UI actions (install IDEA, apply IntelliJ-specific settings)
 
-## Install Learnings (Personal Mac)
+### Install Learnings (Personal Mac)
 
 - Some casks unexpectedly invoke `sudo` even when they look like app-bundle installs (observed during this run: `zoom`, `google-drive`, and overwrite paths for `kiwix`/`simple-comic`).
 - Avoid broad `--force` batches when possible. Prefer normal install first, then targeted single-cask retries for failures.
