@@ -46,3 +46,11 @@ export PATH="${PATH}:${MCP_CLI_BIN}"
 
 # Added by Code Puppy installer on Tue Sep  1 13:35:09 PDT 2026
 alias pup="$HOME/.code-puppy-venv/bin/pup"
+
+
+# Added by Wibey CLI installation
+export PATH="/Users/b0h0166/.local/bin:$PATH"
+
+
+# Added by Wibey CLI installation
+export BUN_INSTALL_CACHE_DIR="/Users/b0h0166/.local/share/bun/cache"
