@@ -227,6 +227,8 @@ chronologically as text:
 - Use **periods** as date component separators instead of hyphens (e.g. `2026.03.27` not `2026-03-27`). Periods prevent unwanted line breaks in cramped table layouts, are analogous to decimal points, save space in variable-width fonts, and cannot be confused with ranges.
 - **Exception: filenames and directory names use hyphens** (e.g. `2026-03-27`, not `2026.03.27`). The periods rationale above (line-wrap avoidance, range disambiguation) doesn't apply to filenames; hyphens instead avoid a trailing dot ambiguous with a file extension and match the sortable `YYYY-MM-DD` convention already established across `aidocs/`, `memos/`, `releases/`, and `incidents/`. Prose dates inside those same files still use periods.
 - When space allows, append day of week e.g. 2026.07.27.Mon
+- When a time is included, use a compact four-digit 24-hour time with no colon, e.g. `2026.09.22.Tue.1149`.
+- When a date-time is embedded in a version number, retain only the periods separating the date, day of week, and time; do not add punctuation inside the time.
 - When year is not needed (e.g. when obvious from context and not needed as a search target), you may use mm.dd.Dow
 - Use hyphens as range indicators instead of slashes (e.g. `2026.03.01-2026.03.27` not `2026-03-01/2026-03-27`). Slashes read like ratios or alternatives, not ranges.
 - Use `yyyy<` for dates after a year and `yyyy>` for dates before a year, so the date itself remains the sortable prefix (e.g. `1900<`, `1900>`).
