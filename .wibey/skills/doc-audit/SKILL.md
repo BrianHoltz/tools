@@ -14,7 +14,12 @@ Consolidated reference for documentation authoring, project document formatting,
     - [Task Table Columns](#task-table-columns)
     - [Task Discipline Rules](#task-discipline-rules)
   - [Active Work](#active-work)
+  - [Next Daily Jira Update](#next-daily-jira-update)
   - [Draft Next Comms](#draft-next-comms)
+  - [Pending Decisions](#pending-decisions)
+  - [Decisions](#decisions)
+  - [Pending Investigations](#pending-investigations)
+  - [Resolved Investigations](#resolved-investigations)
   - [Diagnosis](#diagnosis)
   - [Evidence](#evidence)
   - [Work Log](#work-log)
@@ -70,10 +75,12 @@ Organize mortal docs with the following sections:
 | References       | ●       | ○                   | ●    |
 | Tasks            | ●       | ○                   | —    |
 | Active Work      | ●       | ○                   | —    |
+| Next Daily Jira Update | ○       | ○                   | —    |
 | Draft Next Comms    | ○       | ●                   | ○    |
-| Pending Investigations | ○       | ●                   | ○    |
 | Pending Decisions | ○       | ○                   | ○    |
 | Decisions        | ○       | ○                   | ○    |
+| Pending Investigations | ○       | ●                   | ○    |
+| Resolved Investigations | ○       | ○                   | ○    |
 | Diagnosis           | —       | ●                   | —    |
 | Evidence            | ●       | ●                   | ●    |
 | Work Log         | ●       | ●                   | ○    |
@@ -95,11 +102,11 @@ Sits at the very top. Always structured bullets — never prose paragraphs. See 
 
 ### Status
 
-Two variants depending on doc type:
+No doc type gets a dedicated `## Status` heading — none of [Project.md](../../../docs/templates/Project.md), [Incident.md](../../../docs/templates/Incident.md), or the memo pattern define one (consistent with the [Mortal Doc Structure](#mortal-doc-structure) table above, which has no Status row). Status is conveyed inline instead, using the mechanism suited to each doc type:
 
-- **Projects**: omit the Status section entirely. The [Tasks](#tasks) table **IS** the status display — keep it wl-sorted and up-to-date so readers can scan it directly for current work. With the sorting discipline (done → in-progress → not-started, preserving order within each group), the Tasks table itself provides clear status visibility without needing a separate excerpt.
-- **Incidents**: a status token from [StatusVocabulary.md](../../../docs/StatusVocabulary.md), optionally qualified with an em-dash (e.g. `INVESTIGATING — root cause undiagnosed`). Updated each session.
-- **Memos**: optional; use when the memo is not yet complete. Applicable tokens: `INVESTIGATING`, `PAUSED`, `DONE`, `UNDER_REVIEW`, `AWAITING`, `BLOCKED`, `CANCELED`. Omit the Status section entirely for memos written and completed in one session.
+- **Projects**: the [Tasks](#tasks) table **IS** the status display — keep it well-sorted and up-to-date so readers can scan it directly for current work. With the sorting discipline (done → in-progress → not-started, preserving order within each group), the Tasks table itself provides clear status visibility without needing a separate section.
+- **Incidents**: fold outcome/status into Summary's **What** (Business Impact) bullet — e.g. "Outcome: ✅ test completed successfully..." or a status token from [StatusVocabulary.md](../../../docs/StatusVocabulary.md) (optionally qualified with an em-dash, e.g. `INVESTIGATING — root cause undiagnosed`), inline in that bullet. Updated each session. **Never create a standalone `## Status` heading for an incident** — it is not part of the template.
+- **Memos**: fold a status token inline where relevant (same StatusVocabulary.md tokens: `INVESTIGATING`, `PAUSED`, `DONE`, `UNDER_REVIEW`, `AWAITING`, `BLOCKED`, `CANCELED`) only when the memo is not yet complete. Omit entirely for memos written and completed in one session.
 
 ### Contents
 
@@ -150,11 +157,13 @@ Acceptable columns (not all required):
 
 #### Task Dependencies
 
-**⬆️ DEPENDS_ON is the sole source of truth for task dependencies.** Row order is a *constraint*, not a signal: no task may appear before its declared prerequisites, but tasks in the table need not depend on every task before them.
+**Row order is the primary signal for dependencies.** In a well-ordered Tasks table, each task depends on the immediately preceding one by default. This is the normal case: no marker needed.
 
-**⚠️ Agent rule:** Never assume historical row order implies causality. A task appearing after another task does not mean it depends on that prior task. Dependency is always explicit.
+**⬆️ DEPENDS_ON marks exceptions only: non-adjacent dependencies.** If a task depends on a task that is NOT immediately before it in the table, use the `⬆️ DEPENDS_ON` marker. This keeps non-obvious dependencies explicit while reducing noise on linear chains.
 
-Direct task-to-task dependencies are expressed in one place only: the `⬆️ DEPENDS_ON` marker in the Notes cell.
+**Row order must respect all dependencies** (adjacent or non-adjacent): A task may never appear before its prerequisites in the table.
+
+**⚠️ Agent rule:** Scan a task table top-to-bottom. By default, assume each task depends on the one directly above it. If a `⬆️` marker appears, it signals a non-adjacent dependency to an earlier row — follow the marker to find the actual prerequisite. Do not infer dependencies from row order when a marker is present; the marker overrides row order for that task.
 
 **Task title durability & bolding:** Task titles serve as stable reference targets for dependencies. Choose titles that are:
 - Self-contained (omit project/repo prefixes that would be redundant when referenced)
@@ -176,19 +185,36 @@ For example, "Create new AD group" is better than "variant-group-shell: create n
 - The marker is not a status — it is a relationship signal (see [StatusVocabulary.md § Task Relationship Markers](../../../docs/StatusVocabulary.md#task-relationship-markers)).
 - **Row order must respect dependencies:** If A→B (B depends on A), then A must appear before B in the table. But if C appears before B, C may or may not be a prerequisite of B — that relationship is declared only by the marker, never inferred from position.
 
-**Example:** A task cannot submit a SailPoint integration form until an AD group is provisioned. Other tasks may appear between them without creating a dependency.
+**Example — linear chain (no markers needed):**
 ```markdown
 | Task | Status | Notes |
 | --- | --- | --- |
 | **Create new AD group** | 🛑08.14 | Blocked on ServiceNow ticket...
-| **Register GitHub App** | | ⬆️ **Create new AD group**. Must use group name in GARS request... |
-| **Check org webhooks** | 👀08.11 | Org-level check (no dependency on AD group)... |
-| **Complete SailPoint integration** | | ⬆️ **Create new AD group**. Do not submit until group actually exists... |
+| **Register GitHub App** | | Must use group name in GARS request... (implicitly depends on Create new AD group) |
+| **Complete SailPoint integration** | | Do not submit until GitHub registration complete... (implicitly depends on Register GitHub App) |
 ```
+(No `⬆️` markers needed; each task depends on the one directly above it.)
+
+**Example — non-adjacent dependency (marker required):**
+```markdown
+| Task | Status | Notes |
+| --- | --- | --- |
+| **Create new AD group** | 🛑08.14 | Blocked on ServiceNow ticket...
+| **Check org webhooks** | 👀08.11 | Org-level check (no dependency on AD group)... |
+| **Register GitHub App** | | ⬆️ **Create new AD group**. Must use group name in GARS request... |
+| **Complete SailPoint integration** | | Follows Register GitHub App (implicitly) |
+```
+(Register GitHub App depends on Create new AD group, which is 2 rows back — marker required. Check org webhooks is independent and can appear anywhere. Complete SailPoint integration depends on the immediately preceding Register GitHub App — no marker needed.)
 
 In this example, "Check org webhooks" comes after the AD group task but does not depend on it — the bold `⬆️` references on the other two tasks make their prerequisites explicit and linkable. The table is ordered for readability and to respect declared dependencies, but position alone never implies a prerequisite relationship.
 
 **Glyph: `⬆️` (up arrow).** Literal and intuitive in top-to-bottom reading order: "the task above" → must complete first. The priority is that the reference is **bold** and matches the source task title exactly so readers can click/search to find the prerequisite.
+
+**English form (timeline/review tables):** When a table explicitly opts out of ⬆️ markers (declared via an agent note above the table), express dependencies at the start of the Notes cell as:
+```
+**Depends on:** **Task Title A**, **Task Title B**.
+```
+"Depends on:" label and all task titles are bold; titles are comma-separated; period closes the dependency declaration before the rest of the note. "Blocked by" is reserved for tasks whose Status cell carries a 🛑 or ❓ glyph — do not use it as a synonym for a task dependency.
 
 ### Active Work
 
@@ -221,13 +247,29 @@ Mutable working state for in-progress items. Answers: "What are we doing right n
 - **Completed work in Active Work is a violation.** Do not mark tasks as "DONE" in Active Work or leave past-tense status updates here. The moment a task is no longer in-progress, remove its section entirely
 - **Once cleared, a completed task has no Active Work subsection** — all its detail lives in the Work Log entry for that session
 
+### Next Daily Jira Update
+
+**Include only when the doc has a Jira ticket** in Summary → Where Tracked — required for projects (nearly always ticketed), optional/rare for incidents (most are Slack-only), N/A for memos (no recurring cadence or ticket). Delete the heading entirely when there's no ticket to post to.
+
+A standing, terse, bullet-heavy draft sized to paste directly as a Jira comment — never prose. Three fixed sub-bullets:
+
+- **Done today** — one bullet per logical change/finding this session
+- **Status** — current state in one line (on-track / at-risk / blocked / investigating / resolved, and why)
+- **Next** — the next 1–3 concrete steps
+
+**Key distinction from Draft Next Comms: this section is overwritten, never deleted.** Draft Next Comms holds one-off outbound messages that vanish once sent. Next Daily Jira Update is a recurring cadence artifact — today's bullets replace yesterday's the moment they're posted (prefix per team convention, e.g. `MM.DD.Dow:`), and the section stays in the doc ready for tomorrow's update. Only delete it once the ticket itself closes or the daily-update cadence stops. The Work Log remains the permanent, cumulative history — this section is a disposable cache of "what would I post right now," derived from Tasks/Active Work/Work Log, never a source of new facts. See [git2jira](../git2jira/SKILL.md) for auto-generating these bullets from git history.
+
 ### Draft Next Comms
 
 Holds **only unsent** outbound communications (Slack replies, email drafts, PR comments). A draft that has been sent **must not appear here in any form** — not as a full message body, not as a compressed stub, not as a SENT status line.
 
-- Each draft is a `###` sub-heading with target and the message body as **plain text — no blockquote.** The `###` heading already makes the context obvious, and a `>` prefix causes pasting problems into Slack/Jira/email.
+- Each draft is a `###` sub-heading with target and the message body as **plain text — no blockquote, ever.** The `###` heading already makes the context obvious, and a `>` prefix causes pasting problems into Slack/Jira/email.
+- **No editorializing, meta-commentary, or lead-in sentence before the body, ever.** No "reply in-thread to X because Y", no restating who the target is or why we're replying, no apologizing, no explaining what we should have done differently. The `###` heading already carries the target — that is the only metadata this section needs. The body is only ever the message text itself, ready to copy-paste as-is.
 - **No `Status:` line, no "DRAFT"/"READY"/"do not send without approval" annotation above the body.** A draft's mere presence in this section already means unsent; the requirement to get approval before contacting other humans is a standing global agent rule (not a per-draft warning to restate). Any such label is noise — same category as writing "don't `rm -rf $HOME`" next to every `rm` command.
 - **Every evidence sentence in the body must be a live link to a primary source** (a tool URL, query result, or code line — never this doc's own Evidence/Diagnosis section, never another of our own repo artifacts). Apply the eyeball test from AGENTS.md § Drafting Comms before finalizing: could a skeptical reader verify the claim in under 10 seconds by clicking the link, with no follow-up question?
+- **Link the reader to the manual when relevant.** A draft that invokes a documented procedure, contract, form, policy, or ownership rule must link the precise canonical documentation, not merely name it or point to an incident record.
+- **Empirical claims must identify the entity and link its evidence whenever a primary tool can expose it.** Link directly to the entity's filtered Editorial, Castar, Atom, OLS, or equivalent record—not a Slack thread, tool homepage, or our own artifact. If a permalink cannot encode the result, include the exact copy-pasteable verification recipe with the tool link.
+- **Linked catalog entity IDs use plain link text only.** Never wrap the ID label in backticks, bold, italics, or other typography: those effects can obscure the hyperlink after a Markdown draft is pasted into Slack. Use `[4490YMOZQTYR](https://editorial.walmart.com/...)`, not `[product \`4490YMOZQTYR\` in Editorial](https://editorial.walmart.com/...)`.
 - **When a draft is sent: delete it from this section entirely.** Add one Work Log entry recording when and to whom it was sent (and the Slack `ts` or message URL if available). That is the complete record.
 - **On audit: any lingering full message body, compressed stub, or status/sent note for a message that has already gone out is a violation.** Remove it immediately — the section must contain only unsent drafts.
 - **Cross-reference with blocked Tasks:** If a draft is blocking a Task (the Task cannot proceed until the external party responds), the blocked task's Notes column must name the draft (`Draft: [draft heading](#draft-next-comms)`) and the draft must name the blocked task (`blocks Task: <task name>`).
@@ -358,7 +400,9 @@ Tasks flow through the document deterministically: Tasks → Active Work → Wor
 
 **Empirical Investigations:**
 
-- **Pending Investigations** — empirical unknowns *we can answer ourselves*. Record specific, named questions about state, metrics, or facts. You control the investigation through logs, testing, measurement, or analysis. Minor clarifications from other teams are fine; the core work is ours. Minor questions within an investigation don't demote it to Draft Comms — but if *they* control the outcome and you're waiting for their decision, it's Draft Comms instead. When completed: findings are absorbed into doc edits (Task notes, Context, Evidence, Work Log). No archive needed — the knowledge remains in the doc.
+- **Pending Investigations** — empirical unknowns *we can answer ourselves*. Record specific, named questions about state, metrics, or facts. You control the investigation through logs, testing, measurement, or analysis. Minor clarifications from other teams are fine; the core work is ours. Minor questions within an investigation don't demote it to Draft Comms — but if *they* control the outcome and you're waiting for their decision, it's Draft Comms instead. When completed: findings are absorbed into doc edits (Task notes, Context, Evidence, Work Log), or archived in [Resolved Investigations](#resolved-investigations) if they have no natural home elsewhere.
+
+- **Resolved Investigations** — completed investigations whose findings have no natural home in Interfaces, Engineering Considerations, Task notes, or Work Log. Archive only insights that are important to preserve but do not fit the narrative. Subject to distillation — findings that belong in the body should be absorbed there instead, and this archive entry omitted.
 
 **Inline Placeholders:**
 
@@ -517,7 +561,7 @@ If updating a doc created on an earlier date, move it into the current date fold
 - Only create if the content is substantial (&gt;100 lines) or you're building incrementally
 - Avoid creating multiple ad hoc docs at once — combine into a single TOC'd document to prevent WETness
 - Never link to ad hoc docs from tracked files
-- **After creating or updating an aidocs file, always open it in VS Code** using `code <filepath>`
+- **After creating or updating an aidocs file, always open it** using `open -a "IntelliJ IDEA" <filepath>`
 
 ---
 
@@ -587,16 +631,22 @@ Every mention of the following must carry a hyperlink — no bare references. Fi
 
 **Tickets and change records:**
 
-- Jira ticket IDs (any key: CATGTRLSHP, OPIF, RCTMEXP, CQP, GM, STRCASS, RCTBVAR, …) → `https://jira.walmart.com/browse/TICKET-ID`
+- Jira ticket IDs (any key: CATGTRLSHP, OPIF, RCTMEXP, CQP, GM, STRCASS, RCTBVAR, …) — every mention — `https://jira.walmart.com/browse/TICKET-ID`
 - CRQ / change request numbers (CHG-NNNNNNN) → `https://walmartglobal.service-now.com/nav_to.do?uri=change_request.do?number=CHGNNNNNNN`
 - ServiceNow incidents (INC-NNNNNNN) → same ServiceNow base URL
 - Jira board IDs (board NNN) → `https://jira.walmart.com/secure/RapidBoard.jspa?rapidView=NNN`
 
 **Code and repos:**
 
-- PRs (#NNN) → `https://gecgithub01.walmart.com/<org>/<repo>/pull/NNN`
-- Git commit SHAs (first 7–8 chars) → `https://gecgithub01.walmart.com/<org>/<repo>/commit/SHA`
+- PRs (#NNN) — every mention — `https://gecgithub01.walmart.com/<org>/<repo>/pull/NNN`
+- Git commit SHAs (first 7–8 chars) → `https://gecgithub01.walmart.com/<org>/<repo>/commit/SHA`. Always use commit SHA, not branch, for durability.
 - GHE repo names (relationship-service, qarth-group-service, variant-grouping-stream, etc.) on first mention per doc → link to repo root
+- GHE code file/line (specific file path or line range) → `https://gecgithub01.walmart.com/<org>/<repo>/blob/COMMIT_SHA/path/to/file.ext#L123-L456`. Always link via commit SHA (not branch) for durability. Line numbers are perishable; use only in Evidence entries or dated sources; avoid in timeless prose per [Content Brittleness](#content-brittleness).
+
+**Catalog entities:**
+
+- WPID, itemId, GTIN, SKU — every mention in analysis, diagnosis, or evidence — link to [Editorial](https://editorial.prod.walmart.com) by default, or [Atom](https://atom.prod.walmart.com) if in Atom-specific context
+- offerId, feedId — every mention — link to [Atom](https://atom.prod.walmart.com) only
 
 **Slack:**
 
@@ -666,3 +716,4 @@ Never use these. They are imprecise, imply unstated alternatives, or create conf
 - **"As of [date]"** at the start of sentences — write the claim timelessly; if the date matters, cite it as evidence with a † link.
 - **"currently"**, **"at this time"**, **"now"** in non-Work-Log prose — these rot immediately. Write the claim as a timeless fact or use absolute dates.
 - **"deprioritized", "low/high priority", "urgent", "critical", "immediate"** as editorial labels on any task, item, or work — anywhere in the doc, not just Tasks tables. Priority is conveyed by position: order the list. If a decision to lower/raise priority happened at a point in time, record that fact once in Work Log; do not carry the adjective forward as a live status.
+- **"executive summary"** — write "summary" instead. There are no executives here; the title is redundant. "Summary" is clear and sufficient.

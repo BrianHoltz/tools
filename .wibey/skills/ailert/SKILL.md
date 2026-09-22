@@ -38,6 +38,38 @@ arguments:
 Get the user's attention when an agent is blocked waiting for human action.
 Uses only built-in macOS tools (`osascript`, `afplay`, `say`) — zero dependencies.
 
+## Quick Start
+
+**Blocking on auth?** Stop immediately and use ailert:
+
+```bash
+osascript - "Please log in to Grafana" <<'APPLESCRIPT' &
+on run argv
+  display alert "🌀 Wibey" message (item 1 of argv) giving up after 300
+end run
+APPLESCRIPT
+```
+
+**Long task finished, user may have stepped away?**
+
+```bash
+TIMEOUT=90 MSG="Your build finished" bash ~/.wibey/skills/ailert/ailert.sh
+```
+
+**Auth-wall protocol:** After launching the alert, remain in the same task and poll the blocked page every 5–10 seconds (for at most 5 minutes) for authenticated content. Resume the exact blocked operation as soon as authentication succeeds. Do not emit a routine status response or end the turn while that polling is possible. Stop only after the polling limit expires without user action, or when the user must make a substantive decision beyond authentication.
+
+**✅ USE ailert when:**
+- Agent is **blocked** on SSO/login/credential
+- User has **likely walked away** (long-running task done)
+- Agent needs **explicit decision** before proceeding (ambiguous input, approve/reject)
+- Agent **cannot proceed** without user action
+
+**❌ DON'T use ailert for:**
+- Routine status updates ("I'm working on X")
+- Informational messages that don't require action
+- Multiple rapid alerts (cap at 1 per task)
+- Just to get user attention for curiosity
+
 ## When to use
 
 - Agent needs the user to **log in** (SSO, PingFed, Microsoft)

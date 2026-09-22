@@ -27,6 +27,7 @@
 - [Summary](#summary)
 - [Tasks](#tasks)
 - [Active Work](#active-work)
+- [Next Daily Jira Update](#next-daily-jira-update) *(optional — only if Jira-tracked)*
 - [Draft Next Comms](#draft-next-comms)
 - [Pending Decisions](#pending-decisions)
 - [Pending Investigations](#pending-investigations)
@@ -56,9 +57,19 @@ Evolving investigation plan. Unlike project docs, tasks are added as the investi
 
 Current sub-steps, blockers, and partial results for the in-progress thread. Mutable working state — updated every session. When a sub-step completes, write a Work Log entry and remove it from here. This is where the next agent or human picks up if the session is interrupted.
 
+## Next Daily Jira Update
+
+*Optional — include only when this incident has a Jira ticket in [Summary → Where Tracked](#summary); most incidents are Slack-only and omit this heading entirely.* Standing daily-status bullets sized to paste directly as a Jira comment, terse and bullet-heavy — never prose:
+
+- **Done today**: one bullet per logical change/finding this session
+- **Status**: current state in one line (investigating / diagnosed / mitigated / resolved, and why)
+- **Next**: the next 1–3 concrete steps
+
+**Overwrite in place each session** — this is not a log. Today's bullets replace yesterday's; the Work Log is the permanent record. When posted, prefix per team convention (e.g. `MM.DD.Dow:`) and *keep the section* for tomorrow's update — unlike Draft Next Comms below, a sent update is not deleted, only overwritten next session.
+
 ## Draft Next Comms
 
-Pre-composed messages ready to send — Slack replies, Jira comments, emails. Each draft is a `###` sub-heading with target and the message body as plain text. No blockquote formatting — the section heading makes the context obvious, and `>` prefix causes pasting problems. Include an [incident doc](link) reference in every draft. When a draft is sent, delete it from here entirely and record one Work Log entry with the destination and Slack `ts` or message URL.
+Pre-composed messages ready to send — Slack replies, Jira comments, emails. Each draft is a `###` sub-heading with target and the message body as plain text. **No blockquote formatting, ever** — the section heading makes the context obvious, and `>` prefix causes pasting problems. **No editorializing or lead-in sentence before the body, ever** — no "reply in-thread to X because Y", no restating who the target is or why, no meta-commentary about what we should have done differently. The `###` heading already carries the target; the body is the message text itself, ready to copy-paste as-is. Include an [incident doc](link) reference in every draft. When a draft is sent, delete it from here entirely and record one Work Log entry with the destination and Slack `ts` or message URL.
 
 ## Pending Decisions
 

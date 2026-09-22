@@ -41,6 +41,17 @@
 - **SN / ITIL** — ServiceNow Incidents ticketing system (lifecycle: New → Assigned → In Progress → On Hold → Resolved → Closed → Canceled; P1 Critical – P5 Very Low). [ITIL](https://en.wikipedia.org/wiki/ITIL) (IT Infrastructure Library) is the industry process standard that ServiceNow implements.
 - **Google SRE** — [Google Site Reliability Engineering](https://sre.google/sre-book/table-of-contents/) uses overlapping lifecycle *phases* rather than discrete states: Detection → Response → Mitigation → Resolution → Post-Incident. Column values indicate which phase each status falls within.
 
+## Test Matrix Cell Values
+
+Use these meanings only in test matrices; task-status cells retain the lifecycle meanings above.
+
+| Cell value | Meaning |
+| --- | --- |
+| ⬜ | Unstarted test; use only when required for formatting or symmetry |
+| ✅ | Test completed and passed |
+| ❌ | Test completed and failed |
+| — | Not applicable; the UI does not expose this combination |
+
 ## Task Relationship Markers
 
 Markers appearing in task-table Notes cells to express direct task dependencies. Not a status, but a relationship signal.
