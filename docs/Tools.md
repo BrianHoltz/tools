@@ -2,8 +2,8 @@
 
 ## Local Modifications in Use
 
-- **Code Puppy JetBrains** — adds editable conversation titles in the transcript and History menu, plus a suggested attachment for the focused editor file or selection.
-- **Wibey JetBrains** — supports persistent editable conversation titles, editable queued follow-up prompts, focused-editor file/selection context, and automatic quota snapshots for the usage dashboard.
+- **Code Puppy JetBrains 0.23.1** — adds editable conversation titles in the transcript and History menu, a suggested attachment for the focused editor file or selection, visible universal-constructor tool activity, and the local JCEF startup workaround.
+- **Wibey JetBrains 1.0.27** — supports persistent editable conversation titles, editable queued follow-up prompts, focused-editor file/selection context, and automatic quota snapshots for the usage dashboard.
 - **Zaaack Markdown Editor for VS Code and Cursor** — adds multipanel editing, outline navigation, find, anchor links, and dark-theme/readability improvements.
 - **TypeDown for VS Code and Cursor** — compacts prose, table, and list spacing; preserves editor focus and cursor position through paste.
 - **Shuzijun Markdown Editor for IntelliJ IDEA** — improves body-text readability and supplies the JCEF dependency required by IDEA 2026.2.
@@ -28,6 +28,7 @@ Name each Downloads artifact `<product>-<version>-yyyymmdd.Dow.hhmm-<blah>.<ext>
 | IDE                            | 2026.2       | 1.135.0      | 3.21.13                 |
 | VSCode engine                  | —            | —            | 1.105.1                 |
 | Wibey                          | 1.0.27       | 1.0.20       | 1.0.18                  |
+| Code Puppy                    | 0.23.1       | —            | —                       |
 | └ parallel agents              | ✅            | ✅            | ✅                       |
 | └ enqueue next prompt          | ❌            | ✅            | ✅                       |
 | └ context += @ file            | ✅            | 🟡<100KB     | 🟡<100KB                |
@@ -374,7 +375,8 @@ Line-height, table padding, list spacing, and focus bug patches. Full procedure:
 
 - **Superior features: search/find, git, debug, database, http, yaml preview**
 - **Currently on 2026.2 GA/stable** (build 262.8665.258, released 2026.07.16; installed on Walmart laptop 2026.07.16). The 2026.2 EAP (auto-updated ~2026.06.27) has now shipped as stable — the config dir (`IntelliJIdea2026.2`) carried over from EAP → GA, so all EAP-era JAR patches survived the upgrade. The two 2026.2 breaking changes still require JAR patches (see ToolMods.md).
-- **Patch audit 2026.07.17 (Walmart laptop, 2026.2 GA):** verified all fixes present in the running build — JCEF remote disabled (`idea.vmoptions`), Shuzijun `com.intellij.modules.jcef` depends + 13px font (`markdown-editor-2.0.5.jar`), MCP Server Services-panel suppression (`mcpserver.jar`), keymap overrides (`macOS copy.xml`), and the patched Wibey plugin `1.0.23.jar` from `brian/local-combined` (image-paste `setupClipboardPaste`/`handleImagePaste` + session-title fields all confirmed via `javap`). The one gap — the "Allow Edits to Sensitive Files" dialog suppression (`idea.readonly.fragments.notification.enabled=false`) missing from `early-access-registry.txt` — was reapplied (IDEA quit first; file method). All patches now applied.
+- **Current local tool versions (2026.09.22):** IntelliJ IDEA 2026.2; Wibey 1.0.27 from `brian/local-combined`; Code Puppy JetBrains 0.23.1 from the local `feature/active-context-pill` build. The Code Puppy artifact includes active-editor context, image paste, universal-constructor rendering, JDK 21 build detection, and the JCEF startup workaround.
+- **Patch audit 2026.07.17 (Walmart laptop, 2026.2 GA):** verified all fixes present in the running build — JCEF remote disabled (`idea.vmoptions`), Shuzijun `com.intellij.modules.jcef` depends + 13px font (`markdown-editor-2.0.5.jar`), MCP Server Services-panel suppression (`mcpserver.jar`), keymap overrides (`macOS copy.xml`), and the patched Wibey plugin from `brian/local-combined` (image-paste `setupClipboardPaste`/`handleImagePaste` + session-title fields all confirmed via `javap`). The one gap — the "Allow Edits to Sensitive Files" dialog suppression (`idea.readonly.fragments.notification.enabled=false`) missing from `early-access-registry.txt` — was reapplied (IDEA quit first; file method). All patches now applied.
 - *command-approval constipation*
 - *Parallel agents now supported (as of 2026.06)*
 - *Cannot paste file/line reference!?*
