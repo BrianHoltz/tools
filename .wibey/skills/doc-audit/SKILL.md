@@ -61,6 +61,19 @@ Every repo organizes docs into two types:
 - **Immortal docs** — timeless, non-narrative, reference (e.g., specs, designs, playbooks, guides). Maintained for accuracy and durability.
 - **Mortal docs** — content is anchored to a defined time span and not maintained afterward (e.g., projects, incidents, releases, memos).
 
+### Testing.md Evidence Records
+
+A `*Testing.md` file is a leaf-node CRQ evidence payload, not a mortal work document. It is frozen to PDF and attached to the ServiceNow CRQ at submission so the collected evidence cannot be edited after submission. Agents must enforce these rules even where the general mortal-document template conflicts:
+
+- no YAML frontmatter;
+- no Work Log, editorial history, task tracking, status narrative, project summary, or navigation section;
+- no links to other documents, including project docs, CRQ docs, SQL files, or testing records; local image references needed to render evidence in the PDF are allowed;
+- body content is only text destined for the final PDF, actual Red/Green evidence, and visible `(TODO: …)` or `(TBD: …)` markers whose surrounding text says exactly what evidence remains to be captured; the marker’s closing `)` ends the macro;
+- preserve evidence already collected; do not replace it with procedures, operational instructions, or cross-references;
+- use named Red/Green sections near the top when the test record covers pre-change and post-change evidence.
+
+The Testing.md file is immutable after CRQ submission. Any planning, execution procedure, rationale, cross-reference, or work history belongs in the project or CRQ document instead.
+
 ## Mortal Doc Structure
 
 Organize mortal docs with the following sections:
@@ -335,7 +348,7 @@ Omit any field that genuinely doesn't apply; include as many as possible.
 
 ### Work Log
 
-**Required in all project, incident, release, and memo docs.** Audit trail of effort — what we spent time on, what the problems were, how we moved closer to the goal. Git commits describe *what* changed; the Work Log describes *how* we got there.
+**Required in all project, incident, release, and memo docs except `*Testing.md` evidence records.** Audit trail of effort — what we spent time on, what the problems were, how we moved closer to the goal. Git commits describe *what* changed; the Work Log describes *how* we got there. `*Testing.md` is a frozen PDF payload and must never contain a Work Log.
 
 - Records decisions, discoveries, costs incurred, obstacles overcome
 - Provides context for why code looks the way it does
