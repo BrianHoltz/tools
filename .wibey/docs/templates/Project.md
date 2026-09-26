@@ -35,14 +35,16 @@
 - [Summary](#summary)
 - [Tasks](#tasks)
 - [Active Work](#active-work)
+- [Next Daily Jira Update](#next-daily-jira-update) *(optional)*
 - [Draft Next Comms](#draft-next-comms) *(optional)*
 - [Pending Decisions](#pending-decisions)
+- [Decisions](#decisions)
 - [Pending Investigations](#pending-investigations)
+- [Resolved Investigations](#resolved-investigations)
 - [Ad Hoc Sections](#ad-hoc-sections)
 - [Interfaces](#interfaces)
 - [Engineering Considerations](#engineering-considerations)
 - [Context](#context)
-- [Decisions](#decisions)
 - [Appendices](#appendices)
 - [Evidence](#evidence)
 - [Work Log](#work-log)
@@ -85,17 +87,35 @@ The mutable present: fine-grained subtasks and cached state for whichever [Tasks
 
 *(one `###` section per ▶️ task, subtask details here)*
 
+## Next Daily Jira Update
+
+*Optional — include only if the project has a Jira ticket in [Summary → Where Tracked](#summary); delete this heading entirely for untracked work.* Standing daily-status bullets sized to paste directly as a Jira comment, terse and bullet-heavy — never prose:
+
+- **Done today**: one bullet per logical change finished this session
+- **Status**: current state in one line (on-track / at-risk / blocked, and why)
+- **Next**: the next 1–3 concrete steps
+
+**Overwrite in place each session** — this is not a log. Today's bullets replace yesterday's; the Work Log is the permanent record of history, this section is a live cache of "what would I post right now." When posted, prefix per team convention (e.g. `MM.DD.Dow:`) and *keep the section* for tomorrow's update — unlike Draft Next Comms below, a sent update is not deleted, only overwritten next session. See [git2jira](../../.wibey/skills/git2jira/SKILL.md) for auto-generating these bullets from git history.
+
 ## Draft Next Comms
 
-*Optional.* Pre-composed outbound communications — stakeholder status updates, PR announcements, release notifications, team posts. Each draft is a `###` sub-heading with target and the message body as plain text. No blockquote formatting — the section heading makes the context obvious, and `>` prefix causes pasting problems. No `Status:` line — the draft's presence in this section already means unsent; delete it when sent instead of relabeling it. Link every claim in the body to the primary source that backs it (see AGENTS.md § Drafting Comms). When a draft is sent, delete it from here entirely and record one Work Log entry with the destination and message URL.
+*Optional.* Pre-composed outbound communications — stakeholder status updates, PR announcements, release notifications, team posts. Each draft is a `###` sub-heading with target and the message body as plain text. **No blockquote formatting, ever** — the section heading makes the context obvious, and `>` prefix causes pasting problems. **No editorializing or lead-in sentence before the body, ever** — no "reply in-thread to X because Y", no restating who the target is or why, no meta-commentary about what we should have done differently. The `###` heading already carries the target; the body is the message text itself, ready to copy-paste as-is. No `Status:` line — the draft's presence in this section already means unsent; delete it when sent instead of relabeling it. Link every claim in the body to the primary source that backs it (see AGENTS.md § Drafting Comms). When a draft is sent, delete it from here entirely and record one Work Log entry with the destination and message URL.
 
 ## Pending Decisions
 
 Unresolved choices your team must make — "Should we do X?" or "Which approach?" If resolving requires doing something, that doing is a Task; the question stays here until answered. If a question turns out to need an external answer, *convert* it: remove it from here, create a Draft Next Comms entry, and mark any blocking Task 🛑 — never leave a question in both places. Every decision that blocks a Task must have a corresponding ▶️ (or 🛑) row in the Tasks table. Move to Decisions once answered — never delete.
 
+## Decisions
+
+Team decisions archived for audit trail. Each entry includes the decision, rationale, and date it was made. Move entries here verbatim from Pending Decisions; never delete. Record decisions with dates (e.g., `**YYYY.MM.DD.Dow** — what was decided and why`). By default, all entries should have been previously pending; do not add decisions here that were never in Pending Decisions.
+
 ## Pending Investigations
 
-Empirical unknowns *we can answer ourselves* — "Does this approach work?" or "What is the actual performance?" Record specific, named questions. You control the investigation through analysis, testing, measurement, or code review. Minor clarifications from other teams are fine; the core work is ours. When completed: findings are absorbed into doc edits (Task notes, Interfaces, Engineering Considerations, Work Log). No archive needed.
+Empirical unknowns *we can answer ourselves* — "Does this approach work?" or "What is the actual performance?" Record specific, named questions. You control the investigation through analysis, testing, measurement, or code review. Minor clarifications from other teams are fine; the core work is ours. When completed: findings are absorbed into doc edits (Task notes, Interfaces, Engineering Considerations, Work Log), or archived in Resolved Investigations if they have no natural home in the doc.
+
+## Resolved Investigations
+
+Completed investigations whose findings lack a natural home elsewhere in the doc. Record only insights that are important to preserve but do not fit naturally into Interfaces, Engineering Considerations, Task notes, or Work Log. Do not duplicate findings already documented in the narrative sections — absorb them there instead. When a finding belongs in the body of the doc, skip this archive entry. Subject to distillation and editing; not delete-safe (unlike Decisions).
 
 ## Ad Hoc Sections
 
@@ -174,10 +194,6 @@ Cross-cutting concerns that any reviewer or on-call engineer would want to know.
 ### Concepts
 
 *Optional. Definitions of terms, acronyms, or system components specific to this project. Define inline if brief; add an entry here if the explanation is longer than a parenthetical.*
-
-## Decisions
-
-Team decisions archived for audit trail. Each entry states what was decided, why, and when. Move entries here verbatim from Pending Decisions; do not delete. By default, Decisions should be all and only the choices that were previously in Pending Decisions. Do not add decisions here that were never pending: those belong in the narrative sections or appendices.
 
 ## Appendices
 

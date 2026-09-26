@@ -1,56 +1,79 @@
 # AI/IDE Toolchain
 
+## Local Modifications in Use
+
+- **Code Puppy JetBrains 0.23.1** — adds editable conversation titles in the transcript and History menu, a suggested attachment for the focused editor file or selection, visible universal-constructor tool activity, and the local JCEF startup workaround.
+- **Wibey JetBrains 1.0.27** — supports persistent editable conversation titles, editable queued follow-up prompts, focused-editor file/selection context, and automatic quota snapshots for the usage dashboard.
+- **Zaaack Markdown Editor for VS Code and Cursor** — adds multipanel editing, outline navigation, find, anchor links, and dark-theme/readability improvements.
+- **TypeDown for VS Code and Cursor** — compacts prose, table, and list spacing; preserves editor focus and cursor position through paste.
+- **Shuzijun Markdown Editor for IntelliJ IDEA** — improves body-text readability and supplies the JCEF dependency required by IDEA 2026.2.
+- **IntelliJ IDEA MCP Server plugin** — prevents MCP connections from stealing focus to the Services tool window.
+
+
+
+### Local Build Artifact Rule
+
+This is the canonical personal policy for local IDE/plugin artifacts.
+
+Every locally built IDE/plugin artifact must be copied to `~/Downloads/` for installation and review. Keep the canonical build output in its repository's normal release folder, but treat the Downloads copy as the human-facing local build.
+
+Name each Downloads artifact `<product>-<version>-yyyymmdd.Dow.hhmm-<blah>.<ext>`. The timestamp is the actual build-completion time; `<blah>` is a lowercase, hyphen-free description of the newest included fix, shorter than 10 characters. Example: `code-puppy-jetbrains-0.23.0-20260918.Fri.1146-imgpaste.zip`.
+
 ## IDEs
 
 
-| Feature                        | IDEA              | VS Code       | Cursor                  |
-| ------------------------------ | ----------------- | ------------- | ----------------------- |
-| Score                          | 28.5              | 20.5 ⚙️     | 19.5                    |
-| IDE                            | 2026.2            | 1.135.0       | 3.17.21                 |
-| VSCode engine                  | —                | —            | 1.105.1                 |
-| Wibey                          | 1.0.26            | 1.0.20 ⚙️   | 1.0.18 ⚙️             |
-| └ parallel agents             | ✅                | ✅            | ✅                      |
-| └ enqueue next prompt         | ❌                | ✅            | ✅                      |
-| └ context += @ file           | ✅                | 🟡<100KB      | 🟡<100KB                |
-| └ context += selection        | ✅ cmd-' pill     | ✅ cmd-L pill | 🟡 cmd-L pill via Agent |
-| └ image paste                 | ✅ ⚙️           | ✅            | ✅                      |
-| └ convo title edit            | ✅✅ ⚙️         | ✅            | ✅                      |
-| └ convo title auto            | first prompt ⚙️ | last prompt   | last prompt             |
-| └ convo search                | ✅                | ✅            | ✅                      |
-| └ convo timestamps            | ✅                | ✅            | ✅                      |
-| └ convo bookmark              | ✅                | ✅            | ✅                      |
-| └ rich/linked paste           | ❌                | ❌            | ❌                      |
-| Github Copilot                 | 1.11.2-251        | 0.39.0        | 1.388.0 ????            |
-| └ parallel agents             | ✅                | ✅            | ✅                      |
-| └ context += selection        | ✅ auto           | ❌            | ❌                      |
-| └ convo title                 | 🟡 manual         | ✅ auto       | ✅ auto                 |
-| AI diff review                 | ✅ per delta      | 🟡 per file   | 🟡 per file             |
-| AI diff in linked repo         | ✅                | ❌            | ❌                      |
-| git ops in linked repo         | ✅                | ✅            | ✅                      |
-| approval UX                    | ✅                | ✅            | ✅                      |
-| md preview                     | ✅                | 🟡 only 1     | ✅✅ wysiwyg            |
-| md preview search              | ✅                | ✅            | ❌❌ neither            |
-| md table format                | ✅✅ auto         | 🟡 manual     | 🟡 manual               |
-| md pastes details block        | ❌                | ✔️          | ✔️                    |
-| md headers paste bold to Slack | ✅                | ❌            | ❌                      |
-| search/find                    | ✅                | ✅            | ✅                      |
-| git                            | 🟡                | ✅✅          | ✅✅                    |
-| debug                          | ✅                | ?             | ?                       |
-| database                       | ✅                | ❌            | ❌                      |
-| http                           | ✅                | ❌            | ❌                      |
-| editor history UI              | ✅                | 🟡            | 🟡                      |
+| Feature                        | IDEA         | VS Code      | Cursor                  |
+| ------------------------------ | ------------ | ------------ | ----------------------- |
+| Score                          | 33.5         | 20.5         | 19.5                    |
+| IDE                            | 2026.2       | 1.135.0      | 3.21.13                 |
+| VSCode engine                  | —            | —            | 1.105.1                 |
+| Wibey                          | 1.0.27       | 1.0.20       | 1.0.18                  |
+| Code Puppy                    | 0.23.1       | —            | —                       |
+| └ parallel agents              | ✅            | ✅            | ✅                       |
+| └ enqueue next prompt          | ❌            | ✅            | ✅                       |
+| └ context += @ file            | ✅            | 🟡<100KB     | 🟡<100KB                |
+| └ context += selection         | ✅ cmd-' pill | ✅ cmd-L pill | 🟡 cmd-L pill via Agent |
+| └ image paste                  | ✅            | ✅            | ✅                       |
+| └ convo title edit             | ✅✅           | ✅            | ✅                       |
+| └ convo title auto             | ✅            | ✅            | ✅                       |
+| └ convo search                 | ✅            | ✅            | ✅                       |
+| └ convo timestamps             | ✅            | ✅            | ✅                       |
+| └ convo bookmark               | ✅            | ✅            | ✅                       |
+| └ rich/linked paste            | ❌            | ❌            | ❌                       |
+| Github Copilot                 | 1.11.2-251   | 0.39.0       | 1.388.0 ????            |
+| └ parallel agents              | ✅            | ✅            | ✅                       |
+| └ context += selection         | ✅ auto       | ❌            | ❌                       |
+| └ convo title                  | 🟡 manual    | ✅ auto       | ✅ auto                  |
+| AI diff review                 | ✅ per delta  | 🟡 per file  | 🟡 per file             |
+| AI diff in linked repo         | ✅            | ❌            | ❌                       |
+| git ops in linked repo         | ✅            | ✅            | ✅                       |
+| approval UX                    | ✅            | ✅            | ✅                       |
+| md preview                     | ✅            | 🟡 only 1    | ✅✅ wysiwyg              |
+| md preview search              | ✅            | ✅            | ❌❌ neither              |
+| md table format                | ✅✅ auto      | 🟡 manual    | 🟡 manual               |
+| md pastes details block        | ❌            | ✔️           | ✔️                      |
+| md headers paste bold to Slack | ✅            | ❌            | ❌                       |
+| search/find                    | ✅            | ✅            | ✅                       |
+| git                            | 🟡           | ✅✅           | ✅✅                      |
+| debug                          | ✅            | ?            | ?                       |
+| database                       | ✅            | ❌            | ❌                       |
+| http                           | ✅            | ❌            | ❌                       |
+| editor history UI              | ✅            | 🟡           | 🟡                      |
+
 
 Score rubric
 
 - Glyph values: ✅✅ = 2 pts, ✅ = 1 pt, 🟡 / ✔️ = 0.5 pts, ❌ / ? = 0 pts, ❌❌ = −1 pt
-- ⚙️ suffix = capability provided by a local patch (`~/bin/patches/`); reapply after extension update
 - Version/text-only cells (version numbers, descriptive text) = excluded
 - Copilot rows excluded from IDE score
+- **IDEA patches (baked-in as of 2026.07.17):** image-paste-fix + conversation-title-features are merged into local `brian/local-combined` build (Wibey 1.0.27). Scores reflect working features; ⚙️ notation removed. Recount after IDE/extension updates.
 - Editor score: each IDE gets the maximum score achievable by any editor available to it
   - IDEA: native WYSIWYG editor (8.0 pts); beats viewer (7.0) and shuzijun (3.5)
   - VS Code: typedown (3.5 pts); zaaack broken ~2026.06.01 (was 7 pts w/ patch)
   - Cursor: typedown (3.5 pts); zaaack broken ~2026.06.01 (was 7 pts w/ patch)
 - Final score = IDE row subtotal + best editor subtotal
+
+
 
 ## Markdown Viewers/ Editors
 
@@ -59,35 +82,41 @@ Score rubric
 - typedown and zaaack work in both VS Code and Cursor
 
 
-| Behavior                 | IDEA viewer | IDEA editor | typedown     | zaaack                            | Cursor native |
-| ------------------------ | ----------- | ----------- | ------------ | --------------------------------- | ------------- |
-| version                  | 2026.2      | 2026.2      | 1.1.7        | 0.1.17 (VSCode) / 0.1.13 (Cursor) | 2.6.19        |
-| >1 tab at a time         | ✅          | ✅✅        | ✅✅         | ✅✅                              | ✅✅          |
+| Behavior                 | IDEA viewer | IDEA editor | typedown    | zaaack                            | Cursor native |
+| ------------------------ | ----------- | ----------- | ----------- | --------------------------------- | ------------- |
+| version                  | 2026.2      | 2026.2      | 1.1.7       | 0.1.17 (VSCode) / 0.1.13 (Cursor) | 2.6.19        |
+| >1 tab at a time         | ✅           | ✅✅          | ✅✅          | ✅✅                                | ✅✅            |
 | re-read changed file     | ?           | ?           | ✅           | ?                                 | ?             |
-| wide tables              | ✅          | ✅          | ❌ truncates | ✅✅                              | ❌ truncates  |
-| non-bloated side padding | ✅          | ✅          | ❌           | ✅                                | ❌            |
-| shows images             | ✅          | ✅          | ?            | ?                                 | ?             |
-| find in file             | ✅          | ✅          | ❌           | ✅ ⚙️                           | ❌            |
-| structure                | ✅          | ✅          | ❌           | ✅ ⚙️                           | ❌            |
-| internal links           | ✅          | ❌          | ?            | ✅ ⚙️                           | ?             |
-| link editing             | ?           | ✔️        | ❌           | ✔️                              | ❌            |
-| toolbar                  | -           | ✔️        | ✔️         | ✔️                              | ❌            |
+| wide tables              | ✅           | ✅           | ❌ truncates | ✅✅                                | ❌ truncates   |
+| non-bloated side padding | ✅           | ✅           | ❌           | ✅                                 | ❌             |
+| shows images             | ✅           | ✅           | ?           | ?                                 | ?             |
+| find in file             | ✅           | ✅           | ❌           | ✅ ⚙️                              | ❌             |
+| structure                | ✅           | ✅           | ❌           | ✅ ⚙️                              | ❌             |
+| internal links           | ✅           | ❌           | ?           | ✅ ⚙️                              | ?             |
+| link editing             | ?           | ✔️          | ❌           | ✔️                                | ❌             |
+| toolbar                  | -           | ✔️          | ✔️          | ✔️                                | ❌             |
+
+
+
 
 ### IDE Keybindings
 
 
-| Action         | IDEA                 | VS Code       | Cursor        |
-| -------------- | -------------------- | ------------- | ------------- |
+| Action         | IDEA             | VS Code     | Cursor      |
+| -------------- | ---------------- | ----------- | ----------- |
 | zoom in / out  | `^⌥=` / `^⌥-` ⚠️ | `⌘=` / `⌘-` | `⌘=` / `⌘-` |
-| open file      | `⇧⌘O` ⚠️         | `⌘P`         | `⌘P`         |
-| search project | `⇧⌘F`              | `⇧⌘F`       | `⇧⌘F`       |
-| Wibey history  | ?                    | ?             | ?             |
-| Wibey new chat | ?                    | ?             | ?             |
+| open file      | `⇧⌘O` ⚠️         | `⌘P`        | `⌘P`        |
+| search project | `⇧⌘F`            | `⇧⌘F`       | `⇧⌘F`       |
+| Wibey history  | ?                | ?           | ?           |
+| Wibey new chat | ?                | ?           | ?           |
+
 
 IDEA keybinding overrides (defaults shown in table, actual bindings below):
 
 - ⚠️ **zoom** `^⌥=` / `^⌥-` (`ZoomInIdeAction` / `ZoomOutIdeAction`) → remapped to `⌘=` / `⌘-`. Displaced `CollapseRegion` / `ExpandRegion` (fold/unfold) — unbound and unneeded.
--  **open file** `⇧⌘O` (`GotoFile`) → remapped to `⌘P`. Displaced `FileChooser.TogglePathBar` from `⌘P` — unneeded.
+- **open file** `⇧⌘O` (`GotoFile`) → remapped to `⌘P`. Displaced `FileChooser.TogglePathBar` from `⌘P` — unneeded.
+
+
 
 ### IDEA — Code Puppy tool window font size
 
@@ -98,12 +127,13 @@ Code Puppy (JetBrains plugin) scales its webview text from **IDEA's UI font size
 What this means in practice:
 
 - If you want the Code Puppy window **one point bigger**, bump the UI font size by 1:
-  Preferences → Appearance & Behavior → Appearance → enable **Use custom font** (if needed) →
-  increase **Size**.
+Preferences → Appearance & Behavior → Appearance → enable **Use custom font** (if needed) →
+increase **Size**.
 - If you want Code Puppy to **match Markdown preview / Wibey tool windows**, make the UI font
-  size match your editor font size (Preferences → Editor → Font).
+size match your editor font size (Preferences → Editor → Font).
 - There is no per-tool-window font setting; this is global UI font. (If you don’t want the whole
-  IDE bigger, you’re into "open DevTools and inject CSS" territory.)
+IDE bigger, you’re into "open DevTools and inject CSS" territory.)
+
 
 
 ### Keybindings (swapped from defaults in VS Code and Cursor)
@@ -121,13 +151,18 @@ Extension command IDs:
 - `typedown.openWysiwygEditor` (when `!typedown.editorIsActive`) / `typedown.openDefaultEditor` (when `typedown.editorIsActive`)
 - `markdown-editor.openEditor` (when `editorTextFocus && editorLangId == markdown`)
 
+
+
 ## Top Frictions
 
+- **All IDEA patches currently applied and stable** (verified 2026.07.17). Wibey 1.0.27 from `brian/local-combined` ships with both PRs merged (image-paste-fix + conversation-title-features). Stable baseline for this system; update that branch to stay current as patches are upstreamed.
 - Parallel Wibey agents now available in all three IDEs (as of 2026.06).
 - Top silly frictions: let me buffer up my next prompt, and make it super-easy to reference the current file and selection.
   - Wibey allows enqueuing the next prompt while busy in VS Code and Cursor, but not in IDEA. Allowing this in IDEA would give 30% of the value of parallel agents. I don't like interrupting agents to add their next prompt and then tell them to first finish the previous one.
   - In no IDE does Wibey automatically track the current selection as context, which Github Copilot does in IDEA and VSCode, probably Cursor too.
   - Cursor+Wibey: Cmd-L broke! It now inserts selection context into builtin chat, not Wibey Chat.
+
+
 
 ## Copilot
 
@@ -140,6 +175,8 @@ Extension command IDs:
   - **Native GitHub integration (PR summaries, issue context)**
   - **Multi-file edits in agent mode with @workspace**
   - *No MCP (Model Context Protocol) support*
+
+
 
 ### IDEA Copilot Session History
 
@@ -200,6 +237,8 @@ This is useful for repositioning panels between left and right sidebars as neede
   - **Tab completion with diff preview**
   - *Closed source, can't self-host or audit*
 
+
+
 ## VS Code
 
 - **Supports Copilot**
@@ -210,6 +249,8 @@ This is useful for repositioning panels between left and right sidebars as neede
   - **Remote development (SSH, containers, WSL)**
   - *Chat panel context limited vs dedicated AI IDEs*
 - *Accept All in diff review simply accepts what's on disk and ends the review — safe even if the user made local edits during review.*
+
+
 
 ### Human-vs-Agent Conflict Diff
 
@@ -257,6 +298,8 @@ Current `http.noProxy` in `~/Library/Application Support/Code/User/settings.json
 "markdown.preview.fontSize": 13,
 "markdown.preview.lineHeight": 1.2,
 ```
+
+
 
 ### Markdown WYSIWYG Editor Font → Match Preview Font
 
@@ -332,8 +375,8 @@ Line-height, table padding, list spacing, and focus bug patches. Full procedure:
 
 - **Superior features: search/find, git, debug, database, http, yaml preview**
 - **Currently on 2026.2 GA/stable** (build 262.8665.258, released 2026.07.16; installed on Walmart laptop 2026.07.16). The 2026.2 EAP (auto-updated ~2026.06.27) has now shipped as stable — the config dir (`IntelliJIdea2026.2`) carried over from EAP → GA, so all EAP-era JAR patches survived the upgrade. The two 2026.2 breaking changes still require JAR patches (see ToolMods.md).
-- **Patch audit 2026.07.17 (Walmart laptop, 2026.2 GA):** verified all fixes present in the running build — JCEF remote disabled (`idea.vmoptions`), Shuzijun `com.intellij.modules.jcef` depends + 13px font (`markdown-editor-2.0.5.jar`), MCP Server Services-panel suppression (`mcpserver.jar`), keymap overrides (`macOS copy.xml`), and the patched Wibey plugin `1.0.23.jar` from `brian/local-combined` (image-paste `setupClipboardPaste`/`handleImagePaste` + session-title fields all confirmed via `javap`). The one gap — the "Allow Edits to Sensitive Files" dialog suppression (`idea.readonly.fragments.notification.enabled=false`) missing from `early-access-registry.txt` — was reapplied (IDEA quit first; file method). All patches now applied.
-- *Terminal Blindness observed on personal laptop in IDEA; not observed on Walmart laptop as of 2026.04.04.*
+- **Current local tool versions (2026.09.22):** IntelliJ IDEA 2026.2; Wibey 1.0.27 from `brian/local-combined`; Code Puppy JetBrains 0.23.1 from the local `feature/active-context-pill` build. The Code Puppy artifact includes active-editor context, image paste, universal-constructor rendering, JDK 21 build detection, and the JCEF startup workaround.
+- **Patch audit 2026.07.17 (Walmart laptop, 2026.2 GA):** verified all fixes present in the running build — JCEF remote disabled (`idea.vmoptions`), Shuzijun `com.intellij.modules.jcef` depends + 13px font (`markdown-editor-2.0.5.jar`), MCP Server Services-panel suppression (`mcpserver.jar`), keymap overrides (`macOS copy.xml`), and the patched Wibey plugin from `brian/local-combined` (image-paste `setupClipboardPaste`/`handleImagePaste` + session-title fields all confirmed via `javap`). The one gap — the "Allow Edits to Sensitive Files" dialog suppression (`idea.readonly.fragments.notification.enabled=false`) missing from `early-access-registry.txt` — was reapplied (IDEA quit first; file method). All patches now applied.
 - *command-approval constipation*
 - *Parallel agents now supported (as of 2026.06)*
 - *Cannot paste file/line reference!?*
@@ -345,24 +388,11 @@ Line-height, table padding, list spacing, and focus bug patches. Full procedure:
   - **Built-in profiler and memory analysis**
   - *Expensive ($249/yr commercial, $169 w/ AI Assistant)*
 
-### Terminal Blindness (IDEA Copilot)
 
-This issue occurs mainly in GitHub Copilot in Intellij IDEA. Terminal output detection can fail, causing commands to appear to produce no output even though their output is visible in the terminal.
-
-- **Where observed:** reproducible on personal laptop; **never observed on Walmart laptop** so far (as of 2026.04.04)
-- **Root cause (plugin behavior):** `TerminalUtils.collectTerminalOutput()` computes `commandStartY = cursorY + historyLinesCount + cmdLines - 1` and reads `getText().drop(commandStartY)`. Over time, `cursorY` drifts toward `screenHeight`; once `commandStartY` exceeds available text lines, output capture goes blank.
-- **SOTA workaround status (applied):**
-  - `~/bin/bash_profile`: `BASH_SILENCE_DEPRECATION_WARNING=1`
-  - `~/bin/bashrc`: JetBrains block sets `set +o noclobber`
-  - `~/bin/bashrc`: JetBrains block sets `PROMPT_COMMAND='printf "\e[H\e[2J"'`
-  - `~/bin/bash_profile`: JetBrains sessions preserve `.bashrc` `PROMPT_COMMAND` (no override in history block)
-- **Do not use `\e[3J`:** JediTerm clears both scrollback and screen, which destroys output before Copilot can read it.
-- **Limitations:** `\e[H\e[2J` is not perfect; drift can recur after enough commands. Running `clear` resets drift.
-- **Fallback:** redirect command output to `tmp/YYYYMMDD_HHMMSS_agent.out`, then read the file directly and mirror it with `cat` or `tail` in terminal.
 
 ### IDEA Keybindings
 
-IDEA keybinding overrides are stored in `~/Library/Application Support/JetBrains/IntelliJIdea2025.3/keymaps/macOS copy.xml`. Edit this file to add standard bindings:
+IDEA keybinding overrides are stored in `~/Library/Application Support/JetBrains/IntelliJIdea2026.2/keymaps/macOS copy.xml`. Edit this file to add standard bindings:
 
 - **Zoom**: `⌘=` / `⌘-` (remapped from `^⌥=` / `^⌥-`)
   - Action IDs: `ZoomInIdeAction` / `ZoomOutIdeAction`
@@ -373,6 +403,8 @@ IDEA keybinding overrides are stored in `~/Library/Application Support/JetBrains
 - **Toggle Line Numbers**: `⌥L`
   - Action ID: `EditorToggleShowLineNumbers`
   - Keystroke format: `alt l`
+
+
 
 ### IDEA Workspace Roots
 
@@ -385,6 +417,8 @@ IDEA keybinding overrides are stored in `~/Library/Application Support/JetBrains
 - If the wrong root shows up, remove the direct `My Drive/.../LPSCC` entry and reattach the symlinked root so the workspace stays stable across Drive remounts.
 - Do not let agents rewrite unrelated module/root config while doing this cleanup; even removing one stale root can have side effects on IDEA layout state and Copilot's local session/history mapping after restart.
 
+
+
 ### Markdown Preview
 
 The built-in Markdown preview uses `options/markdown.xml` under `MarkdownSettings`. Font size is 15px.
@@ -394,7 +428,7 @@ The built-in Markdown preview uses `options/markdown.xml` under `MarkdownSetting
 - **JCEF preview** (`MarkdownJCEFHtmlPanel`) — right pane in "Markdown Split Editor" and the standalone Preview tab. Respects custom CSS. Default body font: `Helvetica, Arial, freesans, sans-serif` (bundled `default.css`).
 - **Compose WYSIWYG editor** (`intellij.markdown.compose.preview.jar`, class `JcefLikeMarkdownStylingKt`) — the "Markdown Editor" tab (H/B/I toolbar). Hardcodes `FontFamily.SansSerif` (= SF Pro on macOS); reads `fontSize` from settings; ignores `fontFamily` and all CSS. **Table font size and cell wrapping are also hardcoded** — not configurable without patching the JAR.
 
-**Valid `MarkdownSettingsState` fields in 2026.2:**
+**Valid** `MarkdownSettingsState` **fields in 2026.2:**
 
 - `fontSize` (int) — affects both JCEF preview and Compose editor
 - `fontFamily` (string) — passed to JCEF preview; ignored by Compose editor
@@ -410,6 +444,8 @@ Quick notes:
 - `MarkdownSettings.fontSize` lives in `options/markdown.xml`, not `editor-font.xml`.
 - Editing `markdown.xml` while IDEA is running has no effect — IDEA reads settings at startup and writes them on exit (overwriting any manual edits made while running). Use the Settings UI instead.
 - After changing font size via the Settings UI, close/reopen the Markdown tab to see the change in the JCEF preview.
+
+
 
 ### Disable "Allow Edits to Sensitive Files" Dialog
 
@@ -490,7 +526,11 @@ git merge brian/conversation-title-features   # whichever changed
 
 ---
 
+
+
 ## Wibey Skills
+
+
 
 ### usage-dashboard: UTC day-boundary bug
 
@@ -521,3 +561,4 @@ Files that implement auto-regen (keep in sync):
 
 - `~/.claude/hooks/session-end-usage.py` (active hook)
 - `~/.wibey/skills/usage-dashboard/scripts/session-end-usage.py` (skill source)
+
