@@ -4,6 +4,10 @@
 
 ## Human setup
 
+When Google Drive first asks which local folders to sync to Drive, leave Documents,
+Desktop, and Downloads unchecked. This setup mirrors the existing `My Drive` folder
+locally; it does not back up the Mac's standard folders to Google Drive.
+
 ### Bootstrap (before Copilot Agent)
 
 ```sh
@@ -28,8 +32,8 @@ ln -sf ~/bin/shellrc/zshrc ~/.zshrc
 ln -sf ~/bin/shellrc/bash_profile ~/.bash_profile
 ln -sf ~/bin/shellrc/bashrc ~/.bashrc
 ln -sf ~/bin/shellrc/shellrc.common ~/.shellrc.common
-ln -sfn ~/Google\ Drive ~/gdrive
-ln -sfn ~/Google\ Drive/Shared\ drives/LP\ SCC\ Financial ~/lpscc
+ln -sfn ~/My\ Drive ~/gdrive
+ln -sfn ~/Library/CloudStorage/GoogleDrive-*/Shared\ drives/LP\ SCC\ Financial ~/lpscc
 
 # Wibey custom commands (hardlinks, not symlinks — glob loop never drifts)
 mkdir -p ~/.wibey/commands
