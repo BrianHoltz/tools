@@ -33,6 +33,7 @@ Content roots and git tracking:
 - `~/Documents` ← tracked in `home` monorepo
 - `~/My Drive` ← tracked in `home` monorepo
 - `~/lpscc` ← standalone GitHub repo (`BrianHoltz/lpscc`); NOT part of `home` monorepo
+- `~/src/family-helm` ← standalone GitHub repo (`zoeholtz/family-helm`)
 
 **What is `~/My Drive`:**
 The most important personal files — curated documents worth extra backup and family sharing. Google Drive provides cross-device availability; the monorepo provides durable git history visible to GitHub-hosted Copilot.
@@ -64,6 +65,7 @@ IDEA content roots:
   ~/Documents         → content root 1 (VCS: home monorepo)
   ~/My Drive          → content root 2 (VCS: home monorepo)
   ~/lpscc             → content root 3 (VCS: standalone lpscc repo)
+  ~/src/family-helm   → indexed under the `~/src` content root (VCS: standalone family-helm repo)
 
 Nested/sibling repos:
   ~/src/tools         → public tooling repo (also an IDEA content root)
@@ -106,6 +108,8 @@ The public tools repo lives in `~/src/tools/`. Its stable entrypoint is `~/bin -
 
 Other public repos in `~/src/*` are standalone project repos outside the `home` repo's tracked scope.
 
+FamilyHelm is indexed under the `~/src` IDEA content root because it is an active design and application project, while its standalone Git repository remains a separate VCS root.
+
 **Default rule for new public repos:** put them in `~/src/<name>`.
 
 ## Repo Census
@@ -117,6 +121,7 @@ Current state (2026-07-16, post-recovery, Northstar achieved):
 | `home` (monorepo) | `~`                                     | in-tree              | `BrianHoltz/home` private   | ✅ active; Documents + My Drive + wiki history   |
 | `lpscc`           | `~/lpscc` (symlink)                     | in-tree              | `BrianHoltz/lpscc` private  | ✅ standalone repo; VCS root in IDEA workspace   |
 | `tools` (public)  | `~/src/tools`                           | in-tree              | `BrianHoltz/tools` public   | ✅ active at `~/src/tools`; `~/bin` symlink      |
+| `family-helm`     | `~/src/family-helm`                     | in-tree              | `zoeholtz/family-helm` public | ✅ standalone repo; indexed under `~/src`, with its own VCS root |
 | `wiki` (nested)   | `~/Documents/HoltzDotOrg/Thoughts/wiki` | `~/gitdirs/wiki.git` | `BrianHoltz/wiki` public    | ✅ history imported into monorepo; still active  |
 | `gdrive` (legacy) | —                                       | `~/gitdirs/gdrive`   | `BrianHoltz/gdrive` private | ⏳ archive after 2026-07-30 grace period         |
 
@@ -125,7 +130,7 @@ Current state (2026-07-16, post-recovery, Northstar achieved):
 IDE project at `~/IdeaProjects/Personal/`:
 
 **Content roots:**
-- Documents, My Drive, `~/src/tools`, lpscc (four bounded modules for IDE visibility)
+- Documents, My Drive, `~/src/tools`, and lpscc (four bounded modules for IDE visibility; FamilyHelm is inside the `~/src` module)
 
 **Version control roots (`.idea/vcs.xml`):**
 - `~` (home monorepo root)
@@ -134,6 +139,7 @@ IDE project at `~/IdeaProjects/Personal/`:
 - `~/Documents/HoltzDotOrg/Thoughts/wiki`
 - `~/src/tools` ← standalone public repo; surfaces tools changes in commit pane
 - `~/lpscc` ← standalone repo; surfaces lpscc changes in commit pane
+- `~/src/family-helm` ← standalone public repo; surfaces FamilyHelm changes in commit pane while remaining indexed by the `~/src` module
 
 **First-class indexing requirement:**
 Every content root listed above must be loaded as an IDEA module and indexed as a first-class citizen. Files outside loaded content roots will not appear in IDEA's **Find Files**, navigation, or Copilot context. If a file (e.g. `GitScheme.md`) is missing from Find Files, verify its real directory is a loaded content root and is not excluded.
