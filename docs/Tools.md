@@ -408,6 +408,21 @@ IDEA keybinding overrides are stored in `~/Library/Application Support/JetBrains
 
 ### IDEA Workspace Roots
 
+- On the personal Mac and the Mac mini, the Project view should expose these
+  bounded content roots:
+
+  ```text
+  ~/Documents
+  ~/lpscc
+  ~/My Drive
+  ~/src
+  ```
+
+  This corresponds to the personal laptop layout shown as `Documents`,
+  `lpscc`, `My Drive [GDrive]`, and `src`. Attach the real directories in IDEA
+  rather than only opening `~/src/tools`; the tools checkout is nested under
+  `~/src` but should also have its own VCS mapping when it is being edited.
+
 - Preferred LPSCC root: `~/lpscc` (the symlink to the shared-drive root).
 - In Project view and attached directories, use `~/lpscc` rather than `~/My Drive/Libertarian/LPSCC`.
 - For the tools repo, attach the **real repo path** `~/src/tools` as both an IDEA content root and a VCS root. Do **not** rely on the `~/bin` symlink for IDE root configuration.
@@ -561,4 +576,3 @@ Files that implement auto-regen (keep in sync):
 
 - `~/.claude/hooks/session-end-usage.py` (active hook)
 - `~/.wibey/skills/usage-dashboard/scripts/session-end-usage.py` (skill source)
-

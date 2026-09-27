@@ -132,6 +132,30 @@ IDE project at `~/IdeaProjects/Personal/`:
 **Content roots:**
 - Documents, My Drive, `~/src/tools`, and lpscc (four bounded modules for IDE visibility; FamilyHelm is inside the `~/src` module)
 
+**Personal Mac mini analogue:**
+
+The IntelliJ IDEA Project view should show these bounded roots, matching the
+personal laptop layout:
+
+```text
+Documents   ~/Documents
+lpscc       ~/lpscc
+My Drive    ~/My Drive
+src         ~/src
+```
+
+The `src` module may contain `~/src/tools` and other sibling repositories;
+`~/src/tools` must also be attached as its own module/content root when it
+needs first-class indexing and its own VCS mapping. Do not attach `~/bin`,
+because it is only a symlink to `~/src/tools`.
+
+On a new Mac mini, attach the real `~/Documents`, `~/lpscc`, `~/My Drive`, and
+`~/src` directories in IDEA. Attach the real `~/src/tools` directory as a
+separate content root/module if it is not already visible beneath `src`.
+Expected Project view labels are `Documents`, `lpscc`, `My Drive [GDrive]` (or
+`My Drive`), and `src`. Use these stable local paths rather than Google Drive's
+long CloudStorage target path.
+
 **Version control roots (`.idea/vcs.xml`):**
 - `~` (home monorepo root)
 - `~/Documents`
