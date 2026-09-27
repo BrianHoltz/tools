@@ -192,9 +192,8 @@ to run the export script and attach or copy the resulting transfer directory.
    `/Volumes/Archive/MacMiniTransfers/` as the archive root. Quit Plex and
    Plex HTPC first; the script refuses to run while either is active. The
    script creates a new `runs/YYYYMMDD-HHMMSS/` directory and writes
-   `manifest.txt`, `manifest.tsv`, `large-or-skipped.tsv`, and the selected
-   state there. The progress log is `export_mac_mini_migration.log`; the
-   inventory is `old_mac_mini_inventory.txt`.
+   `manifest.txt`, `manifest.tsv`, `large-or-skipped.tsv`, `export.log`, and
+   the selected state there. The inventory is `old_mac_mini_inventory.txt`.
 3. Do not treat a completed script as proof that all state was copied. Review
    `manifest.txt`, `manifest.tsv`, and `large-or-skipped.tsv`. Anything over
    100 MB is intentionally skipped and requires an explicit decision, except

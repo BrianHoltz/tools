@@ -9,11 +9,11 @@ DEST_ROOT="$ARCHIVE_ROOT/runs/$RUN_ID"
 MAX_KB=102400
 
 log() {
-  printf '[%s] %s\n' "$(date '+%H:%M:%S')" "$*" >&2
+  printf '[%s] %s\n' "$(date '+%H:%M:%S')" "$*"
 }
 
 section() {
-  printf '\n=== %s ===\n' "$*" >&2
+  printf '\n=== %s ===\n' "$*"
 }
 
 copy_file() {
@@ -120,6 +120,7 @@ fi
 
 mkdir -p "$DEST_ROOT/Inventory"
 chmod 700 "$DEST_ROOT"
+exec > >(tee "$DEST_ROOT/export.log") 2>&1
 
 section "Migration export"
 log "Destination: $DEST_ROOT"
