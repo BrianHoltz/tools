@@ -65,6 +65,9 @@ For the VS Code option, the bootstrap commands install the Copilot extensions. O
 
 ### Additional apps requiring human installation
 
+The following are the remaining non-Homebrew apps. Plex is **not** in this
+section: it is a Homebrew cask and belongs in the agent-run install block below.
+
 - Kindle — App Store
 - Family Tree Maker — https://mackiev.com/ftm/
 - OBSBOT Center — https://www.obsbot.com/download
@@ -100,6 +103,7 @@ brew install --cask \
 
 - `stats` — menu bar CPU/RAM/disk/network; auto-launches at login
 - Google Drive — launches at login automatically after install
+- Plex — install with `brew install --cask plex`; do not treat it as a manual download
 
 ### Additional apps
 

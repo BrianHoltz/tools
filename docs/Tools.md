@@ -166,6 +166,32 @@ Extension command IDs:
 
 ## Copilot
 
+### Agent shell-command approvals
+
+For VS Code and Cursor, put these settings in each IDE's user
+`settings.json` to maximize automatic approval of agent tool calls and avoid
+routine sync/delete prompts:
+
+```json
+{
+  "chat.tools.global.autoApprove": true,
+  "chat.tools.urls.autoApprove": { "*": true },
+  "chat.agent.maxRequests": 250,
+  "git.confirmSync": false,
+  "explorer.confirmDelete": false,
+  "security.workspace.trust.untrustedFiles": "open"
+}
+```
+
+These settings do not bypass macOS authorization, `sudo` passwords, GitHub
+authentication, or other OS/security boundaries. IntelliJ IDEA's Copilot
+`run_in_terminal` confirmation is controlled by the IDE/plugin tool host; no
+supported persistent user setting was found that disables that confirmation.
+When IDEA offers an **Always allow** or equivalent command approval, choose it
+for trusted local agent work. Do not edit the plugin's generated tool registry
+to fake approval; updates can overwrite it and the host may still enforce the
+confirmation.
+
 - **Works with VS Code, Intellij IDEA, Android Studio**
 - **Unlimited use of GPT4.1**
 - **Supports Gemini3Pro**
