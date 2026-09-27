@@ -3,7 +3,9 @@
 set -u
 umask 077
 
-DEST_ROOT="/Volumes/Archive/MacMiniTransfers"
+ARCHIVE_ROOT="/Volumes/Archive/MacMiniTransfers"
+RUN_ID="$(date '+%Y%m%d-%H%M%S')"
+DEST_ROOT="$ARCHIVE_ROOT/runs/$RUN_ID"
 MAX_KB=102400
 
 log() {
@@ -71,21 +73,57 @@ copy_dir_if_small() {
     "$label" "$source" "$size_mb" >> "$DEST_ROOT/manifest.tsv"
 }
 
+copy_dir_required() {
+  label="$1"
+  source="$2"
+  relative="$3"
+  destination="$DEST_ROOT/$relative"
+
+  log "$label: checking $source"
+
+  if [ ! -d "$source" ]; then
+    echo "ERROR: required directory is missing: $source" >&2
+    exit 1
+  fi
+
+  log "$label: measuring complete state directory with du"
+  size_kb="$(du -sk "$source" 2>/dev/null | awk '{print $1}')"
+  if [ -z "$size_kb" ]; then
+    echo "ERROR: could not measure required directory: $source" >&2
+    exit 1
+  fi
+
+  size_mb=$((size_kb / 1024))
+  mkdir -p "$(dirname "$destination")"
+  log "$label: copying complete state directory (${size_mb} MB)"
+  ditto "$source" "$destination"
+  printf '%s\t%s\t%s MB\n' \
+    "$label" "$source" "$size_mb" >> "$DEST_ROOT/manifest.tsv"
+}
+
 if [ ! -d "/Volumes/Archive" ]; then
   echo "ERROR: /Volumes/Archive is not mounted." >&2
   exit 1
 fi
 
-if [ ! -d "$DEST_ROOT" ]; then
-  echo "ERROR: destination does not exist: $DEST_ROOT" >&2
+if pgrep -afil 'Plex' >/dev/null 2>&1; then
+  echo "ERROR: quit Plex and Plex HTPC before running this export." >&2
+  pgrep -afil 'Plex' >&2 || true
   exit 1
 fi
 
-mkdir -p "$DEST_ROOT"
+if [ -e "$DEST_ROOT" ]; then
+  echo "ERROR: generated run directory already exists: $DEST_ROOT" >&2
+  echo "Run the script again at a different time; existing contents are never reused." >&2
+  exit 1
+fi
+
+mkdir -p "$DEST_ROOT/Inventory"
 chmod 700 "$DEST_ROOT"
 
 section "Migration export"
 log "Destination: $DEST_ROOT"
+log "Existing archive runs are preserved; this run uses a new directory"
 log "Directories larger than 100 MB will be measured and skipped"
 
 {
@@ -94,35 +132,20 @@ log "Directories larger than 100 MB will be measured and skipped"
   echo "Source host: $(scutil --get ComputerName 2>/dev/null || hostname)"
   echo "macOS: $(sw_vers -productVersion 2>/dev/null || true)"
   echo "Architecture: $(uname -m)"
-  echo "Size limit: 100 MB per selected state directory"
+  echo "Size limit: 100 MB per optional state directory"
+  echo "Complete Plex state is copied regardless of size"
 } > "$DEST_ROOT/manifest.txt"
 
-: > "$DEST_ROOT/manifest.tsv"
-: > "$DEST_ROOT/large-or-skipped.tsv"
+touch "$DEST_ROOT/manifest.tsv" "$DEST_ROOT/large-or-skipped.tsv"
 
 section "Plex Media Server"
-log "Raw Plex media directories are intentionally excluded"
-log "Raw Plex metadata and thumbnails are intentionally excluded from this config export"
+log "Raw movie and television media directories are excluded"
+log "Complete Plex application state is required for server migration"
 
-copy_file \
-  "Plex database" \
-  "$HOME/Library/Application Support/Plex Media Server/Database/com.plexapp.plugins.library.db" \
-  "Plex/Database/com.plexapp.plugins.library.db"
-
-copy_file \
-  "Plex database WAL" \
-  "$HOME/Library/Application Support/Plex Media Server/Database/com.plexapp.plugins.library.db-wal" \
-  "Plex/Database/com.plexapp.plugins.library.db-wal"
-
-copy_file \
-  "Plex database SHM" \
-  "$HOME/Library/Application Support/Plex Media Server/Database/com.plexapp.plugins.library.db-shm" \
-  "Plex/Database/com.plexapp.plugins.library.db-shm"
-
-copy_file \
-  "Plex Preferences.xml" \
-  "$HOME/Library/Application Support/Plex Media Server/Preferences.xml" \
-  "Plex/Preferences.xml"
+copy_dir_required \
+  "Plex complete application state" \
+  "$HOME/Library/Application Support/Plex Media Server" \
+  "Plex/Plex Media Server"
 
 copy_file \
   "Plex macOS preferences plist" \

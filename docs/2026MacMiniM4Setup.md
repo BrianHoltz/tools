@@ -172,11 +172,13 @@ need to be confirmed from each application's settings.
 
 The bounded export script
 [`docs/export_mac_mini_migration.sh`](export_mac_mini_migration.sh) writes
-selected migration state to `/Volumes/Archive/MacMiniTransfers/`. It reports
-each application and source path to stderr, measures selected directories with
-`du`, and skips any selected directory larger than 100 MB. It deliberately
-excludes media libraries, recordings, downloads, Plex metadata/thumbnails,
-logs, caches, credentials in command output, and other raw data.
+each run to a new timestamped subdirectory under
+`/Volumes/Archive/MacMiniTransfers/runs/`. It never truncates or overwrites a
+previous run. It reports each application and source path to stderr, measures
+selected directories with `du`, and skips any optional selected directory
+larger than 100 MB. It copies the complete Plex application state regardless
+of size, while deliberately excluding movie and television media, recordings,
+downloads, logs, caches, credentials in command output, and other raw data.
 
 ### New Mac mini agent handoff
 
@@ -187,13 +189,16 @@ to run the export script and attach or copy the resulting transfer directory.
 1. Open `~/src/tools/docs/2026MacMiniM4Setup.md` and
    `docs/export_mac_mini_migration.sh` from the real `~/src/tools` checkout.
 2. Have the old Mac operator run the export script with
-   `/Volumes/Archive/MacMiniTransfers/` as the destination. The script's
-   progress log is `export_mac_mini_migration.log`; the inventory is
-   `old_mac_mini_inventory.txt`. Both are expected to be saved in Google Drive
-   alongside one another for the new agent to inspect.
+   `/Volumes/Archive/MacMiniTransfers/` as the archive root. Quit Plex and
+   Plex HTPC first; the script refuses to run while either is active. The
+   script creates a new `runs/YYYYMMDD-HHMMSS/` directory and writes
+   `manifest.txt`, `manifest.tsv`, `large-or-skipped.tsv`, and the selected
+   state there. The progress log is `export_mac_mini_migration.log`; the
+   inventory is `old_mac_mini_inventory.txt`.
 3. Do not treat a completed script as proof that all state was copied. Review
    `manifest.txt`, `manifest.tsv`, and `large-or-skipped.tsv`. Anything over
-   100 MB is intentionally skipped and requires an explicit decision.
+   100 MB is intentionally skipped and requires an explicit decision, except
+   for the complete Plex application state, which the script copies in full.
 4. Mount the transfer disk at the same `/Volumes/Archive` path on the new Mac,
    mount the external `media library` volume at the same path as the old Mac,
    and verify both before restoring anything.
