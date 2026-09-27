@@ -232,13 +232,15 @@ Before using the current date for anything, run `date "+%Y-%m-%d %H:%M %Z"`. Run
 
 ### Use EDTF for all dates
 
-Use EDTF with these modifications, while ensuring that every date sorts
-chronologically as text:
+Use EDTF with these modifications; use canonical forms where chronological
+text sorting is required:
 
 - Use **periods** as date component separators instead of hyphens (e.g. `2026.03.27` not `2026-03-27`). Periods prevent unwanted line breaks in cramped table layouts, are analogous to decimal points, save space in variable-width fonts, and cannot be confused with ranges.
+- In human dates, leading year zeroes are optional; a leading `-` is mandatory for BCE. Canonical sortable dates use a fixed four-digit year.
 - **Exception: filenames and directory names use hyphens** (e.g. `2026-03-27`, not `2026.03.27`). The periods rationale above (line-wrap avoidance, range disambiguation) doesn't apply to filenames; hyphens instead avoid a trailing dot ambiguous with a file extension and match the sortable `YYYY-MM-DD` convention already established across `aidocs/`, `memos/`, `releases/`, and `incidents/`. Prose dates inside those same files still use periods.
 - When space allows, append day of week e.g. 2026.07.27.Mon
-- When a time is included, use a compact four-digit 24-hour time with no colon, e.g. `2026.09.22.Tue.1149`.
+- When a time is included, use a compact four-digit 24-hour time, e.g. `2026.09.22.Tue.1149`; add `:ss` for seconds and `.fraction` for subsecond precision (e.g. `1112`, `1112:08`, `1112:08.23`).
+- A timezone suffix is optional when context supplies it. Prefer a human-readable abbreviation such as `PT`, `PST`, or `PDT`; an unambiguous numeric UTC offset such as `-0700` is also allowed when useful.
 - When a date-time is embedded in a version number, retain only the periods separating the date, day of week, and time; do not add punctuation inside the time.
 - When year is not needed (e.g. when obvious from context and not needed as a search target), you may use mm.dd.Dow
 - Use hyphens as range indicators instead of slashes (e.g. `2026.03.01-2026.03.27` not `2026-03-01/2026-03-27`). Slashes read like ratios or alternatives, not ranges.
