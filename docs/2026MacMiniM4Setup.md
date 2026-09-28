@@ -593,3 +593,18 @@ still need to be transferred securely.
 - The old Mac has login agents for Google, Chrome Remote Desktop, Fitbit, EA
   Origin, and other utilities. Recreate only the agents belonging to software
   intentionally migrated.
+
+### Plex export checkpoint — 2026.09.27 22:38
+
+The authenticated SSH session was healthy. The reviewed exporter stalled while recursively measuring the approximately 12 GB Plex state, and a direct complete `ditto` copy also made no progress because the `Media` and `Metadata` trees are extremely file-heavy. Both attempts were stopped without modifying the source.
+
+A selective operational export completed successfully at:
+
+```text
+/Volumes/Archive/MacMiniTransfers/runs/20260927-223500/
+```
+
+The verified run contains the Plex database under `Plex/Plex Media Server/Plug-in Support/Databases/`, the macOS preferences plist, and the operational state directories including Plug-in Support. Its copied Plex state is approximately 3.4 GB. Only the regenerable `Media` and `Metadata` cache trees were explicitly recorded in `large-or-skipped.tsv` as skipped after each exceeded a 15-second traversal probe.
+
+Do not eject the volumes or shut down the old mini until the selective run has been reviewed on the M4. Restore this run first, preserve the M4 Plex state as rollback, mount media volumes at their exact paths, and allow Plex to regenerate missing caches before judging the migration.
+
