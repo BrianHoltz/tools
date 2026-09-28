@@ -213,6 +213,134 @@ The new agent must not reset the old Mac, delete source state, expose transfer
 contents publicly, or commit credentials, tokens, databases, or copied
 application data to the public tools repository.
 
+### Copilot session recovery checkpoint — 2026.09.27
+
+The earlier IntelliJ Copilot session for this project is still recoverable at:
+
+```text
+~/.copilot/session-state/e8a6138a-1ee0-494a-9aaf-82a7ece853ce/
+```
+
+Its `events.jsonl` contains the complete migration conversation, including the
+SSH handoff. IntelliJ reopened a new session instead of reattaching that
+conversation; the old history was not deleted. The earlier session completed
+the exporter changes, pushed commits `5e34fe7` and `6b9e649`, installed
+SecuritySpy, Plex Media Server, and Calibre on the M4, and then paused while
+trying to authenticate an SSH session to `livingroommac.local`.
+
+The network diagnosis and recovery are:
+
+- `livingroommac.local` resolves to `192.168.7.179` and responds to ping with
+  no packet loss.
+- TCP port 22 is open and the authenticated SSH session is established over
+  IPv6.
+- Wi-Fi (`en1`) has the valid current lease `192.168.7.179/24` with gateway
+  `192.168.7.1`.
+- Ethernet (`en0`) had a stale `192.168.0.2/24` lease and owned the default
+  route through `192.168.0.1`. DNS and Internet traffic consequently failed
+  despite successful LAN access over Wi-Fi.
+- The old Mac's Ethernet network service was disabled, moving the default route
+  to Wi-Fi. DNS lookup now succeeds and `curl https://github.com` returns HTTP
+  200.
+
+The Ethernet service can be re-enabled with:
+
+```sh
+sudo networksetup -setnetworkserviceenabled Ethernet on
+```
+
+Only re-enable it after confirming that it receives a valid lease on the
+current network; otherwise it can reclaim the default route and reproduce the
+outage.
+
+Plex is currently reachable on the old mini at `http://192.168.7.179:32400`.
+The unauthenticated `/identity` endpoint reports version
+`1.43.1.10611-1e34174b1`, a claimed server, and machine identifier
+`047719f83ac50053d5950bcf10b8ca7f2cfda09a`. Library contents require the Plex
+account token and were not queried or copied over the network.
+
+The M4 currently has no `/Volumes/Archive`, transfer disk, or `media library`
+volume mounted, and no Plex server process is running there. The migration is
+therefore still in the preparation phase; do not shut down or reset the old
+mini until the export manifests and complete Plex rollback copy are verified.
+
+The latest read-only SSH inventory of the old mini found:
+
+- macOS `12.7.6` and Plex Media Server `1.43.1.10611-1e34174b1` running with
+  its plug-in, tuner, and DLNA helper processes.
+- `/Volumes/Archive` mounted, with `/Volumes/ArchiveCache` also present.
+- Plex application state at
+  `~/Library/Application Support/Plex Media Server`, approximately 12 GB.
+- Local candidate paths `/Users/brian/Movies/TV` (36 KB) and
+  `/Users/brian/PlexTmp` (429 MB). No volume named `media library` is mounted
+  on the old mini at this checkpoint.
+- `/Volumes/Archive/MacMiniTransfers/manifest.txt`,
+  `manifest.tsv`, and `large-or-skipped.tsv` present. Their contents still
+  require review after Plex is stopped; presence alone does not prove that the
+  complete rollback copy is present.
+
+The Plex Remote Access screen shows manual public port `32400`, private
+`192.168.7.179:32400`, and public `98.97.25.164:32400`, but the public mapping
+is currently unreachable. The old Ethernet route was previously
+`192.168.0.2`; update or verify the router's port-forward target to the old
+mini's current Wi-Fi address, and reserve that address or otherwise preserve
+the mapping before migration.
+
+The Plex database was not copied or exposed. A first schema query used the
+wrong column name and was discarded; obtain library names and exact folder
+paths from the Plex dashboard rather than guessing from database internals.
+
+The operator supplied these expected media-path conventions:
+
+```text
+/Volumes/Archive/Family/Family Videos/
+/Volumes/MediaLibrary/TV Shows/
+```
+
+Do not manually recreate the Plex libraries if the export contains the
+complete `Plex Media Server` state. Its database and preferences preserve
+library names, section types (such as Movies, TV Shows, Music, or personal
+video), folder paths, metadata settings, watched state, collections, and
+server identity. Confidence is high that a full state restore will preserve
+the library configuration; confidence is low if only selected files or
+manually recreated libraries are used.
+
+The decisive requirement is path fidelity: mount the media volume on the M4
+with the same name and path used by the old database, especially
+`/Volumes/MediaLibrary`. `/Volumes/Archive` is the transfer/archive volume,
+not a substitute for the media volume unless the old Plex library actually
+stores media there. After restore, verify that each library resolves its
+folders before scanning or enabling automatic cleanup.
+
+Resume this work in the current Copilot session using this checkpoint and the
+prior `events.jsonl` transcript. Do not edit session-state files or try to
+force the old session open while another Copilot session is active; the
+transcript is sufficient to continue safely, and manually resuming avoids
+duplicate-session or stale-lock problems. The old Mac must remain powered on
+and must not be reset until the export and rollback copies are verified.
+
+### Export handoff checkpoint — 2026.09.27 21:52
+
+The operator has quit Plex on the old mini. The current handoff plan is:
+
+1. Keep `/Volumes/Archive` mounted and update the old checkout with
+   `git -C "$HOME/src/tools" pull --ff-only`.
+2. Run
+   `bash "$HOME/src/tools/docs/export_mac_mini_migration.sh" 2>&1`.
+3. Verify the newest timestamped run under
+   `/Volumes/Archive/MacMiniTransfers/runs/` contains the export logs,
+   manifests, complete `Plex/Plex Media Server/` state, and
+   `Plex/com.plexapp.plexmediaserver.plist`. Confirm that the complete Plex
+   state appears in `manifest.tsv` and not in `large-or-skipped.tsv`.
+4. Stop here. The operator will eject the archive and media volumes and shut
+   down the old mini, then mount the transfer disk at `/Volumes/Archive` and
+   the media disk at `/Volumes/MediaLibrary` on the M4.
+
+Do not eject or shut down the old mini until the verification in step 3
+passes. After the physical handoff, restore the complete Plex state on the M4,
+preserve any new-install state as a rollback copy, reboot, and verify library
+paths before changing Remote Access.
+
 ## Inventory findings
 
 The pasted inventory is from an Intel Mac mini (`Macmini7,1`) running macOS
