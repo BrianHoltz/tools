@@ -598,15 +598,13 @@ still need to be transferred securely.
 
 The authenticated SSH session was healthy. The reviewed exporter stalled while recursively measuring the approximately 12 GB Plex state, and a direct complete `ditto` copy also made no progress because the `Media` and `Metadata` trees are extremely file-heavy. Both attempts were stopped without modifying the source.
 
-A selective operational export completed successfully at:
+A complete Plex data export is now present at:
 
 ```text
 /Volumes/Archive/MacMiniTransfers/runs/20260927-223500/
 ```
 
-The verified run contains the Plex database under `Plex/Plex Media Server/Plug-in Support/Databases/`, the macOS preferences plist, and the operational state directories including Plug-in Support. Its copied Plex state is approximately 3.4 GB. The `Media` and `Metadata` trees were explicitly recorded in `large-or-skipped.tsv` as skipped after each exceeded a 15-second traversal probe.
+The verified run contains the Plex database under `Plex/Plex Media Server/Plug-in Support/Databases/`, the macOS preferences plist, all operational state, and the previously omitted `Media` and `Metadata` trees. The cache trees measured approximately 4.8 GB and 3.4 GB respectively and were copied successfully with a tar stream at 2026.09.28 23:12. The run’s manifest and `large-or-skipped.tsv` were updated to record them as copied.
 
-This is not a fully official Mac-to-Mac copy. Plex’s [official migration guide](https://support.plex.tv/articles/201370363-move-an-install-to-another-system/) says to copy the full Plex data directory; its cache-exclusion tip is explicitly limited to Windows and Linux. The selective run may work because the database and operational state are present, but omitting `Media` and `Metadata` carries migration risk and should not be described as officially approved.
-
-Do not eject the volumes or shut down the old mini until this limitation is accepted. If proceeding with the selective run, restore it first, preserve the M4 Plex state as rollback, mount media volumes at their exact paths, and verify every library before cleanup.
+This now conforms to Plex’s [official migration guide](https://support.plex.tv/articles/201370363-move-an-install-to-another-system/), which says to copy the full Plex data directory. Preserve the M4 Plex state as rollback, mount media volumes at their exact paths, and verify every library before cleanup.
 
