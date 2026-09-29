@@ -604,7 +604,9 @@ A selective operational export completed successfully at:
 /Volumes/Archive/MacMiniTransfers/runs/20260927-223500/
 ```
 
-The verified run contains the Plex database under `Plex/Plex Media Server/Plug-in Support/Databases/`, the macOS preferences plist, and the operational state directories including Plug-in Support. Its copied Plex state is approximately 3.4 GB. Only the regenerable `Media` and `Metadata` cache trees were explicitly recorded in `large-or-skipped.tsv` as skipped after each exceeded a 15-second traversal probe.
+The verified run contains the Plex database under `Plex/Plex Media Server/Plug-in Support/Databases/`, the macOS preferences plist, and the operational state directories including Plug-in Support. Its copied Plex state is approximately 3.4 GB. The `Media` and `Metadata` trees were explicitly recorded in `large-or-skipped.tsv` as skipped after each exceeded a 15-second traversal probe.
 
-Do not eject the volumes or shut down the old mini until the selective run has been reviewed on the M4. Restore this run first, preserve the M4 Plex state as rollback, mount media volumes at their exact paths, and allow Plex to regenerate missing caches before judging the migration.
+This is not a fully official Mac-to-Mac copy. Plex’s [official migration guide](https://support.plex.tv/articles/201370363-move-an-install-to-another-system/) says to copy the full Plex data directory; its cache-exclusion tip is explicitly limited to Windows and Linux. The selective run may work because the database and operational state are present, but omitting `Media` and `Metadata` carries migration risk and should not be described as officially approved.
+
+Do not eject the volumes or shut down the old mini until this limitation is accepted. If proceeding with the selective run, restore it first, preserve the M4 Plex state as rollback, mount media volumes at their exact paths, and verify every library before cleanup.
 
