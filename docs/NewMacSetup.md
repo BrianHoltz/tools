@@ -4,6 +4,10 @@
 
 ## Human setup
 
+When Google Drive first asks which local folders to sync to Drive, leave Documents,
+Desktop, and Downloads unchecked. This setup mirrors the existing `My Drive` folder
+locally; it does not back up the Mac's standard folders to Google Drive.
+
 ### Bootstrap (before Copilot Agent)
 
 ```sh
@@ -28,8 +32,8 @@ ln -sf ~/bin/shellrc/zshrc ~/.zshrc
 ln -sf ~/bin/shellrc/bash_profile ~/.bash_profile
 ln -sf ~/bin/shellrc/bashrc ~/.bashrc
 ln -sf ~/bin/shellrc/shellrc.common ~/.shellrc.common
-ln -sfn ~/Google\ Drive ~/gdrive
-ln -sfn ~/Google\ Drive/Shared\ drives/LP\ SCC\ Financial ~/lpscc
+ln -sfn ~/My\ Drive ~/gdrive
+ln -sfn ~/Library/CloudStorage/GoogleDrive-*/Shared\ drives/LP\ SCC\ Financial ~/lpscc
 
 # Wibey custom commands (hardlinks, not symlinks — glob loop never drifts)
 mkdir -p ~/.wibey/commands
@@ -60,6 +64,9 @@ For the IntelliJ IDEA option:
 For the VS Code option, the bootstrap commands install the Copilot extensions. Open `~/bin/docs/NewMacSetup.md` in the editor you selected and confirm Copilot is signed in.
 
 ### Additional apps requiring human installation
+
+The following are the remaining non-Homebrew apps. Plex is **not** in this
+section: it is a Homebrew cask and belongs in the agent-run install block below.
 
 - Kindle — App Store
 - Family Tree Maker — https://mackiev.com/ftm/
@@ -96,6 +103,7 @@ brew install --cask \
 
 - `stats` — menu bar CPU/RAM/disk/network; auto-launches at login
 - Google Drive — launches at login automatically after install
+- Plex — install with `brew install --cask plex`; do not treat it as a manual download
 
 ### Additional apps
 
