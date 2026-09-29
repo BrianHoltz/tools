@@ -17,7 +17,39 @@ This is the canonical personal policy for local IDE/plugin artifacts.
 
 Every locally built IDE/plugin artifact must be copied to `~/Downloads/` for installation and review. Keep the canonical build output in its repository's normal release folder, but treat the Downloads copy as the human-facing local build.
 
-Name each Downloads artifact `<product>-<version>-yyyymmdd.Dow.hhmm-<blah>.<ext>`. The timestamp is the actual build-completion time; `<blah>` is a lowercase, hyphen-free description of the newest included fix, shorter than 10 characters. Example: `code-puppy-jetbrains-0.23.0-20260918.Fri.1146-imgpaste.zip`.
+Name each Downloads artifact `<product>-<version>-yyyymmdd.Dow.hhmm-<blah>.<ext>`. The timestamp is the actual build-completion time; capture it with `date "+%Y%m%d.%a.%H%M"` immediately after the build succeeds, not when copying or renaming the artifact. `<blah>` is a lowercase, hyphen-free description of the newest included fix, shorter than 10 characters. Example: `code-puppy-jetbrains-0.23.0-20260918.Fri.1146-imgpaste.zip`.
+
+### Rebuilding the Local Wibey JetBrains Plugin
+
+Build from `~/src/wibey-jetbrains-plugin` on `brian/local-combined`; this branch combines local modifications with upstream updates. Fetch and merge `origin/main` (never rebase), resolve overlapping edits by preserving both upstream behavior and local features, then confirm no unmerged paths or conflict markers remain. Keep the timestamped build version and update its base version to the release version from upstream. Preserve local PR changes, inspect new upstream `@Service` classes against `plugin.xml`, and let the Gradle service-registration validation run as part of `buildPlugin`.
+
+Run the bridge checks and build the installable distribution ZIP from Terminal.app. `set -e` ensures the Gradle build cannot run after a failed bridge check:
+
+```bash
+set -e
+cd ~/src/wibey-jetbrains-plugin
+git fetch origin main
+git merge --no-edit origin/main
+# Resolve all conflicts before continuing; retain local mods and upstream behavior.
+(cd bridge && bun install --frozen-lockfile && bun run build && bun run test -- --reporter=dot)
+./gradlew buildPlugin
+```
+
+After `buildPlugin` succeeds, capture the actual completion time and stage the newest built distribution. The Downloads version is the release version (before `_` in Gradle's timestamped filename); the separate timestamp is when the build completed. `gpt` is the short included-change label for this upstream GPT model-support release; change it when a different update is newest:
+
+```bash
+STAMP=$(date "+%Y%m%d.%a.%H%M")
+ZIP=$(ls -t build/distributions/wibey-jetbrains-plugin-*.zip | head -n 1)
+VERSION=${ZIP##*/wibey-jetbrains-plugin-}
+VERSION=${VERSION%%_*}
+OUT="$HOME/Downloads/wibey-jetbrains-plugin-$VERSION-$STAMP-gpt.zip"
+unzip -t "$ZIP"
+cp -p "$ZIP" "$OUT"
+cmp "$ZIP" "$OUT"
+shasum -a 256 "$ZIP" "$OUT"
+```
+
+The ZIP must be the dependency-complete installable artifact, not a JAR from `build/libs/`. Confirm the archive test succeeds and both hashes match. Keep the canonical ZIP in `build/distributions/`; install from the timestamped copy in `~/Downloads/`.
 
 ## IDEs
 
@@ -521,7 +553,7 @@ Currently applied: font size patch (13px body text), IDEA 2026.2 compat fix (`JB
 
 New conversation bug fix (`clearMessages` on `newParallelSession`). Full procedure: **ToolMods.md → Wibey Extension**.
 
-### Wibey IDEA — Image Paste Fix (⚙️ local branch, PR pending)
+### Wibey IDEA — Image Paste Fix
 
 **Problem:** Cmd+V with any clipboard image was silently broken. Root cause: `IdeEventQueue` intercepts Cmd+V before any Swing handler — `paste()`, input maps, and `TransferHandler` are all bypassed.
 
@@ -531,7 +563,7 @@ New conversation bug fix (`clearMessages` on `newParallelSession`). Full procedu
 
 **PR:** [#170](https://gecgithub01.walmart.com/genaica/wibey-jetbrains-plugin/pull/170) · **Project doc:** [WibeyIDEAImagePaste.md](https://gecgithub01.walmart.com/CatalogRelationships/relationship-shared/blob/main/projects/WibeyIDEAImagePaste.md)
 
-### Wibey IDEA — Conversation Title Features (⚙️ local branch, PR pending)
+### Wibey IDEA — Conversation Title Features
 
 Three fixes/features on top of stock 1.0.20:
 
@@ -544,26 +576,11 @@ Three fixes/features on top of stock 1.0.20:
 
 **PR:** [#169](https://gecgithub01.walmart.com/genaica/wibey-jetbrains-plugin/pull/169) · **Project doc:** [WibeyTitleFeatures.md](https://gecgithub01.walmart.com/CatalogRelationships/relationship-shared/blob/main/projects/WibeyTitleFeatures.md)
 
-### Installing Both Patches Locally
+### Upgrading the Local Wibey Plugin
 
-Both fixes live on `brian/local-combined` in `~/src/wibey-jetbrains-plugin` (merge of `brian/conversation-title-features` + `brian/image-paste-fix`). Branch has `jvmToolchain(17)` local workaround committed (JDK 21 auto-provision hangs through Zscaler proxy; output bytecode is identical).
+`brian/local-combined` combines local image-paste and conversation-title features with upstream main. Check the branch and current `origin/main` history to determine which local mods remain unique before merging.
 
-**To install** (must run in Terminal.app — Wibey kills long Gradle processes):
-
-```bash
-cd ~/src/wibey-jetbrains-plugin
-git checkout brian/local-combined
-./gradlew buildAndInstall   # ~5 min warm cache
-# restart IDEA
-```
-
-**To update after either PR branch gets new commits:**
-
-```bash
-git checkout brian/local-combined
-git merge brian/conversation-title-features   # whichever changed
-./gradlew buildAndInstall
-```
+To install the build in the active IDEA instance, run `./gradlew buildAndInstall` from Terminal.app, then restart IDEA. For a reviewed artifact, install the timestamped ZIP from `~/Downloads/` using **Settings → Plugins → Install Plugin from Disk**.
 
 ---
 
