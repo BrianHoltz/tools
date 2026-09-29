@@ -3,7 +3,7 @@
 ## Local Modifications in Use
 
 - **Code Puppy JetBrains 0.23.1** — adds editable conversation titles in the transcript and History menu, a suggested attachment for the focused editor file or selection, visible universal-constructor tool activity, and the local JCEF startup workaround.
-- **Wibey JetBrains 1.0.27** — supports persistent editable conversation titles, editable queued follow-up prompts, focused-editor file/selection context, and automatic quota snapshots for the usage dashboard.
+- **Wibey JetBrains 1.0.28** — upstream GPT model support and context-window work, combined locally with persistent editable conversation titles, editable queued follow-up prompts, image paste, focused-editor file/selection context, prompt queuing, and quota snapshots.
 - **Zaaack Markdown Editor for VS Code and Cursor** — adds multipanel editing, outline navigation, find, anchor links, and dark-theme/readability improvements.
 - **TypeDown for VS Code and Cursor** — compacts prose, table, and list spacing; preserves editor focus and cursor position through paste.
 - **Shuzijun Markdown Editor for IntelliJ IDEA** — improves body-text readability and supplies the JCEF dependency required by IDEA 2026.2.
@@ -27,7 +27,7 @@ Name each Downloads artifact `<product>-<version>-yyyymmdd.Dow.hhmm-<blah>.<ext>
 | Score                          | 33.5         | 20.5         | 19.5                    |
 | IDE                            | 2026.2       | 1.135.0      | 3.21.13                 |
 | VSCode engine                  | —            | —            | 1.105.1                 |
-| Wibey                          | 1.0.27       | 1.0.20       | 1.0.18                  |
+| Wibey                          | 1.0.28       | 1.0.20       | 1.0.18                  |
 | Code Puppy                    | 0.23.1       | —            | —                       |
 | └ parallel agents              | ✅            | ✅            | ✅                       |
 | └ enqueue next prompt          | ❌            | ✅            | ✅                       |
@@ -66,7 +66,7 @@ Score rubric
 - Glyph values: ✅✅ = 2 pts, ✅ = 1 pt, 🟡 / ✔️ = 0.5 pts, ❌ / ? = 0 pts, ❌❌ = −1 pt
 - Version/text-only cells (version numbers, descriptive text) = excluded
 - Copilot rows excluded from IDE score
-- **IDEA patches (baked-in as of 2026.07.17):** image-paste-fix + conversation-title-features are merged into local `brian/local-combined` build (Wibey 1.0.27). Scores reflect working features; ⚙️ notation removed. Recount after IDE/extension updates.
+- **IDEA patches (baked-in as of 2026.09.29):** image-paste-fix + conversation-title-features are merged into local `brian/local-combined` build (Wibey 1.0.28), alongside upstream 1.0.28 updates. Scores reflect working features; ⚙️ notation removed. Recount after IDE/extension updates.
 - Editor score: each IDE gets the maximum score achievable by any editor available to it
   - IDEA: native WYSIWYG editor (8.0 pts); beats viewer (7.0) and shuzijun (3.5)
   - VS Code: typedown (3.5 pts); zaaack broken ~2026.06.01 (was 7 pts w/ patch)
@@ -155,7 +155,7 @@ Extension command IDs:
 
 ## Top Frictions
 
-- **All IDEA patches currently applied and stable** (verified 2026.07.17). Wibey 1.0.27 from `brian/local-combined` ships with both PRs merged (image-paste-fix + conversation-title-features). Stable baseline for this system; update that branch to stay current as patches are upstreamed.
+- **All IDEA patches currently applied and stable** (verified 2026.09.29). Wibey 1.0.28 from `brian/local-combined` includes upstream main plus image-paste-fix and conversation-title-features. Rebuild from that branch to keep the local plugin current.
 - Parallel Wibey agents now available in all three IDEs (as of 2026.06).
 - Top silly frictions: let me buffer up my next prompt, and make it super-easy to reference the current file and selection.
   - Wibey allows enqueuing the next prompt while busy in VS Code and Cursor, but not in IDEA. Allowing this in IDEA would give 30% of the value of parallel agents. I don't like interrupting agents to add their next prompt and then tell them to first finish the previous one.
@@ -401,7 +401,7 @@ Line-height, table padding, list spacing, and focus bug patches. Full procedure:
 
 - **Superior features: search/find, git, debug, database, http, yaml preview**
 - **Currently on 2026.2 GA/stable** (build 262.8665.258, released 2026.07.16; installed on Walmart laptop 2026.07.16). The 2026.2 EAP (auto-updated ~2026.06.27) has now shipped as stable — the config dir (`IntelliJIdea2026.2`) carried over from EAP → GA, so all EAP-era JAR patches survived the upgrade. The two 2026.2 breaking changes still require JAR patches (see ToolMods.md).
-- **Current local tool versions (2026.09.22):** IntelliJ IDEA 2026.2; Wibey 1.0.27 from `brian/local-combined`; Code Puppy JetBrains 0.23.1 from the local `feature/active-context-pill` build. The Code Puppy artifact includes active-editor context, image paste, universal-constructor rendering, JDK 21 build detection, and the JCEF startup workaround.
+- **Current local tool versions (2026.09.29):** IntelliJ IDEA 2026.2; Wibey 1.0.28 from `brian/local-combined`; Code Puppy JetBrains 0.23.1 from the local `feature/active-context-pill` build. The Code Puppy artifact includes active-editor context, image paste, universal-constructor rendering, JDK 21 build detection, and the JCEF startup workaround.
 - **Patch audit 2026.07.17 (Walmart laptop, 2026.2 GA):** verified all fixes present in the running build — JCEF remote disabled (`idea.vmoptions`), Shuzijun `com.intellij.modules.jcef` depends + 13px font (`markdown-editor-2.0.5.jar`), MCP Server Services-panel suppression (`mcpserver.jar`), keymap overrides (`macOS copy.xml`), and the patched Wibey plugin from `brian/local-combined` (image-paste `setupClipboardPaste`/`handleImagePaste` + session-title fields all confirmed via `javap`). The one gap — the "Allow Edits to Sensitive Files" dialog suppression (`idea.readonly.fragments.notification.enabled=false`) missing from `early-access-registry.txt` — was reapplied (IDEA quit first; file method). All patches now applied.
 - *command-approval constipation*
 - *Parallel agents now supported (as of 2026.06)*
