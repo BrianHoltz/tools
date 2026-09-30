@@ -630,3 +630,8 @@ Plex remains online with the migrated machine identity and all 11 migrated
 libraries. The transfer copy on `/Volumes/Archive` remains available as
 rollback. Playback, Remote Access, and router forwarding remain the only
 post-migration operational checks.
+
+The operator updated the eero forwarding rule labeled **Living Room Mac Mini**
+to target the M4 at `192.168.7.102` on TCP port `32400`, matching Plex’s
+manual public port. Confirm the M4 keeps this address through an eero DHCP
+reservation and complete Plex’s Remote Access connection test.
