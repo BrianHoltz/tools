@@ -684,3 +684,48 @@ instead of their required container headers, and fail `ffprobe`. No missing
 files or validation failures were found in the Family audio/video or photo
 libraries. Replace or restore the two Movies files from intact originals and
 rescan Movies; do not delete them as part of this migration.
+
+### All Plex libraries integrity scan — 2026.09.30 07:33
+
+A complete read-only scan of all 11 Plex libraries covered 48,202 distinct
+indexed paths: 15,348 audio/video files with `ffprobe` and 32,854 photos with
+macOS `sips` validation. No files were changed. No missing files or image
+validation failures were found. The following 31 audio/video files failed
+container probing:
+
+```text
+/Volumes/MediaLibrary/Movies/Barbie Mariposa and Her Butterfly Fairy Friends.avi
+/Volumes/MediaLibrary/Movies/Naruto Shippuuden The Movie.mkv
+/Volumes/MediaLibrary/Music Videos/Cat Stevens - Morning Has Broken.flv
+/Volumes/MediaLibrary/Music Videos/Lesley Gore - It's My Party.flv
+/Volumes/MediaLibrary/Music Videos/Little Drummer Boy.flv
+/Volumes/MediaLibrary/TV Shows/24/Day.2/24_201__8.AM.to.9.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.2/24_204__11.AM.to.12.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.2/24_211__6.PM.to.7.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.2/24_212__7.PM.to.8.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.2/24_215__10.PM.to.11.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.2/24_219__2.AM.to.3.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.2/24_223__6.AM.to.7.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.2/24_224__7.AM.to.8.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.3/24_306__6PM.to.7.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.3/24_310__10PM.to.11.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.3/24_312__12AM.to.1.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.3/24_320__8.AM.to.9.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.4/24_401__7.AM.to.8.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.5/24_508__2.PM.to.3.PM--[HD].avi
+/Volumes/MediaLibrary/TV Shows/24/Day.5/24_520__2.AM.to.3.AM--[HD].avi
+/Volumes/MediaLibrary/TV Shows/24/Day.5/24_524__6.AM.to.7.AM--[HD].avi
+/Volumes/MediaLibrary/TV Shows/24/Day.5/24_Season.5__Trailer--[HD].avi
+/Volumes/MediaLibrary/TV Shows/24/Day.6/24_603__8.AM.to.9.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.6/24_608__1.PM.to.2.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.6/24_610__3.PM.to.4.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.6/24_613__6.PM.to.7.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.6/24_614__7.PM.to.8.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.6/24_618__11.PM.to.12.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.6/24_620__1.AM.to.2.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.6/24_Season.6__Prequel--.avi
+/Volumes/MediaLibrary/TV Shows/Batman - The Brave And The Bold/Season 2/Batman - The Brave And The Bold - 203 - Revenge Of The Reach! {C_P}.avi
+```
+
+The five Music Videos and all 26 TV Shows failures should be restored or
+re-copied from intact originals before relying on those items for playback.
