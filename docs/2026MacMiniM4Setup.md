@@ -616,3 +616,17 @@ The M4 was rebooted as required by Plex’s macOS migration instructions. Plex M
 
 Remaining post-restore verification is operational: confirm playback from a movie and TV episode, inspect subtitles/artwork and watched state, and test Remote Access before enabling cleanup or changing router forwarding.
 
+### Hostname handoff checkpoint — 2026.09.30 00:10
+
+The new M4 is now the living-room Plex server. Its `ComputerName`,
+`LocalHostName`, and active hostname are all `livingroommac`; Bonjour resolves
+`livingroommac.local` to `192.168.7.102`, and Plex responds at
+`http://livingroommac.local:32400/identity`. The old Intel mini was renamed
+`livingroommacold`, including its local hostname, so the two Macs no longer
+compete for the `livingroommac` name. No reboot is required for this hostname
+change.
+
+Plex remains online with the migrated machine identity and all 11 migrated
+libraries. The transfer copy on `/Volumes/Archive` remains available as
+rollback. Playback, Remote Access, and router forwarding remain the only
+post-migration operational checks.
