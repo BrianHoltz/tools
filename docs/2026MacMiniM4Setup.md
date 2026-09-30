@@ -663,3 +663,24 @@ the required AVI/RIFF header. This is a damaged or otherwise non-video source
 file, not evidence of a current Plex transcoder crash. Do not overwrite it
 until an intact replacement is located; restore or re-copy that movie from its
 original source, then rescan the Movies library.
+
+### Media integrity scan checkpoint — 2026.09.30 00:44
+
+The indexed media files were scanned read-only after the Barbie failure. The
+scan covered all 1,064 files in Movies with `ffprobe`, all 3,775 indexed
+audio/video files in Family Videos, Family Sounds, and Famiy Audio with
+`ffprobe`, and all 27,399 indexed images in Family Photos and Family Photos
+More with macOS `sips` image validation. No files were changed.
+
+The only additional corrupt or unreadable media found was:
+
+```text
+/Volumes/MediaLibrary/Movies/Barbie Mariposa and Her Butterfly Fairy Friends.avi
+/Volumes/MediaLibrary/Movies/Naruto Shippuuden The Movie.mkv
+```
+
+Both files are reported by `file` as generic `data`, begin with zero bytes
+instead of their required container headers, and fail `ffprobe`. No missing
+files or validation failures were found in the Family audio/video or photo
+libraries. Replace or restore the two Movies files from intact originals and
+rescan Movies; do not delete them as part of this migration.
