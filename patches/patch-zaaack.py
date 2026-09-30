@@ -69,6 +69,7 @@ P2_VARIANTS = [
     ('after(){V_(),Y_(),sB(),K_()}',  'after(){V_(),Y_(),sB(),K_(),window.__zaaackEnhance&&window.__zaaackEnhance()}'),  # vditor 3.8.4 (Zaaack 0.1.13)
     ('after(){vE(),wE(),VH(),bE()}',  'after(){vE(),wE(),VH(),bE(),window.__zaaackEnhance&&window.__zaaackEnhance()}'),  # vditor 3.11.2 (Zaaack 0.1.15)
     ('after(){xE(),SE(),XH(),EE(),vditor.focus(),window.__vmdSearch||(window.__vmdSearch=JH())}',  'after(){xE(),SE(),XH(),EE(),vditor.focus(),window.__vmdSearch||(window.__vmdSearch=JH()),window.__zaaackEnhance&&window.__zaaackEnhance()}'),  # vditor 3.11.2 (Zaaack 0.1.17)
+    ('after(){SE(),OE(),ZH(),TE(),vditor.focus(),window.__vmdSearch||(window.__vmdSearch=tB()),a0e(),o0e(e.scrollTop),requestAnimationFrame(()=>{document.body.setAttribute("data-vmd-ready","1")})}', 'after(){SE(),OE(),ZH(),TE(),vditor.focus(),window.__vmdSearch||(window.__vmdSearch=tB()),a0e(),o0e(e.scrollTop),requestAnimationFrame(()=>{document.body.setAttribute("data-vmd-ready","1")}),window.__zaaackEnhance&&window.__zaaackEnhance()}'),  # Zaaack 0.1.21
 ]
 
 # Patch 4: wrap vscode.postMessage to drop intra-doc open-link messages
@@ -759,7 +760,10 @@ EXT_CREATE = '''
 EA_CLASS     = 'class EditorPanel {'
 EA_ACTIVATE  = "context.globalState.setKeysForSync([KeyVditorOptions]);"
 EA_VIEWSTATE = "this._init();"
-EA_DOCCHANGE = "            // don't change webview panel when webview panel is focus"
+EA_DOCCHANGE_CANDIDATES = [
+    "            // don't change webview panel when webview panel is focus",
+    "            if (this._panel.active && !isExternalReload(e)) {",
+]
 EA_DISPOSE   = "EditorPanel.panelsByPath.delete(this._fsPath);"
 EA_CREATE_CANDIDATES = [
   "EditorPanel.panelsByPath.set(fsPath, newPanel);",
@@ -801,9 +805,10 @@ def patch_extension_js(path):
     src = src.replace(EA_VIEWSTATE, EA_VIEWSTATE + EXT_VIEWSTATE, 1)
     print('    [E3] onDidChangeViewState handler inserted')
 
-    # E_DOCCHANGE: insert before the "don't change webview" comment
-    assert src.count(EA_DOCCHANGE) == 1, f'anchor not found or not unique: {EA_DOCCHANGE}'
-    src = src.replace(EA_DOCCHANGE, EXT_DOCCHANGE + EA_DOCCHANGE, 1)
+    # E_DOCCHANGE: refresh the outline before the webview's own-edit guard.
+    docchange_anchor = next((anchor for anchor in EA_DOCCHANGE_CANDIDATES if src.count(anchor) == 1), None)
+    assert docchange_anchor, f'anchor not found or not unique: {EA_DOCCHANGE_CANDIDATES}'
+    src = src.replace(docchange_anchor, EXT_DOCCHANGE + docchange_anchor, 1)
     print('    [E4] outline refresh on doc change inserted')
 
     # E_DISPOSE: insert after panelsByPath.delete
