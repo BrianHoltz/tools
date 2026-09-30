@@ -651,3 +651,15 @@ After waiting for shutdown, `192.168.7.179:32400` refused connections while
 the M4 continued to answer `/identity`. No old Plex files were deleted or
 modified. Refresh the Plex server list in Android and retry the video against
 `livingroommac` before investigating transcoder settings further.
+
+The first home video then played, with minor lag, confirming that Android is
+reaching the M4 and that the general transcoder path is functional. Barbie
+Mariposa failed separately: Plex item `80002` points to
+`/Volumes/MediaLibrary/Movies/Barbie Mariposa and Her Butterfly Fairy Friends.avi`
+(`82,837,504` bytes), and the server log reports that media item `87930` has
+neither a video nor an audio stream. Local probing likewise reports invalid
+input; the file is identified only as generic data and does not begin with
+the required AVI/RIFF header. This is a damaged or otherwise non-video source
+file, not evidence of a current Plex transcoder crash. Do not overwrite it
+until an intact replacement is located; restore or re-copy that movie from its
+original source, then rescan the Movies library.
