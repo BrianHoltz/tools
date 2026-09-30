@@ -635,3 +635,19 @@ The operator updated the eero forwarding rule labeled **Living Room Mac Mini**
 to target the M4 at `192.168.7.102` on TCP port `32400`, matching Plex’s
 manual public port. Confirm the M4 keeps this address through an eero DHCP
 reservation and complete Plex’s Remote Access connection test.
+
+### Android playback / duplicate-server checkpoint — 2026.09.30 00:17
+
+Android reported “the transcoder process crashed” while attempting to play
+`2011-01-04 2243 HDH runs circles` from Family Videos. The M4 logs showed no
+corresponding transcoder invocation or crash report, but both the old Intel
+mini (`192.168.7.179`, Plex `1.43.1`) and the M4 (`192.168.7.102`, Plex
+`1.43.4`) were advertising the same migrated Plex machine identifier
+`047719f83ac50053d5950bcf10b8ca7f2cfda09a`. This can make Plex clients select
+the wrong server and is the leading cause of the reported failure.
+
+The old mini’s Plex server was stopped through its authenticated local API.
+After waiting for shutdown, `192.168.7.179:32400` refused connections while
+the M4 continued to answer `/identity`. No old Plex files were deleted or
+modified. Refresh the Plex server list in Android and retry the video against
+`livingroommac` before investigating transcoder settings further.
