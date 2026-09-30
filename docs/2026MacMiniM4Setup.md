@@ -608,3 +608,11 @@ The verified run contains the Plex database under `Plex/Plex Media Server/Plug-i
 
 This now conforms to Plex’s [official migration guide](https://support.plex.tv/articles/201370363-move-an-install-to-another-system/), which says to copy the full Plex data directory. Preserve the M4 Plex state as rollback, mount media volumes at their exact paths, and verify every library before cleanup.
 
+### Plex restore checkpoint — 2026.09.29 23:25
+
+The complete transfer run was restored on the M4 after a read-only audit confirmed `/Volumes/Archive` and `/Volumes/MediaLibrary` were mounted at the required paths and all 11 stored library roots existed. The destination had no prior Plex state, so no `.new-install` directory was needed; the transfer copy remains the rollback source.
+
+The M4 was rebooted as required by Plex’s macOS migration instructions. Plex Media Server `1.43.4.10903-e5521bd8c` is now online on `127.0.0.1:32400` with the migrated machine identifier. The authenticated `/library/sections` API returns all 11 original libraries, including TV Shows, Movies, Audio, Family Sounds, Family Photos, Gallery, Family Videos, Music Videos, Shows, Famiy Audio, and Family Photos More. No library settings, scans, cleanup, or remote-access changes were performed.
+
+Remaining post-restore verification is operational: confirm playback from a movie and TV episode, inspect subtitles/artwork and watched state, and test Remote Access before enabling cleanup or changing router forwarding.
+
