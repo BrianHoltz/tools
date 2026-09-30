@@ -165,7 +165,8 @@ Shuzijun Markdown Editor plugin (com.shuzijun.markdown-editor) uses Vditor, whic
 
 - CSS in `vditor/style.css` inside `markdown-editor-2.0.5.jar`:
   - Added `font-size: 13px !important` override on `.vditor .vditor-reset`, `.vditor .vditor-sv`, `.vditor .vditor-ir` — overrides the Vditor default 16px across preview, split-view, and IR editing modes
-- Patches apply to `~/Library/Application Support/JetBrains/IntelliJIdea2025.3/plugins/markdown-editor/lib/markdown-editor-2.0.5.jar`. Patches are overwritten on plugin update — reapply after each update. Restart IDEA after patching (tab close/reopen is not enough — IDEA caches plugin JAR resources at startup).
+- **System-appearance fallback:** added a `matchMedia("(prefers-color-scheme: dark)")` fallback and change listener to `template/default.html`. IDEA's New UI auto-detection can report false from `UIUtil.isUnderDarcula()` despite macOS dark appearance; this keeps Vditor dark at launch and switches it live with macOS. Marker: `__shuzijunSystemAppearance__`.
+- Patches apply to `~/Library/Application Support/JetBrains/IntelliJIdea2026.2/plugins/markdown-editor/lib/markdown-editor-2.0.5.jar`. Patches are overwritten on plugin update — reapply after each update. Restart IDEA after patching (tab close/reopen is not enough — IDEA caches plugin JAR resources at startup).
 - Patch procedure: extract `vditor/style.css` from the JAR, add the override, repack with `jar uf`
 
 **IDEA 2026.2 compatibility patch** — Shuzijun 2.0.5 crashes in IDEA 2026.2 with `NoClassDefFoundError: com/intellij/ui/jcef/JBCefApp` because IDEA 2026.2 moved `JBCefApp` from core to the `com.intellij.modules.jcef` plugin module (`jcef-plugin/lib/modules/intellij.platform.ui.jcef.jar`). Shuzijun's plugin.xml only declares `<depends>com.intellij.modules.lang</depends>`, so the class is invisible to its classloader and `MarkdownPreviewFileEditorProvider.accept()` throws on every markdown open, causing the WYSIWYG tab to disappear.
