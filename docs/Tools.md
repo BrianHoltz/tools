@@ -2,7 +2,7 @@
 
 ## Local Modifications in Use
 
-- **Code Puppy JetBrains 0.27.0** — adds a suggested attachment for the focused editor file or selection, local JDK 21 build detection, and the JCEF-proxy-warm startup workaround. (Editable conversation titles and universal-constructor visibility shipped upstream and no longer need a local patch.)
+- **Code Puppy JetBrains + VS Code + Cursor 0.27.0** — same `feature/active-context-pill` branch of `~/src/code-puppy-ide` builds all three; the active-editor-context suggestion is implemented in the shared webview/protocol packages so it applies everywhere. JetBrains additionally carries local JDK 21 build detection and the JCEF-proxy-warm startup workaround (no JCEF in VS Code/Cursor, so those don't need it). The VS Code/Cursor extension was built and installed for the first time 2026.10.02 — previously source-only, never packaged. (Editable conversation titles and universal-constructor visibility shipped upstream and no longer need a local patch.)
 - **Wibey JetBrains 1.0.28** — upstream GPT model support and context-window work, combined locally with persistent editable conversation titles, editable queued follow-up prompts, image paste, focused-editor file/selection context, prompt queuing, and quota snapshots.
 - **Zaaack Markdown Editor for VS Code and Cursor** — adds multipanel editing, outline navigation, find, anchor links, and dark-theme/readability improvements.
 - **TypeDown for VS Code and Cursor** — compacts prose, table, and list spacing; preserves editor focus and cursor position through paste.
@@ -81,6 +81,15 @@ shasum -a 256 "$ZIP" "$OUT"
 
 Install from Downloads: Settings → Plugins → ⚙ → Install Plugin from Disk…, then restart IDEA. **Marketplace auto-update will silently overwrite this with a stock build** — after any Code Puppy update notification, verify the installed jar's version against this branch before trusting that local mods survived (see the 2026.10.02 lesson above). Commit and push the merge to `origin/feature/active-context-pill` so the combined branch stays ahead of upstream and the mods aren't local-only residue.
 
+The same repo's `apps/vscode` builds the VS Code/Cursor side of the identical feature (`pnpm --filter code-puppy-vscode run package` instead of the Gradle step — produces `releases/code-puppy-vscode-<version>.vsix`). Install/update either editor via CLI, no marketplace involved since this extension isn't published there:
+
+```bash
+code --install-extension ~/Downloads/code-puppy-vscode-<version>-<stamp>-<blah>.vsix
+cursor --install-extension ~/Downloads/code-puppy-vscode-<version>-<stamp>-<blah>.vsix
+```
+
+Verify with `code --list-extensions --show-versions | grep puppy` (same flag works for `cursor`). Unlike the JetBrains side, there's no marketplace auto-update to silently clobber this — it only changes when you rebuild and reinstall it yourself.
+
 ## IDEs
 
 
@@ -90,7 +99,7 @@ Install from Downloads: Settings → Plugins → ⚙ → Install Plugin from Dis
 | IDE                            | 2026.2.3     | 1.135.0      | 3.21.13                 |
 | VSCode engine                  | —            | —            | 1.105.1                 |
 | Wibey                          | 1.0.28       | 1.0.20       | 1.0.18                  |
-| Code Puppy                    | 0.27.0       | —            | —                       |
+| Code Puppy                    | 0.27.0       | 0.27.0       | 0.27.0                  |
 | └ parallel agents              | ✅            | ✅            | ✅                       |
 | └ enqueue next prompt          | ❌            | ✅            | ✅                       |
 | └ context += @ file            | ✅            | 🟡<100KB     | 🟡<100KB                |
