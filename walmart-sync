@@ -114,6 +114,24 @@ def walmart_sync_specs(cfg):
     return exact, prefixes
 
 
+def mirror_only_specs(cfg):
+    """Like walmart_sync_specs, but mirror_items only -- excludes personal_only.
+
+    Used to gate pushes: personal_only files may be freely pushed from either
+    laptop, but mirror_items have a canonical source (relationship-shared) and
+    must never be hand-edited on the personal laptop, where that source isn't
+    visible."""
+    exact = set()
+    prefixes = []
+    for item in cfg["mirror_items"]:
+        dst = item["tools_rel"]
+        if item["is_dir"]:
+            prefixes.append(dst.rstrip("/") + "/")
+        else:
+            exact.add(dst)
+    return exact, prefixes
+
+
 def is_managed(path: str, exact, prefixes):
     if path in exact:
         return True
@@ -162,37 +180,128 @@ def pull_repo(repo: Path, label: str, cfg=None, check_managed_only=False):
     return True
 
 
+def git_show_bytes(repo: Path, rev: str, rel_path: str):
+    r = subprocess.run(["git", "-C", str(repo), "show", f"{rev}:{rel_path}"], capture_output=True)
+    if r.returncode != 0:
+        return None
+    return r.stdout
+
+
+def recent_shared_shas(rel_path: str, days: int):
+    r = subprocess.run(
+        ["git", "-C", str(SHARED), "log", f"--since={days} days ago", "--format=%H", "--", rel_path],
+        capture_output=True, text=True,
+    )
+    if r.returncode != 0:
+        return []
+    return [line.strip() for line in r.stdout.splitlines() if line.strip()]
+
+
+def mirror_content_is_legitimate(rel_path: str, candidate: bytes, days: int) -> bool:
+    """True if `candidate` bytes match relationship-shared's current content for
+    rel_path, or any commit of it within the last `days` days. Checks HEAD
+    first (the common case: tools is simply stale), then walks history
+    newest-first and stops at the first match -- cheap in the happy path,
+    bounded in the sad path. False means this content never legitimately
+    existed in relationship-shared within the window -- i.e. it was hand-edited
+    directly in tools, not copied from the canonical source."""
+    current = git_show_bytes(SHARED, "HEAD", rel_path)
+    if current is not None and current == candidate:
+        return True
+    for sha in recent_shared_shas(rel_path, days):
+        if git_show_bytes(SHARED, sha, rel_path) == candidate:
+            return True
+    return False
+
+
+def dir_file_diffs(src: Path, dst: Path):
+    """Yield relative sub-paths that differ (or exist only on one side)
+    between two directory trees."""
+    src_files = {f.relative_to(src) for f in collect_files(src) if f.is_file()} if src.is_dir() else set()
+    dst_files = {f.relative_to(dst) for f in collect_files(dst) if f.is_file()} if dst.is_dir() else set()
+    for rel in sorted(src_files | dst_files, key=str):
+        s, d = src / rel, dst / rel
+        if not s.is_file() or not d.is_file() or s.read_bytes() != d.read_bytes():
+            yield rel
+
+
+def classify_mirror_item(item, cfg):
+    """Classify one mirror item's current state.
+
+    Returns (status, details):
+      status: "ok" | "missing_in_shared" | "drift" | "violation"
+      details: list of (relative_subpath, kind) pairs, kind in
+        {"missing_in_tools", "drift", "violation"}; empty for ok/missing_in_shared.
+
+    "drift" means tools is behind shared but every differing byte-for-byte
+    version it holds legitimately existed in shared's recent history (or
+    tools is simply missing the file) -- safe to copy shared -> tools.
+    "violation" means at least one file's tools-side content was never, in
+    the lookback window, a real relationship-shared version of that path --
+    it was edited directly in tools and must not be silently overwritten.
+    """
+    days = cfg.get("mirror_violation_lookback_days", 30)
+    src = SHARED / item["shared_rel"]
+    dst = TOOLS / item["tools_rel"]
+    if not src.exists():
+        return "missing_in_shared", []
+
+    if item["is_dir"]:
+        diffs = list(dir_file_diffs(src, dst))
+        if not diffs:
+            return "ok", []
+        details = []
+        for rel in diffs:
+            d = dst / rel
+            if not d.is_file():
+                details.append((rel, "missing_in_tools"))
+                continue
+            shared_rel_path = f"{item['shared_rel']}/{rel.as_posix()}"
+            if mirror_content_is_legitimate(shared_rel_path, d.read_bytes(), days):
+                details.append((rel, "drift"))
+            else:
+                details.append((rel, "violation"))
+        status = "violation" if any(k == "violation" for _, k in details) else "drift"
+        return status, details
+
+    if not dst.is_file():
+        return "drift", [(Path("."), "missing_in_tools")]
+    if src.read_bytes() == dst.read_bytes():
+        return "ok", []
+    if mirror_content_is_legitimate(item["shared_rel"], dst.read_bytes(), days):
+        return "drift", [(Path("."), "drift")]
+    return "violation", [(Path("."), "violation")]
+
+
 def check_consistency(cfg, verbose=False):
     if not SHARED.exists():
         print(c(YELLOW, "  [skip] shared repo not found"))
         return True
     all_ok = True
+    days = cfg.get("mirror_violation_lookback_days", 30)
     for item in cfg["mirror_items"]:
-        src = SHARED / item["shared_rel"]
-        dst = TOOLS / item["tools_rel"]
         label = item["tools_rel"]
-        if not src.exists():
+        status, details = classify_mirror_item(item, cfg)
+        if status == "missing_in_shared":
             print(c(YELLOW, f"  [warn] missing in shared: {item['shared_rel']}"))
             continue
-        if not dst.exists():
-            print(c(RED, f"  [missing] {label}"))
+        if status == "ok":
+            print(c(GREEN, f"  [ok] {label}"))
+            continue
+        if status == "drift":
+            print(c(RED, f"  [drift] {label}"))
+            if verbose:
+                for rel, kind in details:
+                    print(f"    {rel}: {kind}")
             all_ok = False
             continue
-        if item["is_dir"]:
-            r = subprocess.run(["diff", "-rq", "--exclude=*.pyc", str(src), str(dst)],
-                               capture_output=True, text=True)
-            same = (r.returncode == 0)
-        else:
-            same = src.read_bytes() == dst.read_bytes()
-            r = None
-        if same:
-            print(c(GREEN, f"  [ok] {label}"))
-        else:
-            print(c(RED, f"  [drift] {label}"))
-            if verbose and r and r.stdout:
-                for line in r.stdout.splitlines()[:20]:
-                    print(f"    {line}")
-            all_ok = False
+        print(c(RED + BOLD, f"  [violation] {label}"))
+        for rel, kind in details:
+            if kind == "violation":
+                print(c(RED, f"    {rel}: content not found in relationship-shared's last {days}d of history -- hand-edited in tools?"))
+            elif verbose:
+                print(f"    {rel}: {kind}")
+        all_ok = False
     return all_ok
 
 
@@ -276,25 +385,31 @@ def do_sync(cfg, dry_run=False):
         return False
 
     changed = []
+    violations = []
+    days = cfg.get("mirror_violation_lookback_days", 30)
     for item in cfg["mirror_items"]:
-        src = SHARED / item["shared_rel"]
-        dst = TOOLS / item["tools_rel"]
-        if not src.exists():
+        label = item["tools_rel"]
+        status, details = classify_mirror_item(item, cfg)
+        if status == "missing_in_shared":
             print(c(YELLOW, f"  [skip] missing in shared: {item['shared_rel']}"))
             continue
-        if item["is_dir"]:
-            r = subprocess.run(["diff", "-rq", "--exclude=*.pyc", str(src), str(dst)],
-                               capture_output=True, text=True)
-            in_sync = (r.returncode == 0)
-        else:
-            in_sync = dst.exists() and src.read_bytes() == dst.read_bytes()
-        if in_sync:
-            print(f"  [=] {item['tools_rel']}")
+        if status == "ok":
+            print(f"  [=] {label}")
             continue
-        changed.append(item["tools_rel"])
-        print(c(YELLOW, f"  [→] {item['tools_rel']}") + (" (would copy)" if dry_run else " (copying)"))
+        if status == "violation":
+            violations.append(label)
+            print(c(RED + BOLD, f"  [violation] {label} -- refusing to overwrite"))
+            for rel, kind in details:
+                if kind == "violation":
+                    print(c(RED, f"    {rel}: content not found in relationship-shared's last {days}d of history -- hand-edited in tools?"))
+            continue
+        # status == "drift": safe to copy shared -> tools
+        changed.append(label)
+        print(c(YELLOW, f"  [→] {label}") + (" (would copy)" if dry_run else " (copying)"))
         if dry_run:
             continue
+        src = SHARED / item["shared_rel"]
+        dst = TOOLS / item["tools_rel"]
         dst.parent.mkdir(parents=True, exist_ok=True)
         if item["is_dir"]:
             if dst.exists():
@@ -302,6 +417,14 @@ def do_sync(cfg, dry_run=False):
             shutil.copytree(src, dst)
         else:
             shutil.copy2(src, dst)
+
+    if violations:
+        print()
+        print(c(RED + BOLD, f"⚠ {len(violations)} mirror item(s) have content not traceable to relationship-shared's last {days} days -- sync aborted for those items."))
+        print(c(RED, "Do not blindly overwrite; investigate manually:"))
+        for label in violations:
+            print(f"  - {label}")
+        return False
 
     if dry_run or not changed:
         return True
