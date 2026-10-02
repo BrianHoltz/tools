@@ -2,7 +2,7 @@
 
 ## Local Modifications in Use
 
-- **Code Puppy JetBrains 0.23.1** — adds editable conversation titles in the transcript and History menu, a suggested attachment for the focused editor file or selection, visible universal-constructor tool activity, and the local JCEF startup workaround.
+- **Code Puppy JetBrains 0.27.0** — adds a suggested attachment for the focused editor file or selection, local JDK 21 build detection, and the JCEF-proxy-warm startup workaround. (Editable conversation titles and universal-constructor visibility shipped upstream and no longer need a local patch.)
 - **Wibey JetBrains 1.0.28** — upstream GPT model support and context-window work, combined locally with persistent editable conversation titles, editable queued follow-up prompts, image paste, focused-editor file/selection context, prompt queuing, and quota snapshots.
 - **Zaaack Markdown Editor for VS Code and Cursor** — adds multipanel editing, outline navigation, find, anchor links, and dark-theme/readability improvements.
 - **TypeDown for VS Code and Cursor** — compacts prose, table, and list spacing; preserves editor focus and cursor position through paste.
@@ -51,6 +51,36 @@ shasum -a 256 "$ZIP" "$OUT"
 
 The ZIP must be the dependency-complete installable artifact, not a JAR from `build/libs/`. Confirm the archive test succeeds and both hashes match. Keep the canonical ZIP in `build/distributions/`; install from the timestamped copy in `~/Downloads/`.
 
+### Rebuilding the Local Code Puppy JetBrains Plugin
+
+Repo: `~/src/code-puppy-ide` (fork `r0b0m29/code-puppy-ide`, monorepo for both the VS Code extension and the JetBrains plugin), branch `feature/active-context-pill`. That branch merges local-only commits (active-editor-context suggestion, JDK 21 build detection, JCEF-proxy-warm startup fix) onto upstream `main`. Full release flow lives in `docs/ai/RELEASING.md` in that repo — this is the shortcut for a local-only install build, no release/tag/publish:
+
+```bash
+cd ~/src/code-puppy-ide
+git fetch origin main
+git merge --no-edit origin/main
+# Resolve conflicts: diff each hunk, prefer upstream when it has absorbed a
+# local fix (check for a same-purpose class/import on the other side before
+# keeping both — duplicated fixes are a DRY violation, not a safe default).
+bash scripts/build-jetbrains-variants.sh
+```
+
+The script builds the webview once, then both JetBrains variants (`legacy` for IDE builds 243–261, unsuffixed `main` for 262+) into `releases/`. IDEA 2026.2.x needs the unsuffixed `code-puppy-jetbrains-<version>.zip`. JDK 21 is auto-detected (`scripts/gradle-jetbrains.sh`) — no `PATH` changes needed, see that repo's RELEASING.md if it can't find one. First build is slow (Gradle daemon + IntelliJ SDK warm-up, ~2 min); reruns are fast.
+
+After `buildPlugin` succeeds, stage the timestamped Downloads copy per the [Local Build Artifact Rule](#local-build-artifact-rule):
+
+```bash
+STAMP=$(date "+%Y%m%d.%a.%H%M")
+ZIP="releases/code-puppy-jetbrains-<version>.zip"
+OUT="$HOME/Downloads/code-puppy-jetbrains-<version>-$STAMP-<blah>.zip"
+unzip -t "$ZIP"
+cp -p "$ZIP" "$OUT"
+cmp "$ZIP" "$OUT"
+shasum -a 256 "$ZIP" "$OUT"
+```
+
+Install from Downloads: Settings → Plugins → ⚙ → Install Plugin from Disk…, then restart IDEA. **Marketplace auto-update will silently overwrite this with a stock build** — after any Code Puppy update notification, verify the installed jar's version against this branch before trusting that local mods survived (see the 2026.10.02 lesson above). Commit and push the merge to `origin/feature/active-context-pill` so the combined branch stays ahead of upstream and the mods aren't local-only residue.
+
 ## IDEs
 
 
@@ -60,7 +90,7 @@ The ZIP must be the dependency-complete installable artifact, not a JAR from `bu
 | IDE                            | 2026.2.3     | 1.135.0      | 3.21.13                 |
 | VSCode engine                  | —            | —            | 1.105.1                 |
 | Wibey                          | 1.0.28       | 1.0.20       | 1.0.18                  |
-| Code Puppy                    | 0.23.1       | —            | —                       |
+| Code Puppy                    | 0.27.0       | —            | —                       |
 | └ parallel agents              | ✅            | ✅            | ✅                       |
 | └ enqueue next prompt          | ❌            | ✅            | ✅                       |
 | └ context += @ file            | ✅            | 🟡<100KB     | 🟡<100KB                |
@@ -433,7 +463,8 @@ Line-height, table padding, list spacing, and focus bug patches. Full procedure:
 
 - **Superior features: search/find, git, debug, database, http, yaml preview**
 - **Currently on 2026.2 GA/stable** (build 262.8665.258, released 2026.07.16; installed on Walmart laptop 2026.07.16). The 2026.2 EAP (auto-updated ~2026.06.27) has now shipped as stable — the config dir (`IntelliJIdea2026.2`) carried over from EAP → GA, so all EAP-era JAR patches survived the upgrade. The two 2026.2 breaking changes still require JAR patches (see ToolMods.md).
-- **Current local tool versions (2026.09.29):** IntelliJ IDEA 2026.2.3; Wibey 1.0.28 from `brian/local-combined`; Code Puppy JetBrains 0.23.1 from the local `feature/active-context-pill` build; Code Puppy Desktop 0.3.0. The Code Puppy artifact includes active-editor context, image paste, universal-constructor rendering, JDK 21 build detection, and the JCEF startup workaround.
+- **Current local tool versions (2026.10.02):** IntelliJ IDEA 2026.2.3; Wibey 1.0.28 from `brian/local-combined`; Code Puppy JetBrains 0.27.0 from the local `feature/active-context-pill` build (repo `~/src/code-puppy-ide`, fork `r0b0m29/code-puppy-ide`); Code Puppy Desktop 0.3.0. The Code Puppy artifact includes active-editor context suggestion, JDK 21 build detection, and the JCEF startup workaround — image paste and universal-constructor rendering are now stock upstream behavior, so the local `ImageAttachmentCache` duplicate was retired in favor of upstream's `ImageCache`.
+- **2026.10.02 lesson:** the JetBrains marketplace plugin update silently replaced the local-combined build with a stock v0.27.0 build, dropping the active-context-pill feature. After any Code Puppy JetBrains marketplace update, re-check the installed plugin version/jar against `~/src/code-puppy-ide`'s `feature/active-context-pill` branch before assuming local mods survived — `unzip -p <plugin jar> META-INF/plugin.xml | grep version` against the installed plugin dir shows the truth.
 - **Patch audit 2026.07.17 (Walmart laptop, 2026.2 GA):** verified all fixes present in the running build — JCEF remote disabled (`idea.vmoptions`), Shuzijun `com.intellij.modules.jcef` depends + 13px font (`markdown-editor-2.0.5.jar`), MCP Server Services-panel suppression (`mcpserver.jar`), keymap overrides (`macOS copy.xml`), and the patched Wibey plugin from `brian/local-combined` (image-paste `setupClipboardPaste`/`handleImagePaste` + session-title fields all confirmed via `javap`). The one gap — the "Allow Edits to Sensitive Files" dialog suppression (`idea.readonly.fragments.notification.enabled=false`) missing from `early-access-registry.txt` — was reapplied (IDEA quit first; file method). All patches now applied.
 - *command-approval constipation*
 - *Parallel agents now supported (as of 2026.06)*
