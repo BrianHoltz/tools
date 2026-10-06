@@ -84,13 +84,15 @@ Other skills can invoke ailert programmatically — see § Calling from other sk
 Parse the `args` string for:
 
 - **`--joke` flag**: if present, remove it from args and force joke mode
-- **`--no-slack` flag**: disable the Slack fallback
+- **`--no-slack` flag**: remove it from args and disable the Slack fallback
 - **`--sms` flag**: enable SMS only when an adapter is configured
 - **`--test` flag**: run adapter discovery/validation without sending an SMS
 - **Timeout**: if the first remaining token is an integer, use it as timeout (seconds)
 - **Message**: everything else is the message
 
 Defaults: timeout = 30, message = "Wibey needs your attention". External fallbacks are opt-in by default; use `AILERT_SLACK=1` or `--sms` explicitly.
+
+The executable wrapper consumes standalone options before parsing timeout/message. With no positional message it preserves `MSG`; with no positional timeout it preserves `TIMEOUT`. Unknown options and invalid timeouts fail before displaying an alert. Use `--` before a literal message beginning with a dash.
 
 ## Easter egg (25% chance, or always with `--joke`)
 
@@ -202,11 +204,14 @@ A self-DM is possible to address in Slack, but it is not a reliable push notific
 
 ## Calling from other skills
 
-Other skills (e.g. grafana-read) or commands (e.g. safe-browse) can invoke ailert by running:
+Other skills (e.g. grafana-read) or commands (e.g. safe-browse) should call the executable wrapper with an explicit message, not translate flags into dialog text:
 
+```bash
+AILERT_SLACK=0 TIMEOUT=60 MSG="Please log in to the requested site" \
+  bash ~/.wibey/skills/ailert/ailert.sh
 ```
-/ailert 60 --no-slack Please log in to Walmart SSO so Wibey can access Grafana
-```
+
+On the work laptop, safe-browse calls the canonical wrapper in the team repo rather than a potentially stale installed copy.
 
 For the walk-away case, configure Slack intentionally:
 
