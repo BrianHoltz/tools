@@ -274,6 +274,8 @@ Use `/tdd` for the full TDD workflow: pull main, branch, failing tests, implemen
 
 When reviewing a PR or CRQ, apply the standards in `shared/docs/ReviewStandards.md` — this is team guidance, not optional. Audit for: coverage threshold, PROD-scope separation, logging clarity (structured fields, distinct log levels), incomplete operational safety protocols, and naming clarity for sharded resources. Never merge a PR that leaves on-call to debug via stack-trace reading or fixes a threshold without providing the fallback path.
 
+For every work-laptop PR review, include the Wibey `pr-agent` plugin's `pr-agent-review` skill and its security-audit and dependency-scan tracks **in addition to** all existing rules and independent review. Follow `shared/docs/ReviewStandards.md` § PR Agent Review Pass when available; otherwise read the installed plugin's `SKILL.md`, reconcile its scope with the authoritative PR diff, validate findings, and report unavailable scans explicitly. Installing the plugin or requesting a review does not authorize posting, remediation, or commits to an approved PR.
+
 #### JDK Availability on Walmart Network
 
 **JDK 21 is installed at `/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home`** on Walmart machines via Homebrew. If a build requires JDK21 (e.g., gradle `jvmToolchain(21)`), agents should use this path and set `CODEPUPPY_JDK21` env var to it rather than attempting to download or install from external sources. Never use `brew install` directly (network-blocked); this path is already available. Check with `/usr/libexec/java_home -V` to confirm installed versions.
