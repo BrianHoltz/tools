@@ -17,12 +17,12 @@ sample-prompts:
   - "converge on shared/aidocs/2026-03-12/1338_ClaytonFeedbackConvergence.md"
   - "converge latest"
 arguments:
-  - topic_or_path — required. If it's an existing .md file path, JOIN that review. Otherwise, START a new review on this topic.
-  - [--role author|critic] — required for START. Which role this agent plays.
-  - [--file path] — (START only) source file containing the section under review
-  - [--lines N-M] — (START only) line range to extract
-  - [--scope text] — (START only) what is in scope (out-of-scope items excluded)
-  - [--label text] — this agent's label (default: auto-detected from tool environment)
+  - "topic_or_path — required. If it's an existing .md file path, JOIN that review. Otherwise, START a new review on this topic."
+  - "[--role author|critic] — required for START. Which role this agent plays."
+  - "[--file path] — (START only) source file containing the section under review"
+  - "[--lines N-M] — (START only) line range to extract"
+  - "[--scope text] — (START only) what is in scope (out-of-scope items excluded)"
+  - "[--label text] — this agent's label (default: auto-detected from tool environment)"
 ---
 
 > [!NOTE]
