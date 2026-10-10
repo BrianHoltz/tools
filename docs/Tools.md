@@ -402,7 +402,7 @@ Line-height, table padding, list spacing, and focus bug patches. Full procedure:
 - **Superior features: search/find, git, debug, database, http, yaml preview**
 - **Currently on 2026.2 GA/stable** (build 262.8665.258, released 2026.07.16; installed on Walmart laptop 2026.07.16). The 2026.2 EAP (auto-updated ~2026.06.27) has now shipped as stable — the config dir (`IntelliJIdea2026.2`) carried over from EAP → GA, so all EAP-era JAR patches survived the upgrade. The two 2026.2 breaking changes still require JAR patches (see ToolMods.md).
 - **Current local tool versions (2026.09.22):** IntelliJ IDEA 2026.2; Wibey 1.0.27 from `brian/local-combined`; Code Puppy JetBrains 0.23.1 from the local `feature/active-context-pill` build. The Code Puppy artifact includes active-editor context, image paste, universal-constructor rendering, JDK 21 build detection, and the JCEF startup workaround.
-- **Patch audit 2026.07.17 (Walmart laptop, 2026.2 GA):** verified all fixes present in the running build — JCEF remote disabled (`idea.vmoptions`), Shuzijun `com.intellij.modules.jcef` depends + 13px font (`markdown-editor-2.0.5.jar`), MCP Server Services-panel suppression (`mcpserver.jar`), keymap overrides (`macOS copy.xml`), and the patched Wibey plugin from `brian/local-combined` (image-paste `setupClipboardPaste`/`handleImagePaste` + session-title fields all confirmed via `javap`). The one gap — the "Allow Edits to Sensitive Files" dialog suppression (`idea.readonly.fragments.notification.enabled=false`) missing from `early-access-registry.txt` — was reapplied (IDEA quit first; file method). All patches now applied.
+- **Patch audit 2026.10.09 (personal Mac, 2026.2.3):** restored the missing JCEF remote-mode override (`idea.vmoptions`), Shuzijun 2.0.7 JCEF dependency + 13px font, MCP Server Services-panel suppression, sensitive-file dialog suppression, and built-in Markdown preview light/dark stylesheet. The active `VSCode OSX` keymap is supplied by the installed `keymap-vscode` plugin; no stale custom keymap XML was recreated.
 - *command-approval constipation*
 - *Parallel agents now supported (as of 2026.06)*
 - *Cannot paste file/line reference!?*
@@ -480,6 +480,13 @@ The built-in Markdown preview uses `options/markdown.xml` under `MarkdownSetting
 
 **To apply custom CSS in 2026.2:** Settings → Languages & Frameworks → Markdown → choose "Custom stylesheet text" (inline mode) and paste CSS there. Do not use the file-path option unless the CSS file lives inside the current project.
 
+**Light/dark fix (2026.2.3):** the inline stylesheet is restored in
+`~/Library/Application Support/JetBrains/IntelliJIdea2026.2/options/markdown.xml`.
+It supplies explicit light colors and a `prefers-color-scheme: dark` block for
+the page background, body text, links, code blocks, blockquotes, and tables.
+If IDEA is running while this file is changed, restart IDEA before judging the
+result; the Markdown preview tab may also need to be closed and reopened.
+
 Quick notes:
 
 - `MarkdownSettings.fontSize` lives in `options/markdown.xml`, not `editor-font.xml`.
@@ -507,7 +514,11 @@ false
 
 ### Shuzijun Markdown Editor Patches
 
-Currently applied: font size patch (13px body text), IDEA 2026.2 compat fix (`JBCefApp` classloader), MCP Server plugin Services panel suppression. Full procedures: **ToolMods.md → Shuzijun** and **ToolMods.md → MCP Server Plugin**.
+Currently applied to Shuzijun 2.0.7: font size patch (13px body text) and
+IDEA 2026.2 compat fix (`JBCefApp` classloader). The JCEF dependency is
+required, not optional. The MCP Server plugin Services panel suppression is
+also applied. Full procedures: **ToolMods.md → Shuzijun** and
+**ToolMods.md → MCP Server Plugin**.
 
 ### JCEF Remote Mode (built-in Markdown preview + Shuzijun both broken)
 
@@ -515,7 +526,7 @@ Currently applied: font size patch (13px body text), IDEA 2026.2 compat fix (`JB
 
 **Root cause:** IDEA 2026.2 enables JCEF out-of-process (remote) mode by default; native CEF objects are null in remote mode, breaking all JCEF consumers. Full root cause chain and fix: **ToolMods.md → JCEF Remote Mode**.
 
-**Fix summary:** add `-Djcef.remote.enabled=false` to `~/Library/Application Support/JetBrains/IntelliJIdea2026.2/idea.vmoptions`. Restart IDEA. **Applied:** 2026.07.02.
+**Fix summary:** add `-Djcef.remote.enabled=false` to `~/Library/Application Support/JetBrains/IntelliJIdea2026.2/idea.vmoptions`. Restart IDEA. **Applied:** 2026.07.02; restored for the 2026.2.3 config on 2026.10.09.
 
 ### Wibey Extension Patches
 
