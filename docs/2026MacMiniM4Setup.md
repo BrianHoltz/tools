@@ -172,11 +172,13 @@ need to be confirmed from each application's settings.
 
 The bounded export script
 [`docs/export_mac_mini_migration.sh`](export_mac_mini_migration.sh) writes
-selected migration state to `/Volumes/Archive/MacMiniTransfers/`. It reports
-each application and source path to stderr, measures selected directories with
-`du`, and skips any selected directory larger than 100 MB. It deliberately
-excludes media libraries, recordings, downloads, Plex metadata/thumbnails,
-logs, caches, credentials in command output, and other raw data.
+each run to a new timestamped subdirectory under
+`/Volumes/Archive/MacMiniTransfers/runs/`. It never truncates or overwrites a
+previous run. It reports each application and source path to stderr, measures
+selected directories with `du`, and skips any optional selected directory
+larger than 100 MB. It copies the complete Plex application state regardless
+of size, while deliberately excluding movie and television media, recordings,
+downloads, logs, caches, credentials in command output, and other raw data.
 
 ### New Mac mini agent handoff
 
@@ -187,13 +189,15 @@ to run the export script and attach or copy the resulting transfer directory.
 1. Open `~/src/tools/docs/2026MacMiniM4Setup.md` and
    `docs/export_mac_mini_migration.sh` from the real `~/src/tools` checkout.
 2. Have the old Mac operator run the export script with
-   `/Volumes/Archive/MacMiniTransfers/` as the destination. The script's
-   progress log is `export_mac_mini_migration.log`; the inventory is
-   `old_mac_mini_inventory.txt`. Both are expected to be saved in Google Drive
-   alongside one another for the new agent to inspect.
+   `/Volumes/Archive/MacMiniTransfers/` as the archive root. Quit Plex and
+   Plex HTPC first; the script refuses to run while either is active. The
+   script creates a new `runs/YYYYMMDD-HHMMSS/` directory and writes
+   `manifest.txt`, `manifest.tsv`, `large-or-skipped.tsv`, `export.log`, and
+   the selected state there. The inventory is `old_mac_mini_inventory.txt`.
 3. Do not treat a completed script as proof that all state was copied. Review
    `manifest.txt`, `manifest.tsv`, and `large-or-skipped.tsv`. Anything over
-   100 MB is intentionally skipped and requires an explicit decision.
+   100 MB is intentionally skipped and requires an explicit decision, except
+   for the complete Plex application state, which the script copies in full.
 4. Mount the transfer disk at the same `/Volumes/Archive` path on the new Mac,
    mount the external `media library` volume at the same path as the old Mac,
    and verify both before restoring anything.
@@ -208,6 +212,134 @@ to run the export script and attach or copy the resulting transfer directory.
 The new agent must not reset the old Mac, delete source state, expose transfer
 contents publicly, or commit credentials, tokens, databases, or copied
 application data to the public tools repository.
+
+### Copilot session recovery checkpoint — 2026.09.27
+
+The earlier IntelliJ Copilot session for this project is still recoverable at:
+
+```text
+~/.copilot/session-state/e8a6138a-1ee0-494a-9aaf-82a7ece853ce/
+```
+
+Its `events.jsonl` contains the complete migration conversation, including the
+SSH handoff. IntelliJ reopened a new session instead of reattaching that
+conversation; the old history was not deleted. The earlier session completed
+the exporter changes, pushed commits `5e34fe7` and `6b9e649`, installed
+SecuritySpy, Plex Media Server, and Calibre on the M4, and then paused while
+trying to authenticate an SSH session to `livingroommac.local`.
+
+The network diagnosis and recovery are:
+
+- `livingroommac.local` resolves to `192.168.7.179` and responds to ping with
+  no packet loss.
+- TCP port 22 is open and the authenticated SSH session is established over
+  IPv6.
+- Wi-Fi (`en1`) has the valid current lease `192.168.7.179/24` with gateway
+  `192.168.7.1`.
+- Ethernet (`en0`) had a stale `192.168.0.2/24` lease and owned the default
+  route through `192.168.0.1`. DNS and Internet traffic consequently failed
+  despite successful LAN access over Wi-Fi.
+- The old Mac's Ethernet network service was disabled, moving the default route
+  to Wi-Fi. DNS lookup now succeeds and `curl https://github.com` returns HTTP
+  200.
+
+The Ethernet service can be re-enabled with:
+
+```sh
+sudo networksetup -setnetworkserviceenabled Ethernet on
+```
+
+Only re-enable it after confirming that it receives a valid lease on the
+current network; otherwise it can reclaim the default route and reproduce the
+outage.
+
+Plex is currently reachable on the old mini at `http://192.168.7.179:32400`.
+The unauthenticated `/identity` endpoint reports version
+`1.43.1.10611-1e34174b1`, a claimed server, and machine identifier
+`047719f83ac50053d5950bcf10b8ca7f2cfda09a`. Library contents require the Plex
+account token and were not queried or copied over the network.
+
+The M4 currently has no `/Volumes/Archive`, transfer disk, or `media library`
+volume mounted, and no Plex server process is running there. The migration is
+therefore still in the preparation phase; do not shut down or reset the old
+mini until the export manifests and complete Plex rollback copy are verified.
+
+The latest read-only SSH inventory of the old mini found:
+
+- macOS `12.7.6` and Plex Media Server `1.43.1.10611-1e34174b1` running with
+  its plug-in, tuner, and DLNA helper processes.
+- `/Volumes/Archive` mounted, with `/Volumes/ArchiveCache` also present.
+- Plex application state at
+  `~/Library/Application Support/Plex Media Server`, approximately 12 GB.
+- Local candidate paths `/Users/brian/Movies/TV` (36 KB) and
+  `/Users/brian/PlexTmp` (429 MB). No volume named `media library` is mounted
+  on the old mini at this checkpoint.
+- `/Volumes/Archive/MacMiniTransfers/manifest.txt`,
+  `manifest.tsv`, and `large-or-skipped.tsv` present. Their contents still
+  require review after Plex is stopped; presence alone does not prove that the
+  complete rollback copy is present.
+
+The Plex Remote Access screen shows manual public port `32400`, private
+`192.168.7.179:32400`, and public `98.97.25.164:32400`, but the public mapping
+is currently unreachable. The old Ethernet route was previously
+`192.168.0.2`; update or verify the router's port-forward target to the old
+mini's current Wi-Fi address, and reserve that address or otherwise preserve
+the mapping before migration.
+
+The Plex database was not copied or exposed. A first schema query used the
+wrong column name and was discarded; obtain library names and exact folder
+paths from the Plex dashboard rather than guessing from database internals.
+
+The operator supplied these expected media-path conventions:
+
+```text
+/Volumes/Archive/Family/Family Videos/
+/Volumes/MediaLibrary/TV Shows/
+```
+
+Do not manually recreate the Plex libraries if the export contains the
+complete `Plex Media Server` state. Its database and preferences preserve
+library names, section types (such as Movies, TV Shows, Music, or personal
+video), folder paths, metadata settings, watched state, collections, and
+server identity. Confidence is high that a full state restore will preserve
+the library configuration; confidence is low if only selected files or
+manually recreated libraries are used.
+
+The decisive requirement is path fidelity: mount the media volume on the M4
+with the same name and path used by the old database, especially
+`/Volumes/MediaLibrary`. `/Volumes/Archive` is the transfer/archive volume,
+not a substitute for the media volume unless the old Plex library actually
+stores media there. After restore, verify that each library resolves its
+folders before scanning or enabling automatic cleanup.
+
+Resume this work in the current Copilot session using this checkpoint and the
+prior `events.jsonl` transcript. Do not edit session-state files or try to
+force the old session open while another Copilot session is active; the
+transcript is sufficient to continue safely, and manually resuming avoids
+duplicate-session or stale-lock problems. The old Mac must remain powered on
+and must not be reset until the export and rollback copies are verified.
+
+### Export handoff checkpoint — 2026.09.27 21:52
+
+The operator has quit Plex on the old mini. The current handoff plan is:
+
+1. Keep `/Volumes/Archive` mounted and update the old checkout with
+   `git -C "$HOME/src/tools" pull --ff-only`.
+2. Run
+   `bash "$HOME/src/tools/docs/export_mac_mini_migration.sh" 2>&1`.
+3. Verify the newest timestamped run under
+   `/Volumes/Archive/MacMiniTransfers/runs/` contains the export logs,
+   manifests, complete `Plex/Plex Media Server/` state, and
+   `Plex/com.plexapp.plexmediaserver.plist`. Confirm that the complete Plex
+   state appears in `manifest.tsv` and not in `large-or-skipped.tsv`.
+4. Stop here. The operator will eject the archive and media volumes and shut
+   down the old mini, then mount the transfer disk at `/Volumes/Archive` and
+   the media disk at `/Volumes/MediaLibrary` on the M4.
+
+Do not eject or shut down the old mini until the verification in step 3
+passes. After the physical handoff, restore the complete Plex state on the M4,
+preserve any new-install state as a rollback copy, reboot, and verify library
+paths before changing Remote Access.
 
 ## Inventory findings
 
@@ -461,3 +593,139 @@ still need to be transferred securely.
 - The old Mac has login agents for Google, Chrome Remote Desktop, Fitbit, EA
   Origin, and other utilities. Recreate only the agents belonging to software
   intentionally migrated.
+
+### Plex export checkpoint — 2026.09.27 22:38
+
+The authenticated SSH session was healthy. The reviewed exporter stalled while recursively measuring the approximately 12 GB Plex state, and a direct complete `ditto` copy also made no progress because the `Media` and `Metadata` trees are extremely file-heavy. Both attempts were stopped without modifying the source.
+
+A complete Plex data export is now present at:
+
+```text
+/Volumes/Archive/MacMiniTransfers/runs/20260927-223500/
+```
+
+The verified run contains the Plex database under `Plex/Plex Media Server/Plug-in Support/Databases/`, the macOS preferences plist, all operational state, and the previously omitted `Media` and `Metadata` trees. The cache trees measured approximately 4.8 GB and 3.4 GB respectively and were copied successfully with a tar stream at 2026.09.28 23:12. The run’s manifest and `large-or-skipped.tsv` were updated to record them as copied.
+
+This now conforms to Plex’s [official migration guide](https://support.plex.tv/articles/201370363-move-an-install-to-another-system/), which says to copy the full Plex data directory. Preserve the M4 Plex state as rollback, mount media volumes at their exact paths, and verify every library before cleanup.
+
+### Plex restore checkpoint — 2026.09.29 23:25
+
+The complete transfer run was restored on the M4 after a read-only audit confirmed `/Volumes/Archive` and `/Volumes/MediaLibrary` were mounted at the required paths and all 11 stored library roots existed. The destination had no prior Plex state, so no `.new-install` directory was needed; the transfer copy remains the rollback source.
+
+The M4 was rebooted as required by Plex’s macOS migration instructions. Plex Media Server `1.43.4.10903-e5521bd8c` is now online on `127.0.0.1:32400` with the migrated machine identifier. The authenticated `/library/sections` API returns all 11 original libraries, including TV Shows, Movies, Audio, Family Sounds, Family Photos, Gallery, Family Videos, Music Videos, Shows, Famiy Audio, and Family Photos More. No library settings, scans, cleanup, or remote-access changes were performed.
+
+Remaining post-restore verification is operational: confirm playback from a movie and TV episode, inspect subtitles/artwork and watched state, and test Remote Access before enabling cleanup or changing router forwarding.
+
+### Hostname handoff checkpoint — 2026.09.30 00:10
+
+The new M4 is now the living-room Plex server. Its `ComputerName`,
+`LocalHostName`, and active hostname are all `livingroommac`; Bonjour resolves
+`livingroommac.local` to `192.168.7.102`, and Plex responds at
+`http://livingroommac.local:32400/identity`. The old Intel mini was renamed
+`livingroommacold`, including its local hostname, so the two Macs no longer
+compete for the `livingroommac` name. No reboot is required for this hostname
+change.
+
+Plex remains online with the migrated machine identity and all 11 migrated
+libraries. The transfer copy on `/Volumes/Archive` remains available as
+rollback. Playback, Remote Access, and router forwarding remain the only
+post-migration operational checks.
+
+The operator updated the eero forwarding rule labeled **Living Room Mac Mini**
+to target the M4 at `192.168.7.102` on TCP port `32400`, matching Plex’s
+manual public port. Confirm the M4 keeps this address through an eero DHCP
+reservation and complete Plex’s Remote Access connection test.
+
+### Android playback / duplicate-server checkpoint — 2026.09.30 00:17
+
+Android reported “the transcoder process crashed” while attempting to play
+`2011-01-04 2243 HDH runs circles` from Family Videos. The M4 logs showed no
+corresponding transcoder invocation or crash report, but both the old Intel
+mini (`192.168.7.179`, Plex `1.43.1`) and the M4 (`192.168.7.102`, Plex
+`1.43.4`) were advertising the same migrated Plex machine identifier
+`047719f83ac50053d5950bcf10b8ca7f2cfda09a`. This can make Plex clients select
+the wrong server and is the leading cause of the reported failure.
+
+The old mini’s Plex server was stopped through its authenticated local API.
+After waiting for shutdown, `192.168.7.179:32400` refused connections while
+the M4 continued to answer `/identity`. No old Plex files were deleted or
+modified. Refresh the Plex server list in Android and retry the video against
+`livingroommac` before investigating transcoder settings further.
+
+The first home video then played, with minor lag, confirming that Android is
+reaching the M4 and that the general transcoder path is functional. Barbie
+Mariposa failed separately: Plex item `80002` points to
+`/Volumes/MediaLibrary/Movies/Barbie Mariposa and Her Butterfly Fairy Friends.avi`
+(`82,837,504` bytes), and the server log reports that media item `87930` has
+neither a video nor an audio stream. Local probing likewise reports invalid
+input; the file is identified only as generic data and does not begin with
+the required AVI/RIFF header. This is a damaged or otherwise non-video source
+file, not evidence of a current Plex transcoder crash. Do not overwrite it
+until an intact replacement is located; restore or re-copy that movie from its
+original source, then rescan the Movies library.
+
+### Media integrity scan checkpoint — 2026.09.30 00:44
+
+The indexed media files were scanned read-only after the Barbie failure. The
+scan covered all 1,064 files in Movies with `ffprobe`, all 3,775 indexed
+audio/video files in Family Videos, Family Sounds, and Famiy Audio with
+`ffprobe`, and all 27,399 indexed images in Family Photos and Family Photos
+More with macOS `sips` image validation. No files were changed.
+
+The only additional corrupt or unreadable media found was:
+
+```text
+/Volumes/MediaLibrary/Movies/Barbie Mariposa and Her Butterfly Fairy Friends.avi
+/Volumes/MediaLibrary/Movies/Naruto Shippuuden The Movie.mkv
+```
+
+Both files are reported by `file` as generic `data`, begin with zero bytes
+instead of their required container headers, and fail `ffprobe`. No missing
+files or validation failures were found in the Family audio/video or photo
+libraries. Replace or restore the two Movies files from intact originals and
+rescan Movies; do not delete them as part of this migration.
+
+### All Plex libraries integrity scan — 2026.09.30 07:33
+
+A complete read-only scan of all 11 Plex libraries covered 48,202 distinct
+indexed paths: 15,348 audio/video files with `ffprobe` and 32,854 photos with
+macOS `sips` validation. No files were changed. No missing files or image
+validation failures were found. The following 31 audio/video files failed
+container probing:
+
+```text
+/Volumes/MediaLibrary/Movies/Barbie Mariposa and Her Butterfly Fairy Friends.avi
+/Volumes/MediaLibrary/Movies/Naruto Shippuuden The Movie.mkv
+/Volumes/MediaLibrary/Music Videos/Cat Stevens - Morning Has Broken.flv
+/Volumes/MediaLibrary/Music Videos/Lesley Gore - It's My Party.flv
+/Volumes/MediaLibrary/Music Videos/Little Drummer Boy.flv
+/Volumes/MediaLibrary/TV Shows/24/Day.2/24_201__8.AM.to.9.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.2/24_204__11.AM.to.12.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.2/24_211__6.PM.to.7.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.2/24_212__7.PM.to.8.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.2/24_215__10.PM.to.11.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.2/24_219__2.AM.to.3.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.2/24_223__6.AM.to.7.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.2/24_224__7.AM.to.8.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.3/24_306__6PM.to.7.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.3/24_310__10PM.to.11.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.3/24_312__12AM.to.1.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.3/24_320__8.AM.to.9.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.4/24_401__7.AM.to.8.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.5/24_508__2.PM.to.3.PM--[HD].avi
+/Volumes/MediaLibrary/TV Shows/24/Day.5/24_520__2.AM.to.3.AM--[HD].avi
+/Volumes/MediaLibrary/TV Shows/24/Day.5/24_524__6.AM.to.7.AM--[HD].avi
+/Volumes/MediaLibrary/TV Shows/24/Day.5/24_Season.5__Trailer--[HD].avi
+/Volumes/MediaLibrary/TV Shows/24/Day.6/24_603__8.AM.to.9.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.6/24_608__1.PM.to.2.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.6/24_610__3.PM.to.4.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.6/24_613__6.PM.to.7.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.6/24_614__7.PM.to.8.PM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.6/24_618__11.PM.to.12.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.6/24_620__1.AM.to.2.AM--.avi
+/Volumes/MediaLibrary/TV Shows/24/Day.6/24_Season.6__Prequel--.avi
+/Volumes/MediaLibrary/TV Shows/Batman - The Brave And The Bold/Season 2/Batman - The Brave And The Bold - 203 - Revenge Of The Reach! {C_P}.avi
+```
+
+The five Music Videos and all 26 TV Shows failures should be restored or
+re-copied from intact originals before relying on those items for playback.

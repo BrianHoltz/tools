@@ -1,4 +1,5 @@
 {
+  "mirror_violation_lookback_days": 180,
   "mirror_items": [
     { "shared_rel": ".wibey/skills/ailert", "tools_rel": ".wibey/skills/ailert", "is_dir": true },
     { "shared_rel": ".wibey/skills/clipboard-read", "tools_rel": ".wibey/skills/clipboard-read", "is_dir": true },

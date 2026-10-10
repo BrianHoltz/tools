@@ -5,16 +5,41 @@
 
 set -e
 
-# Parse arguments
-if [ $# -eq 2 ]; then
+# Consume options before interpreting timeout/message; flags are never messages.
+TIMEOUT="${TIMEOUT-30}"
+MSG="${MSG:-Wibey needs your attention}"
+SLACK_ENABLED=${AILERT_SLACK:-0}
+SMS_ENABLED=0
+TEST_MODE=0
+POSITIONAL=()
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --no-slack) SLACK_ENABLED=0 ;;
+    --sms) SMS_ENABLED=1 ;;
+    --test) TEST_MODE=1 ;;
+    --) shift; POSITIONAL+=("$@"); break ;;
+    -*) echo "ERROR: unknown ailert option: $1" >&2; exit 2 ;;
+    *) POSITIONAL+=("$1") ;;
+  esac
+  shift
+done
+set -- "${POSITIONAL[@]}"
+if [ $# -gt 0 ] && [[ "$1" =~ ^[0-9]+$ ]]; then
   TIMEOUT="$1"
-  MSG="$2"
-elif [ $# -eq 1 ]; then
-  TIMEOUT=30
-  MSG="$1"
-else
-  TIMEOUT="${TIMEOUT:-30}"
-  MSG="${MSG:-Wibey needs your attention}"
+  shift
+fi
+[ $# -eq 0 ] || MSG="$*"
+if ! [[ "$TIMEOUT" =~ ^[0-9]+$ ]]; then
+  echo "ERROR: ailert timeout must be a non-negative integer" >&2
+  exit 2
+fi
+TIMEOUT=$((10#$TIMEOUT))
+
+# --test: dry run only; no dialog, sounds, speech, or external messages.
+if [ "$TEST_MODE" = 1 ]; then
+  [ "$SLACK_ENABLED" = 1 ] && [ -f "$HOME/.claude/skills/slack/scripts/message.ts" ] && echo "Slack: available" || echo "Slack: unavailable"
+  [ "$SMS_ENABLED" = 1 ] && [ -n "${AILERT_SMS_COMMAND:-}" ] && [ -x "$AILERT_SMS_COMMAND" ] && echo "SMS: available" || echo "SMS: unavailable"
+  exit 0
 fi
 
 # Resolve assets next to this script first, then through installed adapters.
@@ -29,20 +54,6 @@ if [ -z "$ASSETS" ]; then
   echo "ERROR: ailert assets not found; using fallback (no sounds)" >&2
   ASSETS="/dev/null"
 fi
-
-SLACK_ENABLED=${AILERT_SLACK:-0}
-SMS_ENABLED=0
-case " $* " in *" --sms "*) SMS_ENABLED=1;; esac
-case " $* " in *" --no-slack "*) SLACK_ENABLED=0;; esac
-
-# --test: dry run only
-case " $* " in
-  *" --test "*)
-    [ "$SLACK_ENABLED" = 1 ] && [ -f "$HOME/.claude/skills/slack/scripts/message.ts" ] && echo "Slack: available" || echo "Slack: unavailable"
-    [ "$SMS_ENABLED" = 1 ] && [ -n "${AILERT_SMS_COMMAND:-}" ] && [ -x "$AILERT_SMS_COMMAND" ] && echo "SMS: available" || echo "SMS: unavailable"
-    exit 0
-    ;;
-esac
 
 # Level 1: visible dialog
 osascript - "$MSG" <<'APPLESCRIPT' &

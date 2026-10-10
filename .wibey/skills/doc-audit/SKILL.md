@@ -23,6 +23,7 @@ Consolidated reference for documentation authoring, project document formatting,
   - [Diagnosis](#diagnosis)
   - [Evidence](#evidence)
   - [Work Log](#work-log)
+- [Drafting Comms](#drafting-comms) — evidence-linking bar for outbound messages
 - [Rules About Pending Work](#rules-about-pending-work)
   - [Tasks Pipeline](#tasks-pipeline)
   - [Where Pending Work Lives](#where-pending-work-lives)
@@ -270,6 +271,8 @@ A standing, terse, bullet-heavy draft sized to paste directly as a Jira comment 
 - **Status** — current state in one line (on-track / at-risk / blocked / investigating / resolved, and why)
 - **Next** — the next 1–3 concrete steps
 
+End the draft with a blank line and the universal italicized provenance line: `*Powered by {Model} in {Harness} in {IDE} via {skill}*`. Link the named skill when one produced the draft; omit `via` only when no skill applies. Use native italics in the destination, or the same plain-text line where italics are unavailable.
+
 **Key distinction from Draft Next Comms: this section is overwritten, never deleted.** Draft Next Comms holds one-off outbound messages that vanish once sent. Next Daily Jira Update is a recurring cadence artifact — today's bullets replace yesterday's the moment they're posted (prefix per team convention, e.g. `MM.DD.Dow:`), and the section stays in the doc ready for tomorrow's update. Only delete it once the ticket itself closes or the daily-update cadence stops. The Work Log remains the permanent, cumulative history — this section is a disposable cache of "what would I post right now," derived from Tasks/Active Work/Work Log, never a source of new facts. See [git2jira](../git2jira/SKILL.md) for auto-generating these bullets from git history.
 
 ### Draft Next Comms
@@ -278,8 +281,9 @@ Holds **only unsent** outbound communications (Slack replies, email drafts, PR c
 
 - Each draft is a `###` sub-heading with target and the message body as **plain text — no blockquote, ever.** The `###` heading already makes the context obvious, and a `>` prefix causes pasting problems into Slack/Jira/email.
 - **No editorializing, meta-commentary, or lead-in sentence before the body, ever.** No "reply in-thread to X because Y", no restating who the target is or why we're replying, no apologizing, no explaining what we should have done differently. The `###` heading already carries the target — that is the only metadata this section needs. The body is only ever the message text itself, ready to copy-paste as-is.
+- **Signature:** End every datestamped draft with a blank line and the universal italicized provenance line: `*Powered by {Model} in {Harness} in {IDE} via {skill}*`. Link the named skill when one produced the draft; omit `via` only when no skill applies. Preserve the line when posting; use native italics in the destination, or the same plain-text line where italics are unavailable.
 - **No `Status:` line, no "DRAFT"/"READY"/"do not send without approval" annotation above the body.** A draft's mere presence in this section already means unsent; the requirement to get approval before contacting other humans is a standing global agent rule (not a per-draft warning to restate). Any such label is noise — same category as writing "don't `rm -rf $HOME`" next to every `rm` command.
-- **Every evidence sentence in the body must be a live link to a primary source** (a tool URL, query result, or code line — never this doc's own Evidence/Diagnosis section, never another of our own repo artifacts). Apply the eyeball test from AGENTS.md § Drafting Comms before finalizing: could a skeptical reader verify the claim in under 10 seconds by clicking the link, with no follow-up question?
+- **Every evidence sentence in the body must be a live link to a primary source** (a tool URL, query result, or code line — never this doc's own Evidence/Diagnosis section, never another of our own repo artifacts). Apply the eyeball test from [Drafting Comms](#drafting-comms) before finalizing: could a skeptical reader verify the claim in under 10 seconds by clicking the link, with no follow-up question?
 - **Link the reader to the manual when relevant.** A draft that invokes a documented procedure, contract, form, policy, or ownership rule must link the precise canonical documentation, not merely name it or point to an incident record.
 - **Empirical claims must identify the entity and link its evidence whenever a primary tool can expose it.** Link directly to the entity's filtered Editorial, Castar, Atom, OLS, or equivalent record—not a Slack thread, tool homepage, or our own artifact. If a permalink cannot encode the result, include the exact copy-pasteable verification recipe with the tool link.
 - **Linked catalog entity IDs use plain link text only.** Never wrap the ID label in backticks, bold, italics, or other typography: those effects can obscure the hyperlink after a Markdown draft is pasted into Slack. Use `[4490YMOZQTYR](https://editorial.walmart.com/...)`, not `[product \`4490YMOZQTYR\` in Editorial](https://editorial.walmart.com/...)`.
@@ -384,6 +388,30 @@ Entry: `- **HH:MM:** Entry text`
 - **Never estimate duration or time deltas.** "~15 minutes" or "about 20 mins" is an anti-pattern. Use `date` to get the actual time, or use `bef.HH:MM` if retroactive.
 
 **For incidents specifically:** Write entries in real time, not retroactively — before switching contexts, after each significant finding. Use `date "+%H:%M"` immediately after each finding to capture the actual clock time. Minimum required entries: when the incident opens (symptom, scope, first data inspected); when each major hypothesis is formed or ruled out; when root cause is confirmed or unresolved; when the doc is committed. **If auditing an incident with no Work Log:** flag as a critical gap; reconstruct what you can from git history and commit messages — note `(reconstructed from git; original timestamps unavailable)` if you do.
+
+## Drafting Comms
+
+**North star — minimum reader effort to independently verify:** every rule below exists to get the reader from "I read a claim" to "I saw the same data myself" in the fewest possible motions — ideally one click, at worst one click plus one paste-and-run. If a rule and this goal ever seem to conflict, this goal wins. Before finalizing any comms draft, reread every evidence sentence and ask: *could a skeptical reader verify this in under 10 seconds, without asking me a follow-up question?* If not, fix the sentence — don't explain why it can't be fixed.
+
+When drafting Slack messages, emails, or any outbound communication — including the [Draft Next Comms](#draft-next-comms) section of a project doc:
+
+- **Inline-link every source you relied on.** If the message claims "we followed X docs" or "the form says Y", the doc/page/tool must be a clickable link right there in the text. This shows due diligence to the recipient and lets the human reviewer verify the agent's claims without hunting for URLs.
+- **Give the reader the manual when it matters.** If a draft invokes a documented procedure, rule, contract, form, or ownership boundary, link the exact canonical documentation that tells the reader how it works or what to do; do not merely name it or link our incident record.
+- **Reference the doc that drives the question.** Frame uncertainty as "the [onboarding guide](url) says X but doesn't cover Y" — not a bare "we're not sure about Y." Citing the source proves the agent read it, surfaces exactly where the gap is, and lets the reviewer click through to confirm.
+- **Link every Walmart tool or platform mentioned by name.** IOP, DX, Kafka Studio, Jira SD, Confluence pages, Kibana, ServiceNow — if it has a URL, link it. Every unlinked tool name is a missed chance for the reviewer to verify.
+- **Never use bare URLs in Slack drafts.** Slack auto-links raw URLs, but they're unreadable in the project doc. Use `[descriptive text](url)` so the doc is reviewable; strip markdown to bare URLs only at send time if needed.
+- **Follow the mechanics in [Draft Next Comms](#draft-next-comms)** — no blockquote formatting, no meta-commentary or lead-in sentence before the body, delete the draft once sent.
+- **Link every diagnostic claim to the tool that confirmed it.** "Catalog looks fine" → link to the Editorial URL you checked. "Offer is DELISTED" → link to Castar. "Feed processed 3 times" → link to Ingestion Portal. One click = reader can verify without asking a follow-up question.
+- **Every empirical claim needs evidence when a primary source can expose it.** Name the specific entity and link directly to its filtered tool record or result—not a Slack conversation, a tool landing page, or our incident doc. If no durable permalink exists, give the exact runnable recipe with the tool link.
+- **Present catalog entities using [Catalog Entity Presentation](#catalog-entity-presentation).** That canonical rule defines the first-mention glyph links, styled ID/title, and repeated-mention exception.
+- **Link every recommendation to the tool where the recipient acts on it.** "Seller needs to resubmit" → link to Ingestion Portal showing current feed state. "Check if other variants are affected" → link to Editorial BVShell. One click = recipient can action the recommendation immediately.
+- **Never link into the incident doc itself as evidence.** A Draft Next Comms link must point to a primary source — GHE source lines, an OLS/Grafana query result, Editorial/Castar/Atom, a Jira ticket — never to the incident doc's own Evidence/Diagnosis section. The incident doc records *our interpretation*; linking to it as "proof" lets an agent cite itself instead of the underlying data, and the recipient can't independently verify anything beyond trusting our write-up.
+- **Never link to our own repo artifacts as evidence either — same violation as linking the incident doc.** A filed SQL query in `shared/sql/`, a memo, a project doc, another Draft Comms — these are all *our own work product*, not primary sources, even though we wrote correct SQL or cited a real table. Linking `shared/sql/prod/foo.sql` as "proof the bag is missing" is exactly as self-referential as linking the incident doc's own Diagnosis section. The only valid link for that claim is the live query tool itself (e.g. a Grafana/OLS/AlloyDB console URL) — see the eyeball test below.
+- **THE EYEBALL TEST — every evidence link must pass it, no exceptions:** open the link cold, with zero other context, and look. If what you see does **not immediately and exactly show the data that backs the claim** — same filter, same records, same result — the link fails and must not be used. This rules out three specific failure modes agents keep repeating:
+  1. **Landing-page/homepage links.** A link to a tool's default screen (e.g. a SQL editor's blank landing page, a dashboard's home view) shows nothing about the claim. It is not evidence; it's a link to the building, not the room.
+  2. **Unfiltered/live-tail links.** A link to a topic browser, log stream, or dashboard showing *whatever is currently flowing* — not the specific records that support the claim — will show different data to the next viewer. If the tool can't preserve the filter/query/time-range in the URL, this pattern doesn't produce valid evidence links.
+  3. **Our own artifacts.** Anything living in this repo (`shared/`) or written by an agent — SQL files, incident docs, memos — is our interpretation of evidence, not the evidence itself. See the bullet above.
+- **When no permalink exists: give the recipe, not the narration.** Never spend a sentence explaining *why* a link can't exist ("no shareable result link exists for this tool, query available on request") — that costs the reader a full sentence and hands them **zero** verification power; they now have to come back and ask you for the query before they can check anything at all. Instead, name the tool, link the tool's own entry URL if it has one, and put the exact, runnable, copy-pasteable query or click-path **inline, in the same sentence**: ❌ "We confirmed via Lenses SQL Studio (no shareable result link exists for this tool, query available on request): two jobs are racing..." ✅ "Run `` SELECT * FROM `topic` WHERE _key IN (...) `` in [Lenses SQL Studio](url) to see it yourself: two jobs are racing..." The tool's homepage link plus an inline recipe is a legitimate two-step verification path — one click to the tool, one paste to reproduce — which is categorically different from the landing-page failure mode above (a bare link with *no* recipe, forcing the reader to reconstruct the query themselves from nothing).
 
 ## Rules About Pending Work
 
@@ -660,6 +688,21 @@ Every mention of the following must carry a hyperlink — no bare references. Fi
 
 - WPID, itemId, GTIN, SKU — every mention in analysis, diagnosis, or evidence — link to [Editorial](https://editorial.prod.walmart.com) by default, or [Atom](https://atom.prod.walmart.com) if in Atom-specific context
 - offerId, feedId — every mention — link to [Atom](https://atom.prod.walmart.com) only
+
+### Catalog Entity Presentation
+
+On the first mention of a catalog entity in each section, use this compact treatment:
+
+```markdown
+`0ZAS081TRVPO` ([🛒](https://www-teflon.walmart.com/product/0ZAS081TRVPO) [📝](https://editorial.stg.walmart.com/pg_product_details/product/canonical/0ZAS081TRVPO?tenantId=0&locale=en_US) [⚛](https://atom.walmart.com/item-management/all-about-an-item?product_id=0ZAS081TRVPO) *Apple Services Promo 28*)
+```
+
+- Put the literal entity ID in monospace using backticks; do not bold it.
+- Put the shopping page, Editorial, and Atom links, followed by the italicized title, inside one pair of parentheses immediately after the ID. Their link labels are exactly `🛒`, `📝`, and `⚛`; use `📝` and no other glyph for Editorial.
+- Use the live Walmart.com item page or Teflon item page for `🛒`, the entity’s direct Editorial record for `📝`, and the entity’s direct Atom record for `⚛`. Omit a glyph only when that platform has no entity-specific URL; never substitute a landing page.
+- Follow the links with the literal entity title, normally italicized, inside the same parentheses as the glyph links. Omit the title when space is genuinely constrained or no title is available.
+- Apply the same treatment to WPIDs, item IDs, GTINs, SKUs, offer IDs, and other catalog entities, including offers. The ID determines the linked records; do not turn descriptive prose into the link label.
+- After the full first mention, repeated mentions in the same section may use only the styled literal ID. A new section starts a new first-mention obligation.
 
 **Slack:**
 

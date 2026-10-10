@@ -2,8 +2,8 @@
 
 ## Local Modifications in Use
 
-- **Code Puppy JetBrains 0.23.1** — adds editable conversation titles in the transcript and History menu, a suggested attachment for the focused editor file or selection, visible universal-constructor tool activity, and the local JCEF startup workaround.
-- **Wibey JetBrains 1.0.27** — supports persistent editable conversation titles, editable queued follow-up prompts, focused-editor file/selection context, and automatic quota snapshots for the usage dashboard.
+- **Code Puppy JetBrains + VS Code + Cursor 0.27.0** — same `feature/active-context-pill` branch of `~/src/code-puppy-ide` builds all three; the active-editor-context suggestion is implemented in the shared webview/protocol packages so it applies everywhere. JetBrains additionally carries local JDK 21 build detection and the JCEF-proxy-warm startup workaround (no JCEF in VS Code/Cursor, so those don't need it). The VS Code/Cursor extension was built and installed for the first time 2026.10.02 — previously source-only, never packaged. (Editable conversation titles and universal-constructor visibility shipped upstream and no longer need a local patch.)
+- **Wibey JetBrains 1.0.28** — upstream GPT model support and context-window work, combined locally with persistent editable conversation titles, editable queued follow-up prompts, image paste, focused-editor file/selection context, prompt queuing, and quota snapshots.
 - **Zaaack Markdown Editor for VS Code and Cursor** — adds multipanel editing, outline navigation, find, anchor links, and dark-theme/readability improvements.
 - **TypeDown for VS Code and Cursor** — compacts prose, table, and list spacing; preserves editor focus and cursor position through paste.
 - **Shuzijun Markdown Editor for IntelliJ IDEA** — improves body-text readability and supplies the JCEF dependency required by IDEA 2026.2.
@@ -17,7 +17,78 @@ This is the canonical personal policy for local IDE/plugin artifacts.
 
 Every locally built IDE/plugin artifact must be copied to `~/Downloads/` for installation and review. Keep the canonical build output in its repository's normal release folder, but treat the Downloads copy as the human-facing local build.
 
-Name each Downloads artifact `<product>-<version>-yyyymmdd.Dow.hhmm-<blah>.<ext>`. The timestamp is the actual build-completion time; `<blah>` is a lowercase, hyphen-free description of the newest included fix, shorter than 10 characters. Example: `code-puppy-jetbrains-0.23.0-20260918.Fri.1146-imgpaste.zip`.
+Name each Downloads artifact `<product>-<version>-yyyymmdd.Dow.hhmm-<blah>.<ext>`. The timestamp is the actual build-completion time; capture it with `date "+%Y%m%d.%a.%H%M"` immediately after the build succeeds, not when copying or renaming the artifact. `<blah>` is a lowercase, hyphen-free description of the newest included fix, shorter than 10 characters. Example: `code-puppy-jetbrains-0.23.0-20260918.Fri.1146-imgpaste.zip`.
+
+### Rebuilding the Local Wibey JetBrains Plugin
+
+Build from `~/src/wibey-jetbrains-plugin` on `brian/local-combined`; this branch combines local modifications with upstream updates. Fetch and merge `origin/main` (never rebase), resolve overlapping edits by preserving both upstream behavior and local features, then confirm no unmerged paths or conflict markers remain. Keep the timestamped build version and update its base version to the release version from upstream. Preserve local PR changes, inspect new upstream `@Service` classes against `plugin.xml`, and let the Gradle service-registration validation run as part of `buildPlugin`.
+
+Run the bridge checks and build the installable distribution ZIP from Terminal.app. `set -e` ensures the Gradle build cannot run after a failed bridge check:
+
+```bash
+set -e
+cd ~/src/wibey-jetbrains-plugin
+git fetch origin main
+git merge --no-edit origin/main
+# Resolve all conflicts before continuing; retain local mods and upstream behavior.
+(cd bridge && bun install --frozen-lockfile && bun run build && bun run test -- --reporter=dot)
+./gradlew buildPlugin
+```
+
+After `buildPlugin` succeeds, capture the actual completion time and stage the newest built distribution. The Downloads version is the release version (before `_` in Gradle's timestamped filename); the separate timestamp is when the build completed. `gpt` is the short included-change label for this upstream GPT model-support release; change it when a different update is newest:
+
+```bash
+STAMP=$(date "+%Y%m%d.%a.%H%M")
+ZIP=$(ls -t build/distributions/wibey-jetbrains-plugin-*.zip | head -n 1)
+VERSION=${ZIP##*/wibey-jetbrains-plugin-}
+VERSION=${VERSION%%_*}
+OUT="$HOME/Downloads/wibey-jetbrains-plugin-$VERSION-$STAMP-gpt.zip"
+unzip -t "$ZIP"
+cp -p "$ZIP" "$OUT"
+cmp "$ZIP" "$OUT"
+shasum -a 256 "$ZIP" "$OUT"
+```
+
+The ZIP must be the dependency-complete installable artifact, not a JAR from `build/libs/`. Confirm the archive test succeeds and both hashes match. Keep the canonical ZIP in `build/distributions/`; install from the timestamped copy in `~/Downloads/`.
+
+### Rebuilding the Local Code Puppy JetBrains Plugin
+
+Repo: `~/src/code-puppy-ide` (fork `r0b0m29/code-puppy-ide`, monorepo for both the VS Code extension and the JetBrains plugin), branch `feature/active-context-pill`. That branch merges local-only commits (active-editor-context suggestion, JDK 21 build detection, JCEF-proxy-warm startup fix) onto upstream `main`. Full release flow lives in `docs/ai/RELEASING.md` in that repo — this is the shortcut for a local-only install build, no release/tag/publish:
+
+```bash
+cd ~/src/code-puppy-ide
+git fetch origin main
+git merge --no-edit origin/main
+# Resolve conflicts: diff each hunk, prefer upstream when it has absorbed a
+# local fix (check for a same-purpose class/import on the other side before
+# keeping both — duplicated fixes are a DRY violation, not a safe default).
+bash scripts/build-jetbrains-variants.sh
+```
+
+The script builds the webview once, then both JetBrains variants (`legacy` for IDE builds 243–261, unsuffixed `main` for 262+) into `releases/`. IDEA 2026.2.x needs the unsuffixed `code-puppy-jetbrains-<version>.zip`. JDK 21 is auto-detected (`scripts/gradle-jetbrains.sh`) — no `PATH` changes needed, see that repo's RELEASING.md if it can't find one. First build is slow (Gradle daemon + IntelliJ SDK warm-up, ~2 min); reruns are fast.
+
+After `buildPlugin` succeeds, stage the timestamped Downloads copy per the [Local Build Artifact Rule](#local-build-artifact-rule):
+
+```bash
+STAMP=$(date "+%Y%m%d.%a.%H%M")
+ZIP="releases/code-puppy-jetbrains-<version>.zip"
+OUT="$HOME/Downloads/code-puppy-jetbrains-<version>-$STAMP-<blah>.zip"
+unzip -t "$ZIP"
+cp -p "$ZIP" "$OUT"
+cmp "$ZIP" "$OUT"
+shasum -a 256 "$ZIP" "$OUT"
+```
+
+Install from Downloads: Settings → Plugins → ⚙ → Install Plugin from Disk…, then restart IDEA. **Marketplace auto-update will silently overwrite this with a stock build** — after any Code Puppy update notification, verify the installed jar's version against this branch before trusting that local mods survived (see the 2026.10.02 lesson above). Commit and push the merge to `origin/feature/active-context-pill` so the combined branch stays ahead of upstream and the mods aren't local-only residue.
+
+The same repo's `apps/vscode` builds the VS Code/Cursor side of the identical feature (`pnpm --filter code-puppy-vscode run package` instead of the Gradle step — produces `releases/code-puppy-vscode-<version>.vsix`). Install/update either editor via CLI, no marketplace involved since this extension isn't published there:
+
+```bash
+code --install-extension ~/Downloads/code-puppy-vscode-<version>-<stamp>-<blah>.vsix
+cursor --install-extension ~/Downloads/code-puppy-vscode-<version>-<stamp>-<blah>.vsix
+```
+
+Verify with `code --list-extensions --show-versions | grep puppy` (same flag works for `cursor`). Unlike the JetBrains side, there's no marketplace auto-update to silently clobber this — it only changes when you rebuild and reinstall it yourself.
 
 ## IDEs
 
@@ -25,10 +96,10 @@ Name each Downloads artifact `<product>-<version>-yyyymmdd.Dow.hhmm-<blah>.<ext>
 | Feature                        | IDEA         | VS Code      | Cursor                  |
 | ------------------------------ | ------------ | ------------ | ----------------------- |
 | Score                          | 33.5         | 20.5         | 19.5                    |
-| IDE                            | 2026.2       | 1.135.0      | 3.21.13                 |
+| IDE                            | 2026.2.3     | 1.135.0      | 3.21.13                 |
 | VSCode engine                  | —            | —            | 1.105.1                 |
-| Wibey                          | 1.0.27       | 1.0.20       | 1.0.18                  |
-| Code Puppy                    | 0.23.1       | —            | —                       |
+| Wibey                          | 1.0.28       | 1.0.20       | 1.0.18                  |
+| Code Puppy                    | 0.27.0       | 0.27.0       | 0.27.0                  |
 | └ parallel agents              | ✅            | ✅            | ✅                       |
 | └ enqueue next prompt          | ❌            | ✅            | ✅                       |
 | └ context += @ file            | ✅            | 🟡<100KB     | 🟡<100KB                |
@@ -66,7 +137,7 @@ Score rubric
 - Glyph values: ✅✅ = 2 pts, ✅ = 1 pt, 🟡 / ✔️ = 0.5 pts, ❌ / ? = 0 pts, ❌❌ = −1 pt
 - Version/text-only cells (version numbers, descriptive text) = excluded
 - Copilot rows excluded from IDE score
-- **IDEA patches (baked-in as of 2026.07.17):** image-paste-fix + conversation-title-features are merged into local `brian/local-combined` build (Wibey 1.0.27). Scores reflect working features; ⚙️ notation removed. Recount after IDE/extension updates.
+- **IDEA patches (baked-in as of 2026.09.29):** image-paste-fix + conversation-title-features are merged into local `brian/local-combined` build (Wibey 1.0.28), alongside upstream 1.0.28 updates. Scores reflect working features; ⚙️ notation removed. Recount after IDE/extension updates.
 - Editor score: each IDE gets the maximum score achievable by any editor available to it
   - IDEA: native WYSIWYG editor (8.0 pts); beats viewer (7.0) and shuzijun (3.5)
   - VS Code: typedown (3.5 pts); zaaack broken ~2026.06.01 (was 7 pts w/ patch)
@@ -155,7 +226,7 @@ Extension command IDs:
 
 ## Top Frictions
 
-- **All IDEA patches currently applied and stable** (verified 2026.07.17). Wibey 1.0.27 from `brian/local-combined` ships with both PRs merged (image-paste-fix + conversation-title-features). Stable baseline for this system; update that branch to stay current as patches are upstreamed.
+- **All IDEA patches currently applied and stable** (verified 2026.09.29). Wibey 1.0.28 from `brian/local-combined` includes upstream main plus image-paste-fix and conversation-title-features. Rebuild from that branch to keep the local plugin current.
 - Parallel Wibey agents now available in all three IDEs (as of 2026.06).
 - Top silly frictions: let me buffer up my next prompt, and make it super-easy to reference the current file and selection.
   - Wibey allows enqueuing the next prompt while busy in VS Code and Cursor, but not in IDEA. Allowing this in IDEA would give 30% of the value of parallel agents. I don't like interrupting agents to add their next prompt and then tell them to first finish the previous one.
@@ -401,7 +472,8 @@ Line-height, table padding, list spacing, and focus bug patches. Full procedure:
 
 - **Superior features: search/find, git, debug, database, http, yaml preview**
 - **Currently on 2026.2 GA/stable** (build 262.8665.258, released 2026.07.16; installed on Walmart laptop 2026.07.16). The 2026.2 EAP (auto-updated ~2026.06.27) has now shipped as stable — the config dir (`IntelliJIdea2026.2`) carried over from EAP → GA, so all EAP-era JAR patches survived the upgrade. The two 2026.2 breaking changes still require JAR patches (see ToolMods.md).
-- **Current local tool versions (2026.09.22):** IntelliJ IDEA 2026.2; Wibey 1.0.27 from `brian/local-combined`; Code Puppy JetBrains 0.23.1 from the local `feature/active-context-pill` build. The Code Puppy artifact includes active-editor context, image paste, universal-constructor rendering, JDK 21 build detection, and the JCEF startup workaround.
+- **Current local tool versions (2026.10.02):** IntelliJ IDEA 2026.2.3; Wibey 1.0.28 from `brian/local-combined`; Code Puppy JetBrains 0.27.0 from the local `feature/active-context-pill` build (repo `~/src/code-puppy-ide`, fork `r0b0m29/code-puppy-ide`); Code Puppy Desktop 0.3.0. The Code Puppy artifact includes active-editor context suggestion, JDK 21 build detection, and the JCEF startup workaround — image paste and universal-constructor rendering are now stock upstream behavior, so the local `ImageAttachmentCache` duplicate was retired in favor of upstream's `ImageCache`.
+- **2026.10.02 lesson:** the JetBrains marketplace plugin update silently replaced the local-combined build with a stock v0.27.0 build, dropping the active-context-pill feature. After any Code Puppy JetBrains marketplace update, re-check the installed plugin version/jar against `~/src/code-puppy-ide`'s `feature/active-context-pill` branch before assuming local mods survived — `unzip -p <plugin jar> META-INF/plugin.xml | grep version` against the installed plugin dir shows the truth.
 - **Patch audit 2026.10.09 (personal Mac, 2026.2.3):** restored the missing JCEF remote-mode override (`idea.vmoptions`), Shuzijun 2.0.7 JCEF dependency + 13px font, MCP Server Services-panel suppression, sensitive-file dialog suppression, and built-in Markdown preview light/dark stylesheet. The active `VSCode OSX` keymap is supplied by the installed `keymap-vscode` plugin; no stale custom keymap XML was recreated.
 - *command-approval constipation*
 - *Parallel agents now supported (as of 2026.06)*
@@ -532,7 +604,7 @@ also applied. Full procedures: **ToolMods.md → Shuzijun** and
 
 New conversation bug fix (`clearMessages` on `newParallelSession`). Full procedure: **ToolMods.md → Wibey Extension**.
 
-### Wibey IDEA — Image Paste Fix (⚙️ local branch, PR pending)
+### Wibey IDEA — Image Paste Fix
 
 **Problem:** Cmd+V with any clipboard image was silently broken. Root cause: `IdeEventQueue` intercepts Cmd+V before any Swing handler — `paste()`, input maps, and `TransferHandler` are all bypassed.
 
@@ -542,7 +614,7 @@ New conversation bug fix (`clearMessages` on `newParallelSession`). Full procedu
 
 **PR:** [#170](https://gecgithub01.walmart.com/genaica/wibey-jetbrains-plugin/pull/170) · **Project doc:** [WibeyIDEAImagePaste.md](https://gecgithub01.walmart.com/CatalogRelationships/relationship-shared/blob/main/projects/WibeyIDEAImagePaste.md)
 
-### Wibey IDEA — Conversation Title Features (⚙️ local branch, PR pending)
+### Wibey IDEA — Conversation Title Features
 
 Three fixes/features on top of stock 1.0.20:
 
@@ -555,26 +627,11 @@ Three fixes/features on top of stock 1.0.20:
 
 **PR:** [#169](https://gecgithub01.walmart.com/genaica/wibey-jetbrains-plugin/pull/169) · **Project doc:** [WibeyTitleFeatures.md](https://gecgithub01.walmart.com/CatalogRelationships/relationship-shared/blob/main/projects/WibeyTitleFeatures.md)
 
-### Installing Both Patches Locally
+### Upgrading the Local Wibey Plugin
 
-Both fixes live on `brian/local-combined` in `~/src/wibey-jetbrains-plugin` (merge of `brian/conversation-title-features` + `brian/image-paste-fix`). Branch has `jvmToolchain(17)` local workaround committed (JDK 21 auto-provision hangs through Zscaler proxy; output bytecode is identical).
+`brian/local-combined` combines local image-paste and conversation-title features with upstream main. Check the branch and current `origin/main` history to determine which local mods remain unique before merging.
 
-**To install** (must run in Terminal.app — Wibey kills long Gradle processes):
-
-```bash
-cd ~/src/wibey-jetbrains-plugin
-git checkout brian/local-combined
-./gradlew buildAndInstall   # ~5 min warm cache
-# restart IDEA
-```
-
-**To update after either PR branch gets new commits:**
-
-```bash
-git checkout brian/local-combined
-git merge brian/conversation-title-features   # whichever changed
-./gradlew buildAndInstall
-```
+To install the build in the active IDEA instance, run `./gradlew buildAndInstall` from Terminal.app, then restart IDEA. For a reviewed artifact, install the timestamped ZIP from `~/Downloads/` using **Settings → Plugins → Install Plugin from Disk**.
 
 ---
 
