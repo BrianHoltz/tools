@@ -2,7 +2,7 @@
 
 ## Overview
 
-- **Authoritative location:** `~/bin/docs/GitScheme.md` in the public `tools` repo is the cross-laptop reference for personal repo and workspace layout.
+- **Authoritative location:** `~/src/tools/docs/GitScheme.md` in the public `tools` repo is the cross-laptop reference for personal repo and workspace layout.
 - **Current structure:** Private monorepo at `~` tracking Documents and My Drive; lpscc as standalone GitHub repo; public tools repo at `~/src/tools`
 - **Workspace file**: `~/Personal.code-workspace` (local, not tracked)
 - **Status**: ✅ Northstar achieved — migration complete as of 2026-07-16
@@ -18,7 +18,7 @@
 
 - Private monorepo at `~` so GitHub-hosted Copilot sees Documents + My Drive from one repo.
 - Keep LPSCC rooted at `~/lpscc` (symlink to shared-drive folder), tracked in its own standalone GitHub repo, visible as a content root and VCS root in the IDEA workspace.
-- Keep the personal toolchain publicly shareable via `BrianHoltz/tools`; local checkout at `~/src/tools` with stable `~/bin` entrypoint.
+- Keep the personal toolchain publicly shareable via `BrianHoltz/tools`; local checkout at `~/src/tools` with stable `~/bin` compatibility entrypoint.
 - **Personal laptop only:** Mirror `~/My Drive` for redundancy — family members access these files and they warrant extra backup across devices.
 - **Work laptop:** Do not mirror Google Drive. Read-only access acceptable; all real edits on personal laptop.
 
@@ -38,7 +38,7 @@ Content roots and git tracking:
 **What is `~/My Drive`:**
 The most important personal files — curated documents worth extra backup and family sharing. Google Drive provides cross-device availability; the monorepo provides durable git history visible to GitHub-hosted Copilot.
 
-The public tools repo lives at `~/src/tools/` with a stable Unix-y entrypoint via `~/bin → ~/src/tools`:
+The public tools repo lives at `~/src/tools/`; `~/bin → ~/src/tools` is retained as a stable Unix-y compatibility entrypoint:
 
 ```text
 ~/src/tools/          public repo (BrianHoltz/tools)
@@ -104,7 +104,7 @@ This gives one GitHub-visible monorepo while local IDEs work with natural `Docum
 
 ### Public tooling repo structure
 
-The public tools repo lives in `~/src/tools/`. Its stable entrypoint is `~/bin -> ~/src/tools`.
+The public tools repo lives in `~/src/tools/`. Its stable compatibility entrypoint is `~/bin -> ~/src/tools`.
 
 Other public repos in `~/src/*` are standalone project repos outside the `home` repo's tracked scope.
 

@@ -10,7 +10,7 @@ Patch and modification procedures. See Tools.md for tool preferences, standings,
 
 ### Multi-panel Editor + Outline + Find + Anchor Nav (`patch-zaaack.py`)
 
-The ⚙️ rows in the comparison table — find in file, structure, internal links — are added by `~/bin/patches/patch-zaaack.py` (canonical, lives in `~/bin/` repo and syncs across laptops via git). It patches four files — `media/dist/main.js`, `media/dist/main.css`, `out/extension.js`, and `package.json` — in **both** `~/.vscode/extensions/zaaack.markdown-editor-<version>/` and `~/.cursor/extensions/zaaack.markdown-editor-<version>/` (each IDE has its own extensions dir). **Supports Zaaack 0.1.13, 0.1.15, 0.1.17, and 0.1.21**; the script globs all matching versioned dirs and supports their bundled Vditor variants via `P2_VARIANTS`.
+The ⚙️ rows in the comparison table — find in file, structure, internal links — are added by `~/src/tools/patches/patch-zaaack.py` (canonical, lives in the `~/src/tools` repo and syncs across laptops via git). The `~/bin/patches/patch-zaaack.py` compatibility path resolves to the same script. It patches four files — `media/dist/main.js`, `media/dist/main.css`, `out/extension.js`, and `package.json` — in **both** `~/.vscode/extensions/zaaack.markdown-editor-<version>/` and `~/.cursor/extensions/zaaack.markdown-editor-<version>/` (each IDE has its own extensions dir). **Supports Zaaack 0.1.13, 0.1.15, 0.1.17, and 0.1.21**; the script globs all matching versioned dirs and supports their bundled Vditor variants via `P2_VARIANTS`.
 
 **Why patch instead of switching editors.** Every webview-based WYSIWYG competitor (typedown, IDEA shuzijun, Mark Sharp, Unotes, vscode-markdown-wysiwyg, Teddy Editor) shares the same Cmd+F gap — VS Code's find UI doesn't reach into webview content, and vditor doesn't expose a public search API. The only extension with native find is `remcohaszing.markdown-decorations`, but it's decoration-only and loses the rich WYSIWYG rendering that makes zaaack the best choice. So patching zaaack beats every alternative on the market as of 2026.05.
 
@@ -87,7 +87,7 @@ The ⚙️ rows in the comparison table — find in file, structure, internal li
 **Reapply procedure** (after Zaaack extension update, OS migration, or fresh checkout):
 
 1. Confirm installed version(s): `ls ~/.vscode/extensions/ ~/.cursor/extensions/ 2>/dev/null | grep zaaack`. The script auto-globs every matching dir under both IDEs.
-2. `python3 ~/bin/patches/patch-zaaack.py` — for each target dir: applies multi-file editor patch to `extension.js` (step MP1–MP5), then patches `main.js` (3 sites), `main.css` (1 site), `extension.js` outline (6 sites), and `package.json` (2 sites). Re-running strips + re-injects where applicable (marker-based idempotency) and creates `.bak.<unix-ts>` backups of all files before patching.
+2. `python3 ~/src/tools/patches/patch-zaaack.py` — for each target dir: applies multi-file editor patch to `extension.js` (step MP1–MP5), then patches `main.js` (3 sites), `main.css` (1 site), `extension.js` outline (6 sites), and `package.json` (2 sites). Re-running strips + re-injects where applicable (marker-based idempotency) and creates `.bak.<unix-ts>` backups of all files before patching.
    - If a new Zaaack version ships a new vditor version, add a new tuple to `P2_VARIANTS` and update `MULTIPANEL_SINGLETON_OLD` if TypeScript recompilation changed the `_a` var references.
 3. Sanity check:
 
@@ -99,7 +99,7 @@ The ⚙️ rows in the comparison table — find in file, structure, internal li
 
 **Multi-file editor patch baked in.** `patch_extension_js_multipanel()` runs automatically before the outline patches, converting the singleton `EditorPanel.currentPanel` to a per-file `EditorPanel.panelsByPath` Map. Idempotent: re-running is safe. The outline patches depend on `panelsByPath` and are skipped if it is absent.
 
-**Recreating the patch from scratch** (if `~/bin/patches/patch-zaaack.py` is ever lost): use the main.js anchor strings + enhancer/TreeView responsibilities described above, add one marker-guarded CSS block in `main.css` for dark tables/outline width, and add the `extension.js` + `package.json` TreeView patches. All patch sites use anchor checks plus marker-comment idempotency.
+**Recreating the patch from scratch** (if `~/src/tools/patches/patch-zaaack.py` is ever lost): use the main.js anchor strings + enhancer/TreeView responsibilities described above, add one marker-guarded CSS block in `main.css` for dark tables/outline width, and add the `extension.js` + `package.json` TreeView patches. All patch sites use anchor checks plus marker-comment idempotency.
 
 **Fallbacks if the patch ever breaks:**
 

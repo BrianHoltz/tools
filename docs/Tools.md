@@ -442,7 +442,7 @@ Observed result: this workflow successfully enables independent previews per mar
 
 ### Zaaack Find / Outline / Anchor Nav (patched)
 
-⚙️ rows — find in file, structure, internal links — are added by `~/bin/patches/patch-zaaack.py`. Run after each Zaaack update; the script globs both `~/.vscode/extensions/` and `~/.cursor/extensions/` so one run covers both IDEs. Full patch procedure and implementation notes: **ToolMods.md → Zaaack**.
+⚙️ rows — find in file, structure, internal links — are added by `~/src/tools/patches/patch-zaaack.py`. Run after each Zaaack update; the script globs both `~/.vscode/extensions/` and `~/.cursor/extensions/` so one run covers both IDEs. Full patch procedure and implementation notes: **ToolMods.md → Zaaack**.
 
 ### Markdown Preview Theme (auto-switch)
 

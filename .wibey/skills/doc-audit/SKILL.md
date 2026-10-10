@@ -1,3 +1,8 @@
+---
+name: doc-audit
+description: Audit and improve maintained documentation for accuracy, structure, links, duplication, and durable wording. Use for documentation audits and substantive edits to project or reference docs; exclude ephemeral scratch notes.
+---
+
 # Doc Audit Skill
 
 Consolidated reference for documentation authoring, project document formatting, and audit standards. Describes patterns for any repo: immortal (timeless) vs mortal (time-bound) docs, mortal doc structure, evidence, temporal writing, and consistency audits.

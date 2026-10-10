@@ -130,7 +130,7 @@ Hardlinks (not symlinks — required by Wibey):
 | `~/.wibey/commands/commitz.md` | `wibey/commands/commitz.md` |
 | `~/.wibey/commands/convo.md`   | `wibey/commands/convo.md`   |
 
-For IDE workspace roots, use `~/lpscc` (the symlink) instead of `~/My Drive/Libertarian/LPSCC`; that keeps the LPSCC root attached to the shared-drive root rather than the local folder tree.
+For IDE workspace roots, use `~/lpscc` (the symlink) instead of the long Google Drive path; that keeps the LPSCC root attached to the `Shared drives/LP SCC Financial` root rather than the local folder tree.
 
 ## SEE ALSO
 
