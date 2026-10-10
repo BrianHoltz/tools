@@ -16,6 +16,7 @@ This file is the global layer; a repo's AGENTS.md supplies project/team context,
   - [safewrite CAS pattern](#safewrite-cas-pattern)
   - [Other file operation rules](#other-file-operation-rules)
 - [Communication Style](#communication-style)
+  - [ChatGPT Work GitHub authentication](#chatgpt-work-github-authentication)
   - [Communication Signing](#communication-signing)
 - [Browser Automation](#browser-automation)
 - [Inferring Intended Files](#inferring-intended-files)
