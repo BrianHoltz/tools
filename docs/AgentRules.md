@@ -1,41 +1,44 @@
 # AgentRules.md - Global AI Agent Rules
 
-Personal global rules for the user. The rules in this file apply to all repos, all AI models, all hosts. Any project-specific or model-specific AI rules override them only where they explicitly conflict.
+Personal rules for all repos, AI models, and hosts. Project-specific or model-specific rules supplement these rules and override a conflicting rule only when they explicitly say so.
 
-**AgentRules.md vs AGENTS.md:** These are two different layers of agent instruction:
+This file is the global layer; a repo's AGENTS.md supplies project/team context, tooling, workflows, and layout conventions. Read both when applicable. AGENTS.md need not repeat these rules.
 
-- **AgentRules.md** (this file) — global, cross-laptop, cross-repo, cross-model. Personal rules that always apply. Lives in `~/bin/`, synced to both laptops via git. Not team-visible; not project-specific.
-- **AGENTS.md** — project/team-level supplement. Lives at the repo root (or symlinked from the team's shared repo). Adds team context: domain terminology, shared tooling, team workflows, file layout conventions. Supplements this file; does not override it.
-
-When both apply, read both. If they conflict, AgentRules.md loses to AGENTS.md only where AGENTS.md explicitly says so. AGENTS.md can safely skip any rule already in AgentRules.md — agents will have both in context.
-
-## Table of Contents
+## Contents
 
 - [The Seven Commandments](#the-seven-commandments)
-- [Andreessen Commandment](#andreessen-commandment)
-- [~/bin/ structure](#bin-structure)
-  - [~/bin/ vs relationship-shared/](#bin-vs-relationship-shared)
+- [Truth-Seeking Commandments](#truth-seeking-commandments)
+- [Tools Repository](#tools-repository)
+  - [Personal and Team Sources](#personal-and-team-sources)
 - [Write Rules](#write-rules)
   - [Wibey plans path](#wibey-plans-path)
   - [Inode preservation](#inode-preservation)
   - [safewrite CAS pattern](#safewrite-cas-pattern)
   - [Other file operation rules](#other-file-operation-rules)
 - [Communication Style](#communication-style)
+  - [Communication Provenance](#communication-provenance)
 - [Browser Automation](#browser-automation)
 - [Inferring Intended Files](#inferring-intended-files)
 - [Dates and Times](#dates-and-times)
   - [Always verify the current date](#always-verify-the-current-date)
   - [Use EDTF for all dates](#use-edtf-for-all-dates)
+  - [Human-readable durations](#human-readable-durations)
 - [Documentation](#documentation)
 - [Rules For Personal Laptop](#rules-for-personal-laptop)
   - [Family Reference Documents](#family-reference-documents)
 - [Rules For Work Laptop](#rules-for-work-laptop)
   - [Coding Workflow](#coding-workflow)
+    - [Code Review Standards](#code-review-standards)
+    - [JDK Availability on Walmart Network](#jdk-availability-on-walmart-network)
   - [PR Diff Source of Truth](#pr-diff-source-of-truth)
   - [Git Merge Strategy](#git-merge-strategy)
+  - [Team Tool Discovery](#team-tool-discovery)
+- [Portable Agent Tooling](#portable-agent-tooling)
+  - [Codex Integration](#codex-integration)
   - [Custom Commands](#custom-commands)
-  - [Wibey Skills — ~/bin/.wibey/ Directory](#wibey-skills----binwibey-directory)
-    - [Project-Level Commands](#project-level-commands)
+  - [Portable Skills and Mirrors](#portable-skills-and-mirrors)
+
+*[doc-audit](https://github.com/BrianHoltz/tools/blob/main/.wibey/skills/doc-audit/SKILL.md): 2026.10.09.Fri*
 
 ## The Seven Commandments
 
@@ -59,45 +62,46 @@ When both apply, read both. If they conflict, AgentRules.md loses to AGENTS.md o
 - Steelman opposing views and explore non-obvious frames before converging.
 - Restate your position under pushback unless new evidence or superior reasoning appears.
 
-## ~/bin structure
+## Tools Repository
 
-The canonical source of this file is `~/bin/docs/AgentRules.md`, version-controlled in the public tools repo (`github.com/BrianHoltz/tools`) checked out at `~/src/tools` and exposed locally at `~/bin`. **The `tools` repo is the cross-laptop sync mechanism, and `~/bin` is the stable local entrypoint** — push on work laptop, pull on personal laptop. The following paths are symlinks to this file:
+The canonical repository is `~/src/tools/`, the local checkout of the public [tools repo](https://github.com/BrianHoltz/tools). [AgentRules.md](AgentRules.md) lives at `~/src/tools/docs/AgentRules.md`. `~/bin/` is just a legacy symlink to `~/src/tools/`, retained for compatibility with existing paths and PATH settings. Use the canonical path for edits, commits, new configuration, scripts, and adapter targets. Git synchronizes the repository across laptops.
 
-- `~/.claude/CLAUDE.md` — read by Claude Code CLI (and Wibey at Walmart)
-- `~/.cursor/cursorrules` — read by Cursor
-- `~/.code_puppy/AGENTS.md` — read by Code Puppy. Code Puppy has no single CLAUDE.md-style entrypoint; it concatenates three AGENTS.md layers into every session's system prompt — global (`~/.code_puppy/AGENTS.md`, this file), project (`<CWD>/.code_puppy/AGENTS.md`), and repo-root fallback (`./AGENTS.md`) — so this symlink is what makes AgentRules.md load automatically, every session, every repo, with no action needed from the user or the agent. If the user references "the Commandments", "AgentRules", or anything from this file, it is already in context via this path — never say you can't find it or ask where it lives.
-- `.github/copilot-instructions.md` symlink in each repo root — read by GitHub Copilot (VS Code). GitHub Copilot does NOT read `~/.claude/CLAUDE.md`; it only reads this file from the open repo root.
+Agent adapter installation targets link to `~/src/tools/docs/AgentRules.md`; installed adapters depend on the host and agent:
 
-**Canonical-vs-adapter rule:** personal agent machinery lives canonically in the `tools` repo at `~/src/tools/`, exposed locally at `~/bin/`. Home-directory special folders such as `~/.claude/commands/`, `~/.claude/CLAUDE.md`, `~/.cursor/cursorrules`, and `~/.wibey/commands/` are adapter/install locations. Workspace-local `.github/` trees are also adapters for GitHub Copilot. Do **not** treat `~/IdeaProjects/Personal/.github/skills/` or any other workspace-local `.github/skills/` directory as a primary source of truth.
+- `~/.codex/AGENTS.md` — Codex global instructions; see [Codex Integration](#codex-integration) for profiles, overrides, and setup.
+- `~/.claude/CLAUDE.md` — Claude Code CLI and Wibey at Walmart.
+- `~/.cursor/cursorrules` — Cursor.
+- `~/.code_puppy/AGENTS.md` — Code Puppy's global layer. Code Puppy also loads `<CWD>/.code_puppy/AGENTS.md` and repo-root `./AGENTS.md`. When this adapter is installed, AgentRules loads each session; do not ask the user where the Commandments live.
+- `<repo>/.github/copilot-instructions.md` — GitHub Copilot in VS Code. Copilot reads the open repo's adapter, not `~/.claude/CLAUDE.md`.
 
-Other `~/bin/` files symlinked into `~/`:
+Home-directory agent folders such as `~/.codex/` and `~/.agents/skills/`, and workspace-local `.agents/` and `.github/` trees are adapters, not canonical sources. Personal agent machinery belongs in `~/src/tools`; do not treat a workspace-local `.github/skills/` directory as its source of truth.
 
-- `~/.shellrc.common` → `~/bin/shellrc/shellrc.common` — shared PATH/env for zsh + bash
-- `~/.zprofile` → `~/bin/shellrc/zprofile` — zsh login shell config
-- `~/.zshrc` → `~/bin/shellrc/zshrc` — zsh interactive shell config
-- `~/.bash_profile` → `~/bin/shellrc/bash_profile` — bash login/interactive shell config
-- `~/.bashrc` → `~/bin/shellrc/bashrc` — bash interactive shell config
+Shell configuration adapters in `~/` resolve to these canonical files:
+
+- `~/.shellrc.common` → `~/src/tools/shellrc/shellrc.common` — shared PATH/env for zsh + bash
+- `~/.zprofile` → `~/src/tools/shellrc/zprofile` — zsh login shell config
+- `~/.zshrc` → `~/src/tools/shellrc/zshrc` — zsh interactive shell config
+- `~/.bash_profile` → `~/src/tools/shellrc/bash_profile` — bash login/interactive shell config
+- `~/.bashrc` → `~/src/tools/shellrc/bashrc` — bash interactive shell config
 
 Canonical personal path aliases in `~/`:
 
-- `~/gdrive` → `~/Google Drive` — preferred short path for the Google Drive mount
-- `~/lpscc` → `~/Google Drive/Shared drives/LP SCC Financial` — preferred short path for LP SCC Financial
+- `~/gdrive` → `~/My Drive` — preferred short path for My Drive
+- `~/lpscc` → the Google Drive CloudStorage `Shared drives/LP SCC Financial` directory — preferred short path for LP SCC Financial
 
-Use these aliases in local tool/IDE config when possible to avoid space-heavy paths and keep paths consistent across settings.
-For workspace roots, attach `~/lpscc` itself; do **not** attach `~/My Drive/Libertarian/LPSCC` directly.
+Use these aliases in local tool/IDE config when possible to avoid space-heavy paths and keep paths consistent across settings. For workspace roots, attach `~/lpscc` itself; do **not** attach `~/My Drive/Libertarian/LPSCC` directly.
 
-The `~/bin/` repo also contains personal tool settings and reference docs (not symlinked):
+The `~/src/tools/` repo also contains personal tool settings and reference docs (not symlinked):
 
-- `~/bin/docs/Tools.md` — IDE/editor comparison matrix, extension patches, keybinding customizations, and tool-specific configuration notes
+- [Tools.md](Tools.md) — IDE/editor comparison matrix, extension patches, keybinding customizations, and tool-specific configuration notes
 
-To update the above files, edit the `~/bin/` copies and commit in the `~/bin/` repo.
+To update the above files, edit the canonical files under `~/src/tools/` and commit in the `~/src/tools/` repo.
 
-### ~/bin/ vs relationship-shared/
+### Personal and Team Sources
 
-Two completely separate repos serve different scopes:
+The repos serve different scopes:
 
-
-|                           | `~/bin/`                                     | `relationship-shared/`       |
+|                           | `~/src/tools/`                              | `relationship-shared/`       |
 | ------------------------- | -------------------------------------------- | ---------------------------- |
 | Git host                  | GitHub (personal, public)                    | Walmart GHE (team, internal) |
 | Available on              | both laptops                                 | work laptop only             |
@@ -106,14 +110,14 @@ Two completely separate repos serve different scopes:
 
 **Skills by laptop:**
 
-- **Work laptop**: team skills from `shared/.wibey/skills/` (relationship-shared); personal skills from `~/bin/.wibey/skills/`. The Wibey VS Code extension is Walmart-internal and only present on the work laptop, never on the personal laptop.
-- **Personal laptop**: only `~/bin/.wibey/skills/`, exposed per-workspace via `.wibey/skills/` symlinks. The Wibey extension is not available or expected here.
+- **Work laptop**: team skills from `shared/.wibey/skills/` (relationship-shared); personal skills from `~/src/tools/.wibey/skills/`. The Wibey VS Code extension is Walmart-internal and only present on the work laptop, never on the personal laptop.
+- **Personal laptop**: for skills maintained in these repos, use `~/src/tools/.wibey/skills/`. Wibey-style workspace adapters use `.wibey/skills/`; Codex adapters use [its documented discovery locations](#codex-integration). The Wibey extension is not available or expected here.
 
-Skills useful on both laptops live canonically in relationship-shared (team owns them) and are manually copied to `~/bin/.wibey/skills/` + committed when updated.
+Team-owned portable skills live canonically in relationship-shared and are copied into `~/src/tools/.wibey/skills/` through the [mirror workflow](#portable-skills-and-mirrors). Personal-only skills live canonically in tools.
 
-**When resolving a skill on personal laptop**: look in `~/bin/.wibey/skills/<name>/SKILL.md`. Do not attempt to read `shared/` — the symlink doesn't exist. Do not expect the Wibey extension to be present.
+**When resolving a skill on personal laptop**: look in `~/src/tools/.wibey/skills/<name>/SKILL.md`. Do not attempt to read `shared/` — the symlink doesn't exist. Do not expect the Wibey extension to be present.
 
-**When resolving a skill on work laptop**: check `shared/.wibey/skills/` first (team version may be newer than `~/bin/` copy). The Wibey extension is available and should be used if needed.
+**When resolving a skill on work laptop**: check `shared/.wibey/skills/` first (team version may be newer than `~/src/tools/` copy). The Wibey extension is available and should be used if needed.
 
 ## Write Rules
 
@@ -121,7 +125,7 @@ Skills useful on both laptops live canonically in relationship-shared (team owns
 
 Do not use `~/.wibey/plans/` or its subdirectories. If an IDE, extension, or MCP tool directs a write there, stop and report the source to the user.
 
-- Work plans, investigations, and drafts belong in `~/src/relationship-shared/aidocs/` with `YYYY-MM-DD_description.md` filenames.
+- Plans, investigations, and drafts follow [doc-audit placement and naming](../.wibey/skills/doc-audit/SKILL.md#ad-hoc-documents): `shared/aidocs/yyyy-mm-dd/hhmm_CamelCase.md` when the team shared symlink is available; otherwise `<repo>/aidocs/yyyy-mm-dd/hhmm_CamelCase.md`. On the work laptop outside a team workspace, use `~/src/relationship-shared/aidocs/` with the same date-folder convention.
 - Ephemeral scratch belongs in `/tmp/`.
 - Other writes follow these rules.
 
@@ -133,42 +137,38 @@ If `~/.wibey/plans/` exists as a directory rather than a file, alert the user.
 
 **Don't revert ambiguous changes.** If you encounter a change in a doc or file and there is a non-trivial chance it was the user's deliberate choice, do not revert it — full stop. This applies even if the change looks wrong, inconsistent, out of place, or contrary to what you were about to write yourself. Default assumption for any small change of unknown origin: the human user made it deliberately and considers it important. Investigate or ask before undoing it; never silently revert or overwrite it back to the prior state.
 
-Three rules for how to write:
+Git-tracked Markdown files (`*.md`) require the [fhold protocol](fhold.md).
 
-Files requiring the fhold protocol (expand this list as the protocol matures):
+**Path rule:** Always call `fhold` and `safewrite` via full path (`~/src/tools/fhold`, `~/src/tools/safewrite`). Agent shells, including Codex terminal tools and spawned agents, may run in a non-login shell that does not inherit the interactive `PATH`, causing bare commands to fail with "not found" even when `~/src/tools/` is in the user's interactive PATH.
 
-- Git-tracked markdown files (`*.md`)
+**Tracked Markdown:** use `fhold` to coordinate, then write.
 
-**Path rule:** Always call `fhold` and `safewrite` via full path (`~/bin/fhold`, `~/bin/safewrite`). Agent subshells (Bash tool, spawned agents) may run in a non-login shell that does not inherit the interactive `PATH`, causing bare commands to fail with "not found" even when `~/bin/` is in the user's interactive PATH.
+- Before every write: `~/src/tools/fhold status FILE`
+- **Reviewed mode** (default — no permit holds): `~/src/tools/fhold review register FILE --agent $AGENT` (exit 0 → proceed; exit 2 → inspect the existing hold). If the hold is more than five minutes old, release it with `~/src/tools/fhold review release FILE` and claim a new review hold; its owner is stale. If it is five minutes old or newer, show the user the existing hold’s agent, task, acquisition time, age, and pre-write SHA-256, then wait for their decision before writing. Write with an [inode-preserving method](#inode-preservation). Use the host's reviewable editing tools when they preserve the inode; Codex CLI may show changes through git diff instead of IDE Accept/Reject controls. `~/src/tools/fhold review release FILE` when you know you're done, or just let 30min TTL lapse.
+- **Permit mode** (any permit holds exist): `~/src/tools/fhold permit register FILE --agent $AGENT` if not already registered. Write with **`~/src/tools/safewrite`**. `~/src/tools/fhold permit release FILE --agent $AGENT` when you know you're done, or just let the 30min TTL lapse.
+- **IDE diff in permit mode violates the protocol.** If an Accept/Reject diff button appears while you're in permit mode, you used Edit/Write tools when you should have used `safewrite`. That write will race with other agents working on the file.
 
-**Rule 1 — Files in the list above:** use `fhold` to coordinate, then write.
+**Other existing files:** use inode-preserving editing tools or an in-place rewrite. Review changes through the host's diff view or git diff; observer buffers stay live. No fhold needed because these other files are not expected to get concurrent edits.
 
-- Before every write: `~/bin/fhold status FILE`
-- **Reviewed mode** (default — no permit holds): `~/bin/fhold review register FILE --agent $AGENT` (exit 0 → proceed; exit 2 → inspect the existing hold). If the hold is more than five minutes old, release it with `~/bin/fhold review release FILE` and claim a new review hold; its owner is stale. If it is five minutes old or newer, show the user the existing hold’s agent, task, acquisition time, age, and pre-write SHA-256, then wait for their decision before writing. Write with an **inode-preserving method** (IDE Edit/Write tools, vim). The IDE shows your changes as a diff for user review. `~/bin/fhold review release FILE` when you know you're done, or just let 30min TTL lapse.
-- **Permit mode** (any permit holds exist): `~/bin/fhold permit register FILE --agent $AGENT` if not already registered. Write with **`~/bin/safewrite`**. `~/bin/fhold permit release FILE --agent $AGENT` when you know you're done, or just let the 30min TTL lapse.
-- **IDE diff in permit mode = violation.** If an Accept/Reject diff button appears while you're in permit mode, you used Edit/Write tools when you should have used `safewrite`. That write will race with other agents working on the file.
-
-**Rule 2 — All other files:** use inode-preserving Edit/Write tools. IDE diff shows your changes; observer buffers stay live. No fhold needed because these other files are not expected to get concurrent edits.
-
-**Rule 3 — Write directly** (exceptions to Rules 1–2):
+**Direct writes** (exceptions to the coordination and editing requirements above):
 
 - Agent-owned ephemeral temp files
 - Newly-created files of any type — nothing exists yet to race against
 
 ### Inode preservation
 
-Never update a file by creating a new one in its place. `sed -i ''` on macOS, `mv tmpfile original`, and `echo > file` all change the inode. File watchers (e.g. Typedown) watch the original inode and go blind after the swap. Safe methods: `safewrite` (truncate+rewrite), IDE Edit/Write tools, vim. In Python: `open(path, 'w').write(content)`.
+Never update a file by creating a new one in its place. `sed -i ''` on macOS and `mv tmpfile original` replace the inode. Truncating an existing regular file, as with `echo > file`, preserves its inode but overwrites its content; it still requires the applicable write protocol. File watchers (e.g. Typedown) watch the original inode and go blind after the swap. Use `safewrite` (truncate+rewrite) or an editor/tool verified to preserve the inode. In vim, use `:set backupcopy=yes` to avoid replacing it when making backups. In Python: `open(path, 'w').write(content)`.
 
-**Symlinks:** Before using Write on any file, check whether it is a symlink (`ls -la`). The Write tool may sever the symlink by creating a new regular file at the path rather than writing through to the target. Use Edit instead — Edit patches the existing bytes and preserves the symlink. If you must use Write (e.g. full-file rewrite), do it from the directory where the file is real, not from the symlinked path.
+**Symlinks:** Before editing, check whether the path is a symlink (`ls -la`). Resolve it and edit the canonical target with an inode-preserving method. Do not assume that a tool named Write, Edit, or apply_patch preserves symlinks or inodes; verify its behavior. This applies to Codex instruction and skill adapters too.
 
 ### safewrite CAS pattern
 
 ```sh
-HASH=$(shasum -a 256 FILE | awk '{print $1}')
+WRITE_SHA256=$(shasum -a 256 FILE | awk '{print $1}')
 python3 my_transform.py > /tmp/new_out
-~/bin/safewrite FILE \
+~/src/tools/safewrite FILE \
   --from /tmp/new_out \
-  --expect-sha256 "$HASH" \
+  --expect-sha256 "$WRITE_SHA256" \
   --max-shrink-pct 20 \
   --sentinel-regex "^# " \
   --note "agent=claude, task=abc123"
@@ -177,48 +177,54 @@ python3 my_transform.py > /tmp/new_out
 
 On exit 3 (CAS mismatch): file changed since you read it. Re-read, rebuild from new state, retry. Never reuse stale content.
 
-Run `~/bin/safewrite -h` for full options. Run `~/bin/fhold -h` for the fhold MENU and full protocol.
+Run `~/src/tools/safewrite -h` for full options. Run `~/src/tools/fhold -h` for the fhold MENU and full protocol.
 
 ### Other file operation rules
 
-- Never `rm` directly on user files — use `trash` or `mv ~/.Trash/`. **Exception: `/tmp/` and `tmp/` may be deleted with plain `rm` — no `trash`, no confirmation, no hesitation (see [Seven Commandments](#the-seven-commandments)).**
-- Duplicate/conflicting files: ASK which to keep before deleting either
+- Never `rm` directly on user files — use `trash` or move them into `~/.Trash/`. Exception: files under `/tmp/` and `tmp/` may be deleted with plain `rm` without confirmation.
+- Duplicate/conflicting files: ask which to keep before deleting either
 - No VCS changes unless you're certain the user wants them
 - Commit granularity: independent changes → separate commits; interdependent → one commit
 - **Two-tier commit policy**: mechanical changes (artifacts, formatting) → commit directly; substantive changes (logic, data, content) → `git add` and summarize for user review. User can override with "just commit it".
-- **PR Approval Boundary — CRITICAL**: **Never commit to a branch that has an open PR with any approvals, even if changes seem mechanical or trivial.** Approvals represent a user checkpoint where the reviewer has signed off on the diff they saw. Any commit after that point (1) invalidates the approval, (2) sneaks changes past the reviewer, or (3) forces a new review cycle. This includes auto-commits from skills (snyk-fix, code formatters, etc.) — check PR status before triggering them. If changes are needed to an approved PR, ask the user explicitly: "This PR has X approval(s). Should I commit these changes, or would you prefer to request changes manually?"
-- **Commit message provenance**: Every commit made by an agent ends with the same `Powered by {Model} in {Harness} in {IDE} via {skill}` signature line used for all other agent-authored communications (see [The Seven Commandments](#the-seven-commandments) § Don't Spam) — plain text, since git commit messages don't render italics. Use the resolved model identifier (check the agent's model registry/config, e.g. `~/.code_puppy/models.json`, for what a configured alias like `claude-5-sonnet` actually resolves to); omit `{Harness}` or `{IDE}` only when genuinely undiscoverable in the current session, and omit `via {skill}` when no skill applies. This keeps agent provenance auditable in `git log` with one consistent convention instead of a separate trailer format.
+- **PR approval boundary**: Never commit to a branch that has an open PR with any approvals without explicit user permission, even for mechanical changes. Reviewers approved the diff they saw; another commit invalidates that checkpoint or requires another review. Check PR status before triggering any skill that auto-commits. If changes are needed to an approved PR, ask the user explicitly: "This PR has X approval(s). Should I commit these changes, or would you prefer to request changes manually?"
+- **Commit provenance**: End every agent-authored commit with the plain-text signature defined in [Communication Provenance](#communication-provenance).
 
 ## Communication Style
 
-- **Getting the user's attention:** use the `ailerts` skill (if available) when blocked and the user has likely switched away. Not for routine status — only when stopped and user likely doesn't know.
+- **Getting the user's attention:** use the [ailert](../.wibey/skills/ailert/SKILL.md) skill (if available) when blocked and the user has likely switched away. Not for routine status — only when stopped and user likely doesn't know.
 - **No horizontal scrolling in chat.** Never use tables, wide code fences, or any other element that causes horizontal scroll in the conversation pane. Use prose, bullet lists, or definition-style (`**term** — explanation`) instead. Sole exception: code or preformatted text that must be quoted verbatim and cannot reasonably be reformatted.
 - **Links beat font effects.** Never apply code formatting, bold, italics, or other font effects to text that could instead be a hyperlink. If text is linkable, make it a link — font effects are for semantic/syntactic markup only. When both apply (e.g. a channel name that is also code), the link wins. Remove bare IDs (commit hashes, Slack channel codes, UUIDs) from visible text; they belong only inside URLs.
+
+### Communication Provenance
+
+Every agent-authored, datestamped external communication or ready-to-send draft—including Jira, GitHub/PR, Slack, email, and Draft Next Comms—and every agent-authored git commit ends with a separate final line: *Powered by {Model} in {Harness} in {IDE} via {skill}*.
+
+Link the skill to its SKILL.md when one is responsible; omit `via` when no skill applies. Use native italics where supported, plain text otherwise, including commits. Gather identifiers and versions from the actual runtime or configuration; use the standup2jira provenance commands when that work skill is available. Resolve configured aliases through the model registry rather than guessing a model name. Report only verified detail; omit the harness or IDE only when genuinely undiscoverable. If the exact model variant or a version is unavailable, use the verified family or product name without inventing greater precision.
 
 ## Browser Automation
 
 - When an agent needs to inspect a live page, take screenshots, or read DOM content, prefer a terminal-launched Chrome with `--remote-debugging-port` (CDP) over VS Code browser tabs.
 - Default pattern on personal laptop: launch Google Chrome from the terminal with CDP enabled, then drive it via the DevTools protocol using a single shared agent profile directory, not the user's personal profile.
-- Agents must NEVER point CDP Chrome at the user's personal Chrome profile, and must NEVER copy cookies or other session state out of the personal profile into an agent profile.
-- Use one stable shared agent profile path for browser automation work, for example `--user-data-dir=~/.agent-chrome-profile`, so all agents converge on the same non-personal session state instead of creating ad hoc profiles. Never `/tmp` — it's cleared on reboot, destroying every cached session.
+- Agents must never point CDP Chrome at the user's personal Chrome profile, and must never copy cookies or other session state out of the personal profile into an agent profile.
+- Use one stable shared agent profile path for browser automation work, for example `--user-data-dir="$HOME/.agent-chrome-profile"`, so all agents converge on the same non-personal session state instead of creating ad hoc profiles. Do not use `/tmp` for the profile; reboot can clear cached sessions.
 - For bot-protected government sites, assume direct `curl`/`fetch_webpage` may be blocked even when an interactive browser succeeds. Treat CDP browser context as the source of truth.
 - Prefer direct, parameterized page URLs when available (for example `view=electronic`) instead of brittle click navigation.
 - For protected downloads, retrieve artifacts within the browser session context (request with browser credentials) rather than unauthenticated terminal HTTP calls.
-- Capture evidence in a reusable triad: 1) page text extract, 2) full-page screenshot, 3) source artifact download when available.
+- Capture the page text, a full-page screenshot, and the source artifact download when available.
 - After recovering a missing artifact, store it in the canonical local archive path immediately and verify the file content before concluding.
 - Avoid opening VS Code integrated browser tabs for agent work unless the user explicitly wants a human-view-only tab. Those tabs clutter the IDE and may not expose screenshot or DOM access to the agent.
 - If a VS Code browser tab was opened only for agent investigation and a CDP-capable browser is available, switch to CDP and stop adding more IDE tabs.
-- **Every CDP tab must open inside your own dedicated top-level browser window** — the one whose leftmost tab is your identification page. Commands such as `tab new`, direct `open`, and `curl /json/new` silently open tabs in whichever window the browser currently considers focused, which is almost never yours. Use whatever session-aware tab-creation helper your browser setup checklist provides (e.g., `cdp_ensure_tab`). This is the #1 cause of work executing invisibly in the wrong window.
+- **Every CDP tab must open inside your own dedicated top-level browser window** — the one whose leftmost tab is your identification page. Commands such as `tab new`, direct `open`, and `curl /json/new` silently open tabs in whichever window the browser currently considers focused, which is almost never yours. Use whatever session-aware tab-creation helper your browser setup checklist provides (e.g., `cdp_ensure_tab`). Verify the tab belongs to your window before using it.
 
 ## Inferring Intended Files
 
 Resolve ambiguous file references before asking. Priority order:
 
-**IDE (Wibey):** active tab → dirty tabs → other open tabs → workspace search → ask user. Use `getDiagnostics` scope `open-editors`. Active tab = strongest signal; dirty tab = recently edited. If `getDiagnostics` fails to identify the active file, take a macOS screenshot: `screencapture -x /tmp/wibey_ctx_$$.png && sips -Z 1800 /tmp/wibey_ctx_$$.png --out /tmp/wibey_ctx_small_$$.png`, read it with the Read tool to see what's on screen, then delete both files. Never ask the user which file before trying this. When reading the screenshot, also note any visible text selection (highlighted text in the editor) — a selection is the strongest possible signal about what the user is focused on and should be treated as the user pointing at that exact content.
+**IDE:** explicit attachment or visible selection → active tab → dirty tabs → other open tabs → workspace search → ask user. Use the context and tools available in the current host. In Codex with JetBrains MCP, `get_all_open_file_paths` reports the active and other open editors. In Wibey, use `getDiagnostics` with scope `open-editors`. Do not assume one host's tools exist in another. If editor tools cannot resolve the reference and screenshot access is available, inspect the screen before asking; on macOS, `screencapture -x /tmp/agent_context_$$.png` captures it. Use the host's image-viewing tool and delete temporary captures afterward. A visible text selection points at that exact content.
 
 **CLI:** use `git diff`, `git log -1`, shell history, or cwd to infer the most recently touched file.
 
-**Name without path:** check `~/bin/` first, then workspace search. On work laptop also check `~/src/relationship-shared/` (symlinked as `shared`). On personal laptop also check `~/Documents/Google Drive/FamilyDocuments/`.
+**Name without path:** check `~/src/tools/` first, then workspace search. On work laptop also check `~/src/relationship-shared/` (symlinked as `shared`). On personal laptop also check `~/gdrive/FamilyDocuments/`.
 
 ## Dates and Times
 
@@ -228,8 +234,7 @@ Before using the current date for anything, run `date "+%Y-%m-%d %H:%M %Z"`. Run
 
 ### Use EDTF for all dates
 
-Use EDTF with these modifications; use canonical forms where chronological
-text sorting is required:
+Use [Extended Date/Time Format](https://www.loc.gov/standards/datetime/) (EDTF) with these modifications; use canonical forms where chronological text sorting is required:
 
 - Use **periods** as date component separators instead of hyphens (e.g. `2026.03.27` not `2026-03-27`). Periods prevent unwanted line breaks in cramped table layouts, are analogous to decimal points, save space in variable-width fonts, and cannot be confused with ranges.
 - In human dates, leading year zeroes are optional; a leading `-` is mandatory for BCE. Canonical sortable dates use a fixed four-digit year.
@@ -246,23 +251,21 @@ text sorting is required:
 
 ### Human-readable durations
 
-Format durations as compact `NdNhNmXs`, omitting zero-valued leading units. Use
-a decimal part for seconds only when the total duration is under one minute;
-round seconds to whole numbers for durations of one minute or longer.
+Format durations as compact `NdNhNmXs`, omitting zero-valued leading units. Use a decimal part for seconds only when the total duration is under one minute; round seconds to whole numbers for durations of one minute or longer.
 
 ## Documentation
 
-For documentation authoring, planning docs, status/task/work-log hygiene, evidence conventions, and doc audits, use the doc-audit skill as the shared reference. On the work laptop, it is at `shared/.wibey/skills/doc-audit/SKILL.md` (team repo). It is **not** in `~/bin/.wibey/` because it contains Walmart-internal URLs (gecgithub01, Jira keys, service names) that would be exposed in a public GitHub push.
+For documentation authoring, planning docs, status/task/work-log hygiene, evidence conventions, and audits, use [doc-audit](../.wibey/skills/doc-audit/SKILL.md). On the work laptop prefer the team source at `shared/.wibey/skills/doc-audit/SKILL.md`; on the personal laptop use the portable copy at `~/src/tools/.wibey/skills/doc-audit/SKILL.md`.
 
-**Document length is not a team policy.** Do not impose, mention, or enforce an arbitrary line-count ceiling on code or documentation. Keep a file cohesive, readable, and maintainable; split it only when separation improves those qualities or the content has genuinely distinct ownership. Model selection and context budgeting are not reasons to mutilate a coherent document.
+**Document length is not a team policy.** Do not impose, mention, or enforce an arbitrary line-count ceiling on code or documentation. Keep a file cohesive, readable, and maintainable; split it only when separation improves those qualities or the content has distinct ownership. Model selection and context budgeting do not justify splitting a coherent document.
 
-For questions about the personal Git/repo/workspace layout, consult `~/bin/docs/GitScheme.md` first. It is the authoritative cross-laptop reference for the `home` monorepo, `~/My Drive`, `~/lpscc`, and how `~/src/tools` plus the `~/bin` symlink fit into that scheme. Use `~/bin/docs/GitScheme_RCA.md` for the 2026.07 recovery incident and rationale behind the current layout.
+For questions about the personal Git/repo/workspace layout, consult [GitScheme.md](GitScheme.md) first. It is the authoritative cross-laptop reference for the `home` monorepo, `~/My Drive`, `~/lpscc`, and how `~/src/tools` and the legacy `~/bin` symlink fit into that scheme. Use [GitScheme_RCA.md](GitScheme_RCA.md) for the 2026.07 recovery incident and rationale behind the current layout.
 
 ## Rules For Personal Laptop
 
 ### Family Reference Documents
 
-For any question about family members, genealogy, life events, relationships, DNA, or the Holtz/Lusin family tree: consult `~/Documents/Google Drive/FamilyDocuments/FamilyEncyclopedia.md` first. It is the authoritative human-readable reference. `FamilyDocuments/Genealogy/FamilyTree.md` has the tree structure. Fall back to the GED file only for low-level GEDCOM detail not covered in either file.
+For any question about family members, genealogy, life events, relationships, DNA, or the Holtz/Lusin family tree: consult `~/gdrive/FamilyDocuments/FamilyEncyclopedia.md` first. It is the authoritative human-readable reference. `~/gdrive/FamilyDocuments/Genealogy/FamilyTree.md` has the tree structure. Fall back to the GED file only for low-level GEDCOM detail not covered in either file.
 
 ## Rules For Work Laptop
 
@@ -272,7 +275,7 @@ Use `/tdd` for the full TDD workflow: pull main, branch, failing tests, implemen
 
 #### Code Review Standards
 
-When reviewing a PR or CRQ, apply the standards in `shared/docs/ReviewStandards.md` — this is team guidance, not optional. Audit for: coverage threshold, PROD-scope separation, logging clarity (structured fields, distinct log levels), incomplete operational safety protocols, and naming clarity for sharded resources. Never merge a PR that leaves on-call to debug via stack-trace reading or fixes a threshold without providing the fallback path.
+When reviewing a PR or CRQ, apply the standards in `shared/docs/ReviewStandards.md` — these team standards are required. Audit for: coverage threshold, PROD-scope separation, logging clarity (structured fields, distinct log levels), incomplete operational safety protocols, and naming clarity for sharded resources. Never merge a PR that leaves on-call to debug via stack-trace reading or fixes a threshold without providing the fallback path.
 
 For every work-laptop PR review, include the Wibey `pr-agent` plugin's `pr-agent-review` skill and its security-audit and dependency-scan tracks **in addition to** all existing rules and independent review. Follow `shared/docs/ReviewStandards.md` § PR Agent Review Pass when available; otherwise read the installed plugin's `SKILL.md`, reconcile its scope with the authoritative PR diff, validate findings, and report unavailable scans explicitly. Installing the plugin or requesting a review does not authorize posting, remediation, or commits to an approved PR.
 
@@ -284,10 +287,10 @@ For every work-laptop PR review, include the Wibey `pr-agent` plugin's `pr-agent
 
 When reviewing a PR or describing what a branch/PR changes relative to its base:
 
-- Use `gh pr diff <number>` (or `gh pr view <number> --json files`) as the **sole authoritative source** — this is the merge diff GitHub shows on "Files changed".
-- **Never** use `git diff main..branch` — branches accumulate merge commits and ancestry artifacts that don't reflect the PR diff.
+- Use `gh pr diff <number>` (or `gh pr view <number> --json files`) as the **sole authoritative source** — this is the merge diff GitHub shows on Files changed.
+- Never use `git diff main..branch` — branches accumulate merge commits and ancestry artifacts that don't reflect the PR diff.
 - Commits show *how* changes were made; the diff defines *what* the PR changes.
-- If `gh pr diff` and `git diff main..branch` disagree, `gh pr diff` is correct. Period.
+- If `gh pr diff` and `git diff main..branch` disagree, `gh pr diff` is authoritative.
 
 ### Git Merge Strategy
 
@@ -295,49 +298,7 @@ Use merge, not rebase. Rebase rewrites SHAs, turning every Jira comment, CI link
 
 Merge commits are honest: they record that the integration happened at that point in time, on the file states that actually existed.
 
-### Custom Commands
-
-User-level commands source from `~/bin/.wibey/commands/`. When triggered, read the source file before executing. On the personal laptop, these source files should also be installed into the real home-directory adapter locations used by local agents (for example `~/.claude/commands/` and, when relevant, `~/.wibey/commands/`), rather than relying on a particular workspace such as `~/IdeaProjects/Personal`.
-
-User-level commands (available in all workspaces via hardlinks to `~/.wibey/commands/`):
-
-- **commitz** — cluster diffs into commit buckets
-- **continue** — checkpoint and resume: write work log, commit, keep working *(mirrored from relationship-shared)*
-- **convo** — park conversation with visible title for Mission Control
-- **plando** — structured plan-and-execute workflow *(mirrored from relationship-shared)*
-- **say** — text-to-speech output
-- **tdd** — TDD workflow enforcer: branch, baseline, red, green, verify, coverage *(mirrored from relationship-shared)*
-
-Install paths:
-
-- Source commands: `~/bin/.wibey/commands/*.md`
-- Wibey user commands: `~/.wibey/commands/*.md` — **must be hardlinks, not symlinks** (Wibey's extension filters with `entry.isFile()`, which returns `false` for symlinks, silently dropping them)
-
-To install or reinstall **all** user commands as hardlinks (glob — never drifts as commands are added):
-
-```sh
-mkdir -p ~/.wibey/commands
-for f in ~/bin/.wibey/commands/*.md; do ln -f "$f" ~/.wibey/commands/; done
-```
-
-**Agent workspace setup check (work laptop, run at session start):** Verify every command in `~/bin/.wibey/commands/` has a corresponding hardlink in `~/.wibey/commands/`. If any are missing, run the loop above and reload the IDE window.
-
-```sh
-# Quick check: list missing
-for f in ~/bin/.wibey/commands/*.md; do
-  name=$(basename "$f")
-  [ -f ~/.wibey/commands/"$name" ] || echo "MISSING: $name"
-done
-```
-
-Maintenance/debug checklist:
-
-- If a user command is missing: run the install loop above.
-- Verify hardlinks (not symlinks): `node -e "const fs=require('fs'); fs.readdirSync(process.env.HOME+'/.wibey/commands',{withFileTypes:true}).forEach(e=>console.log(e.name,'isFile:',e.isFile(),'isSymlink:',e.isSymbolicLink()))"`
-- After adding or changing files, reload the IDE window.
-- Keep the source files in `~/bin/.wibey/commands/`; do not rename or move them.
-- If discovery still fails, check YAML frontmatter: `description` must be present and valid.
-- TODO: design and implement a bridge so Wibey/Claude custom skills and commands are discoverable and usable from GitHub Copilot (not just Wibey/Claude command loaders).
+### Team Tool Discovery
 
 **Outside team repos (work laptop only):** When the current workspace has no `shared/` symlink (e.g. `~/My Drive/`, `~/Desktop/`, any personal folder), the team skills and commands are still available directly at `~/src/relationship-shared/.wibey/`. Always check there before concluding a skill or command doesn't exist.
 
@@ -346,88 +307,88 @@ Maintenance/debug checklist:
 
 Read the command/skill file before executing it, exactly as you would for a workspace-local command.
 
-### Wibey Skills — ~/bin/.wibey/ Directory
+## Portable Agent Tooling
 
-Wibey discovers project-level skills from `<workspace>/.wibey/skills/`. The `~/bin/` repo ships its own `.wibey/` directory (git-tracked real directory, not a symlink) so that opening `~/bin/` in a Wibey IDE exposes a curated set of portable skills and commands.
+### Codex Integration
 
-**Three-tier taxonomy:**
+[Codex instruction discovery](https://developers.openai.com/codex/guides/agents-md) reads global guidance from `~/.codex/AGENTS.md`, or from the directory selected by `CODEX_HOME`. A non-empty `AGENTS.override.md` at that level replaces AGENTS.md. Project instruction files are loaded from the repository root toward the working directory; later, more specific guidance takes precedence. Preserve project/team instructions rather than replacing their AGENTS.md files with this global file.
 
-
-| Tier                       | Location                                              | Tracked       | Available on                  |
-| -------------------------- | ----------------------------------------------------- | ------------- | ----------------------------- |
-| 1 — Team                  | `relationship-shared/.wibey/` (via `shared/` symlink) | Walmart GHE   | Work laptop, team repos       |
-| 2 — Portable              | `~/bin/.wibey/`                                       | Public GitHub | Both laptops                  |
-| 3 — Personal Walmart-only | `~/.wibey/`                                           | Untracked     | Work laptop only (keep empty) |
-
-**`~/bin/.wibey/` directory layout:**
-
-```
-.wibey/
-  skills/
-    ailert/          SKILL.md + assets/  — mirrored from relationship-shared
-    clipboard-read/  SKILL.md            — mirrored
-    converge/        SKILL.md            — mirrored
-    doc-audit/       SKILL.md            — mirrored
-    ftm/             SKILL.md            — personal-only (Family Tree Maker integration)
-  commands/
-    avoid-numbering.md — personal-only (admonish agent to scrub sequential labels)
-    commitz.md       — personal-only (cluster diffs into commit buckets)
-    convo.md         — personal-only (park conversation for Mission Control)
-    say.md           — personal-only (text-to-speech output)
-    continue.md      — mirrored from relationship-shared
-    plando.md        — mirrored
-    tdd.md           — mirrored
-  docs/
-    AnchorDoc.md                         — mirrored from relationship-shared
-    StatusVocabulary.md                  — mirrored from relationship-shared
-    IncidentRCA.md                       — mirrored
-    templates/
-      Project.md                         — mirrored
-      Incident.md                        — mirrored
-  hooks/             (empty)
-```
-
-**Mirror-safe convention:** Skills, commands, and docs in relationship-shared that are mirror-safe contain no Walmart-proprietary content and are designed for personal-laptop use. Use `~/bin/walmart-sync` to audit and sync the mirror.
-
-**Checking mirror state** — behaviour depends on laptop:
-
-- **Personal laptop** (shared absent): `~/bin/walmart-sync` checks git state (warns on dirty tree or unpushed commits) then pulls from origin.
-- **Work laptop** (shared present): `~/bin/walmart-sync` runs the full three-check audit.
-
-**Sync workflow (work laptop only) — three steps:**
+For a profile without existing global instructions, install the adapter with:
 
 ```sh
-~/bin/walmart-sync --sync          # copy drifted items from shared to bin
-cd ~/bin && git add -p && git commit  # review and commit manually
-~/bin/walmart-sync --push          # portability gate, then push to origin
+mkdir -p ~/.codex
+ln -s "$HOME/src/tools/docs/AgentRules.md" "$HOME/.codex/AGENTS.md"
 ```
 
-Other useful invocations:
+For a custom `CODEX_HOME`, use that profile's instruction path instead. Inspect an existing file, symlink, or override before changing it; the command intentionally does not force replacement. Restart Codex or start a new session to load instruction changes, then ask it to list its active instruction sources. Confirm that the IDE launcher uses the same profile; a model name such as GPT does not establish how its host loads files. These local adapters do not make the file visible to an ordinary ChatGPT chat or a remote agent; supply it through that host's supported instructions, attachment, or repository setup.
+
+Codex's default instruction byte limit is 32 KiB. This document requires a larger budget. Set the top-level `project_doc_max_bytes = 65536` in the active profile's config.toml, preserving existing configuration, to leave room for global and project guidance. Increase it if the actual combined instructions require more; verify loading rather than inferring it from file presence. This is a loader setting, not a document-length policy.
+
+[Codex skill discovery](https://developers.openai.com/codex/skills) supports user skills under `~/.agents/skills/` and repository skills under `.agents/skills/`. Link individual skill directories to their canonical sources under `~/src/tools/.wibey/skills/`; do not copy their contents or overwrite existing adapters. For example:
 
 ```sh
-~/bin/walmart-sync          # full audit (work) or pull (personal)
-~/bin/walmart-sync -v       # full audit, also show passing items
-~/bin/walmart-sync --sync --dry-run  # preview what would be synced
+mkdir -p ~/.agents/skills
+ln -s "$HOME/src/tools/.wibey/skills/doc-audit" "$HOME/.agents/skills/doc-audit"
 ```
 
-Three checks that `walmart-sync --` audit runs:
+Each discovered skill needs SKILL.md frontmatter with `name` and `description`. Use Codex's skill selector or an explicit `$doc-audit` mention to verify discovery; read the source directly if the current host has not registered it. Tool names and capabilities in portable workflows are intentions to map onto available Codex tools, not evidence that a Wibey/Claude-only tool is installed. Apply the same write, approval, and authentication boundaries in every host.
 
-- **Consistency** — byte-diff bin copies vs relationship-shared originals. Work laptop only.
-- **Portability** — grep for Walmart-internal markers (`gecgithub01`, internal hostnames, Jira keys) that must not appear in the public `~/bin/` GitHub repo.
-- **Ref-integrity** — flag references to paths/skills that dangle on personal laptop (`~/src/relationship-shared`, `shared/` symlink).
+### Custom Commands
 
-**Known pre-existing portability issues:** The SKILL.md files for `ailert`, `clipboard-read`, and `converge`, and the commands `continue`, `plando`, `tdd` all contain GHE provenance links (`gecgithub01.walmart.com`) and `relationship-shared` text references — these shipped with the initial mirror and are already committed to the public repo. To clean them up, strip the provenance block from each file in relationship-shared before re-mirroring, or patch them locally after sync.
+User-level commands source from `~/src/tools/.wibey/commands/`. When triggered, read the source file before executing. On the personal laptop, these source files should also be installed into the real home-directory adapter locations used by local agents (for example `~/.claude/commands/` and, when relevant, `~/.wibey/commands/`), rather than relying on a particular workspace such as `~/IdeaProjects/Personal`.
 
-**When AgentRules.md mirror lists change**, update the `mirror_items` and `personal_only` arrays in `~/bin/walmart-sync.json` to match — the policy manifest; `~/bin/walmart-sync` itself is a thin orchestrator with no embedded lists.
+In Codex, these Markdown commands are readable workflows; their presence in `.wibey/commands/` does not register native slash commands. When the user invokes one by name, resolve and read its source, then execute through the available tools. Read command definitions in [the source directory](../.wibey/commands/); the [sync manifest](../walmart-sync.json) identifies mirrored and personal-only commands.
 
-Currently mirror-safe skills: `ailert` (with `assets/`), `clipboard-read`, `converge`, `doc-audit`.
-Currently mirror-safe commands: `continue`, `plando`, `tdd`.
-Currently mirror-safe docs: `AnchorDoc.md`, `StatusVocabulary.md`, `IncidentRCA.md`, `templates/Project.md`, `templates/Incident.md`.
+Install paths:
 
-### Project-Level Commands
+- Source commands: `~/src/tools/.wibey/commands/*.md`
+- Wibey user commands: `~/.wibey/commands/*.md` — **must be hardlinks, not symlinks** (Wibey's extension filters with `entry.isFile()`, which returns `false` for symlinks, silently dropping them)
 
-In teams using the agent-toolkit shared repo pattern, commands live at `<workspace>/shared/.wibey/commands/` and are consistent across all repos via the `shared/` symlink:
+To install or reinstall **all** user commands as hardlinks (glob — never drifts as commands are added):
 
-- **plando** — Structured plan-and-execute workflow with aidocs task record.
-- **tdd** — TDD workflow enforcer: branch, baseline, red, green, verify, full suite, newman, coverage.
-- **continue** — Checkpoint and resume: write work log, commit, then keep working.
+```sh
+mkdir -p ~/.wibey/commands
+for f in ~/src/tools/.wibey/commands/*.md; do ln -f "$f" ~/.wibey/commands/; done
+```
+
+**Work-laptop session setup:** Verify that every source command has a matching hardlink in `~/.wibey/commands/`. File existence alone does not prove a hardlink; compare device and inode:
+
+```sh
+python3 - <<'PYTHON'
+from pathlib import Path
+import os
+source = Path.home() / 'src/tools/.wibey/commands'
+adapter = Path.home() / '.wibey/commands'
+for command in source.glob('*.md'):
+    target = adapter / command.name
+    if target.is_symlink() or not target.exists() or not os.path.samefile(command, target):
+        print(f'REINSTALL: {command.name}')
+PYTHON
+```
+
+If any command needs reinstalling, run the install loop and reload the IDE window.
+
+Maintenance/debug checklist:
+
+- If a user command is missing: run the install loop above.
+- Verify hardlinks using the device-and-inode check above.
+- After adding or changing files, reload the IDE window.
+- Keep the source files in `~/src/tools/.wibey/commands/`; do not rename or move them.
+- If discovery still fails, check YAML frontmatter: `description` must be present and valid.
+- TODO: design and implement a bridge so Wibey/Claude custom skills and commands are discoverable and usable from GitHub Copilot (not just Wibey/Claude command loaders).
+
+### Portable Skills and Mirrors
+
+The canonical portable skill sources are in `~/src/tools/.wibey/skills/`. Codex discovery adapters are described in [Codex Integration](#codex-integration). Wibey discovers project-level skills from `<workspace>/.wibey/skills/`. The tools repo's tracked `.wibey/` directory exposes portable skills and commands when tools is open as the workspace. Team sources remain in relationship-shared; `~/.wibey/` is an untracked adapter location, not a source for personal Walmart-only skills. Keep that skill tier empty; installed command hardlinks belong there.
+
+Mirror skill discovery metadata together with each skill body. TODO: carry the doc-audit name/description frontmatter into the team source before the next mirror sync.
+
+The [sync manifest](../walmart-sync.json) is the source of truth for mirrored items, personal-only items, and audit exemptions. Update its `mirror_items` and `personal_only` entries when that inventory changes; do not maintain a second inventory here.
+
+Mirrored content must contain no Walmart-proprietary material and must support personal-laptop use. Use [walmart-sync](../walmart-sync) to check or copy the mirror:
+
+- On the personal laptop, a bare invocation checks git state, warns about dirty or unpushed changes, then pulls from origin. It is not a read-only audit.
+- On the work laptop, a bare invocation audits consistency with team sources, portability, reference integrity, and personal-only item placement. Use `-v` to include passing items.
+- `--sync --dry-run` previews copies from the team source. `--sync` performs them; review and commit the diff before using `--push`, which runs the portability gate before pushing.
+
+Portability checks scan for configured internal markers; reference-integrity checks flag work-only paths that cannot resolve on the personal laptop. Passing these checks does not establish that all content is portable or nonproprietary. TODO: remove work-only provenance links and path references from portable skill/command bodies at the team source, then re-mirror them; audit exemptions are defined in the manifest.
