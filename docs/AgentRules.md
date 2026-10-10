@@ -196,6 +196,16 @@ Run `~/src/tools/safewrite -h` for full options. Run `~/src/tools/fhold -h` for 
 - **No horizontal scrolling in chat.** Never use tables, wide code fences, or any other element that causes horizontal scroll in the conversation pane. Use prose, bullet lists, or definition-style (`**term** — explanation`) instead. Sole exception: code or preformatted text that must be quoted verbatim and cannot reasonably be reformatted.
 - **Links beat font effects.** Never apply code formatting, bold, italics, or other font effects to text that could instead be a hyperlink. If text is linkable, make it a link — font effects are for semantic/syntactic markup only. When both apply (e.g. a channel name that is also code), the link wins. Remove bare IDs (commit hashes, Slack channel codes, UUIDs) from visible text; they belong only inside URLs.
 
+### ChatGPT Work GitHub authentication
+
+For Brian’s GitHub repositories, reuse the credential stored in his unshared ChatGPT Library file **Livy-GitHub-Credential-2026.txt**, valid until 2026.12.31 unless revoked. The file contains only the token. Never put the token or an encrypted copy in this public repository.
+
+- Load these rules from `BrianHoltz/tools/docs/AgentRules.md` before repository work. ChatGPT Library access is required for credential retrieval; local agents without it should use their existing host credentials.
+- Before GitHub shell writes, use the Library skill to materialize `libfile_834a92ab985c819183ae394b71f34e91` into a private session directory. If the identifier no longer resolves, search Library for the exact filename with title-only matching, verify the exact match, and use its returned identifier. Do not print the file or retrieve the token through a content-reading tool that exposes it in chat.
+- Restrict the local credential file to mode 0600. Use HTTPS with an ephemeral Git askpass helper or an equivalent credential mechanism; read the token from the file without embedding it in remote URLs, command-line arguments, committed files, logs, or output. Disable conflicting credential helpers when needed.
+- Authenticate as `BrianHoltz`, then perform authorized operations under the write and Android Work durability rules. Verify pushed commits on origin. Retrieve the saved credential before asking Brian to paste it again; if Library access or authentication fails, report the specific blocker and stop. A saved file does not itself grant authorization for unrelated changes.
+- Do not share this Library file or include its contents in exports or ordinary artifacts. At expiry or revocation, request a replacement and update the existing credential file. A fresh conversation must still load these rules; the saved credential does not guarantee automatic rule discovery.
+
 ### Communication Signing
 
 Every agent-authored, datestamped external communication or ready-to-send draft—including Jira, GitHub/PR, Slack, email, and Draft Next Comms—and every agent-authored git commit ends with a separate final line: *Powered by {Model} in {Harness} in {IDE} via {skill}*.
