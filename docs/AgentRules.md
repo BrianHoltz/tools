@@ -313,6 +313,8 @@ Read the command/skill file before executing it, exactly as you would for a work
 
 [Codex instruction discovery](https://developers.openai.com/codex/guides/agents-md) reads global guidance from `~/.codex/AGENTS.md`, or from the directory selected by `CODEX_HOME`. A non-empty `AGENTS.override.md` at that level replaces AGENTS.md. Project instruction files are loaded from the repository root toward the working directory; later, more specific guidance takes precedence. Preserve project/team instructions rather than replacing their AGENTS.md files with this global file.
 
+Install the global adapter once per Codex profile; repository-by-repository symlinks are unnecessary for local sessions using that profile. A `project_doc_fallback_filenames = ["AgentRules.md"]` setting only checks directories on the project discovery path; it does not search for `tools/docs/AgentRules.md` elsewhere in the workspace.
+
 For a profile without existing global instructions, install the adapter with:
 
 ```sh
@@ -322,7 +324,7 @@ ln -s "$HOME/src/tools/docs/AgentRules.md" "$HOME/.codex/AGENTS.md"
 
 For a custom `CODEX_HOME`, use that profile's instruction path instead. Inspect an existing file, symlink, or override before changing it; the command intentionally does not force replacement. Restart Codex or start a new session to load instruction changes, then ask it to list its active instruction sources. Confirm that the IDE launcher uses the same profile; a model name such as GPT does not establish how its host loads files. These local adapters do not make the file visible to an ordinary ChatGPT chat or a remote agent; supply it through that host's supported instructions, attachment, or repository setup.
 
-Codex's default instruction byte limit is 32 KiB. This document requires a larger budget. Set the top-level `project_doc_max_bytes = 65536` in the active profile's config.toml, preserving existing configuration, to leave room for global and project guidance. Increase it if the actual combined instructions require more; verify loading rather than inferring it from file presence. This is a loader setting, not a document-length policy.
+Codex's default instruction byte limit is 32 KiB. This document requires a larger budget. Set `project_doc_max_bytes = 65536` at the top of the active profile's config.toml, before any `[table]` header, preserving existing configuration, to leave room for global and project guidance. Increase it if the actual combined instructions require more; verify loading rather than inferring it from file presence. This is a loader setting, not a document-length policy.
 
 [Codex skill discovery](https://developers.openai.com/codex/skills) supports user skills under `~/.agents/skills/` and repository skills under `.agents/skills/`. Link individual skill directories to their canonical sources under `~/src/tools/.wibey/skills/`; do not copy their contents or overwrite existing adapters. For example:
 
