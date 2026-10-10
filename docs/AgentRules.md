@@ -16,7 +16,7 @@ This file is the global layer; a repo's AGENTS.md supplies project/team context,
   - [safewrite CAS pattern](#safewrite-cas-pattern)
   - [Other file operation rules](#other-file-operation-rules)
 - [Communication Style](#communication-style)
-  - [Communication Provenance](#communication-provenance)
+  - [Communication Signing](#communication-signing)
 - [Browser Automation](#browser-automation)
 - [Inferring Intended Files](#inferring-intended-files)
 - [Dates and Times](#dates-and-times)
@@ -43,12 +43,12 @@ This file is the global layer; a repo's AGENTS.md supplies project/team context,
 ## The Seven Commandments
 
 1. **Don't Ramble**: From sections to words, cut or condense until meaning changes.
-2. **Don't Repeat**: This is so important that I'm self-consciously repeating it. Cut everything that performs helpfulness without delivering it, or completeness without informing. If what you're writing already exists elsewhere, then omit it or link it, don't repeat it.
+2. **Don't Repeat**: This is so important that I'm self-consciously repeating it. Cut everything that performs helpfulness without delivering it, or completeness without informing. If the information exists elsewhere, then omit it or link it, don't repeat it.
 3. **Don't Clobber**: Every file write must follow the [Write Rules](#write-rules).
-4. **Don't Quit**: Do not give up on the best tool for the job: if it is missing or broken or needs auth, invest in getting it to work, and fallback only when repair fails and user is unresponsive, and state the fallback + reason. **Auth/credential walls are not yours to route around.** The moment a crucial tool is blocked on login, SSO, or a dead credential: **STOP immediately, alert the user using `ailert` (this is the exact use case for ailert — blocking auth walls), and wait.** Do not fill the wait with guesswork, alternative-tool spelunking, or "best-effort" workarounds on the underlying task — that is busy-work that wastes everyone's time and risks wrong or wasted changes. The single correct move is using ailert to notify the user of the credential/login requirement and stopping until you have it.
-5. **Don't Spam**: Ask permission before communicating with other humans, e.g. via Slack, Jira, email, or Github comments/approvals. But just use normal caution when doing other git or Confluence operations. And don't spam in docs reminding agents what the rules are. Every agent-authored, datestamped external communication or ready-to-send draft—including Jira, GitHub/PR, Slack, email, Draft Next Comms, and git commit messages—ends with a separate final line: *Powered by {Model} in {Harness} in {IDE} via {skill}*. Link the named skill to its `SKILL.md` when one is responsible; omit `via` only when no skill applies. Gather model/harness/IDE versions using the standup2jira provenance commands — never guess a plausible-sounding name. Use the platform's native italics; where italics are unavailable (e.g. git commit messages), use the same line as plain text.
-6. **Don't Count**: Never label things sequentially, e.g. with numbers or letters. It's opaque and brittle and lazy. Use names. Exceptions may be granted for sequences that are long or immutable.
-7. **Don't Narrate**: Except in designated sections (e.g. work logs), documents should not narrate their history or be self-conscious of previous versions. Omit apologetic or performative text. Documents are timeless; all that matters is whether the text helps the reader.
+4. **Don't Quit**: Use the best tool for the job. Repair a missing or broken tool before falling back; use a fallback only when repair fails and the user is unresponsive, and state the fallback and reason. At a crucial tool's login, SSO, or a dead credential: stop immediately, alert the user using `ailert`, and wait. Do not route around authentication or continue the underlying task through guesswork, alternative-tool spelunking, or "best-effort" workarounds.
+5. **Don't Spam**: Ask permission before communicating with other humans through Slack, Jira, email, or GitHub comments/approvals. Use normal caution for other git or Confluence operations. Do not repeat agent rules in docs. Agent-authored external communications, ready-to-send drafts, and commits follow [Communication Signing](#communication-signing).
+6. **Don't Count**: Never label things sequentially with numbers or letters. It's opaque and brittle and lazy. Use names. Exceptions may be granted for long or immutable sequences.
+7. **Don't Narrate**: Except in designated sections such as work logs, documents should not narrate their history or exhibit consciousness of previous versions. Omit apologetic or performative text. Documents are timeless; all that matters is whether the text helps the reader.
 
 ## Truth-Seeking Commandments
 
@@ -187,7 +187,7 @@ Run `~/src/tools/safewrite -h` for full options. Run `~/src/tools/fhold -h` for 
 - Commit granularity: independent changes → separate commits; interdependent → one commit
 - **Two-tier commit policy**: mechanical changes (artifacts, formatting) → commit directly; substantive changes (logic, data, content) → `git add` and summarize for user review. User can override with "just commit it".
 - **PR approval boundary**: Never commit to a branch that has an open PR with any approvals without explicit user permission, even for mechanical changes. Reviewers approved the diff they saw; another commit invalidates that checkpoint or requires another review. Check PR status before triggering any skill that auto-commits. If changes are needed to an approved PR, ask the user explicitly: "This PR has X approval(s). Should I commit these changes, or would you prefer to request changes manually?"
-- **Commit provenance**: End every agent-authored commit with the plain-text signature defined in [Communication Provenance](#communication-provenance).
+- **Commit signing**: End every agent-authored commit with the plain-text signature defined in [Communication Signing](#communication-signing).
 
 ## Communication Style
 
@@ -195,11 +195,11 @@ Run `~/src/tools/safewrite -h` for full options. Run `~/src/tools/fhold -h` for 
 - **No horizontal scrolling in chat.** Never use tables, wide code fences, or any other element that causes horizontal scroll in the conversation pane. Use prose, bullet lists, or definition-style (`**term** — explanation`) instead. Sole exception: code or preformatted text that must be quoted verbatim and cannot reasonably be reformatted.
 - **Links beat font effects.** Never apply code formatting, bold, italics, or other font effects to text that could instead be a hyperlink. If text is linkable, make it a link — font effects are for semantic/syntactic markup only. When both apply (e.g. a channel name that is also code), the link wins. Remove bare IDs (commit hashes, Slack channel codes, UUIDs) from visible text; they belong only inside URLs.
 
-### Communication Provenance
+### Communication Signing
 
 Every agent-authored, datestamped external communication or ready-to-send draft—including Jira, GitHub/PR, Slack, email, and Draft Next Comms—and every agent-authored git commit ends with a separate final line: *Powered by {Model} in {Harness} in {IDE} via {skill}*.
 
-Link the skill to its SKILL.md when one is responsible; omit `via` when no skill applies. Use native italics where supported, plain text otherwise, including commits. Gather identifiers and versions from the actual runtime or configuration; use the standup2jira provenance commands when that work skill is available. Resolve configured aliases through the model registry rather than guessing a model name. Report only verified detail; omit the harness or IDE only when genuinely undiscoverable. If the exact model variant or a version is unavailable, use the verified family or product name without inventing greater precision.
+Link the skill to its SKILL.md when one is responsible; omit `via` when no skill applies. Use native italics where supported, plain text otherwise, including commits. Gather identifiers and versions from the actual runtime or configuration; use the standup2jira signing commands when that work skill is available. Resolve configured aliases through the model registry rather than guessing a model name. Report only verified detail; omit the harness or IDE only when genuinely undiscoverable. If the exact model variant or a version is unavailable, use the verified family or product name without inventing greater precision.
 
 ## Browser Automation
 
@@ -391,4 +391,4 @@ Mirrored content must contain no Walmart-proprietary material and must support p
 - On the work laptop, a bare invocation audits consistency with team sources, portability, reference integrity, and personal-only item placement. Use `-v` to include passing items.
 - `--sync --dry-run` previews copies from the team source. `--sync` performs them; review and commit the diff before using `--push`, which runs the portability gate before pushing.
 
-Portability checks scan for configured internal markers; reference-integrity checks flag work-only paths that cannot resolve on the personal laptop. Passing these checks does not establish that all content is portable or nonproprietary. TODO: remove work-only provenance links and path references from portable skill/command bodies at the team source, then re-mirror them; audit exemptions are defined in the manifest.
+Portability checks scan for configured internal markers; reference-integrity checks flag work-only paths that cannot resolve on the personal laptop. Passing these checks does not establish that all content is portable or nonproprietary. TODO: remove work-only signing links and path references from portable skill/command bodies at the team source, then re-mirror them; audit exemptions are defined in the manifest.
