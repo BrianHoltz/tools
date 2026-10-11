@@ -137,14 +137,14 @@ Score rubric
 - **IDEA patches (baked-in as of 2026.09.29):** image-paste-fix + conversation-title-features are merged into local `brian/local-combined` build (Wibey 1.0.28), alongside upstream 1.0.28 updates. Scores reflect working features; ⚙️ notation removed. Recount after IDE/extension updates.
 - Editor score: each IDE gets the maximum score achievable by any editor available to it
   - IDEA: native WYSIWYG editor (8.0 pts); beats viewer (7.0) and shuzijun (3.5)
-  - VS Code: typedown (3.5 pts); zaaack broken ~2026.06.01 (was 7 pts w/ patch)
+  - VS Code: historical typedown score 3.5 pts; Zaaack local source build requires an interactive recount ([build details](ToolMods.md#zaaack-source-build)).
   - Cursor: typedown (3.5 pts); zaaack broken ~2026.06.01 (was 7 pts w/ patch)
 - Final score = IDE row subtotal + best editor subtotal
 
 ## Markdown Viewers/ Editors
 
 - VSCode md preview hangs for big files, but zaaack handles them
-  - zaaack lacks: string search; intra-doc link nav; outline view. Wibey fixed them all!
+  - The local Zaaack source build includes string search, intra-document link navigation, and a separate Markdown Outline sidebar tree. [Build and maintenance](ToolMods.md#zaaack-source-build).
 - typedown and zaaack work in both VS Code and Cursor
 
 | Behavior                 | IDEA viewer | IDEA editor | typedown     | zaaack                            | Cursor native |
@@ -415,7 +415,9 @@ Observed result: this workflow successfully enables independent previews per mar
 
 ### Zaaack Find / Outline / Anchor Nav (patched)
 
-⚙️ rows — find in file, structure, internal links — are added by `~/src/tools/patches/patch-zaaack.py`. Run after each Zaaack update; the script globs both `~/.vscode/extensions/` and `~/.cursor/extensions/` so one run covers both IDEs. Full patch procedure and implementation notes: **ToolMods.md → Zaaack**.
+The VS Code source build lives in `~/src/vscode-markdown-editor`, branch `brian/markdown-ux`, version `0.1.22-local.2`. It includes bundled toolbar/menu translations, Markdown Outline in Explorer, plain-click links (Option-click to edit), a unified toolbar/Cmd+F search bar, and a single-row adaptive toolbar with a `»` overflow tray. The [GitHub fork](https://github.com/BrianHoltz/vscode-markdown-editor) and [VSIX releases](https://github.com/BrianHoltz/vscode-markdown-editor/releases) make the source and installer available to other Macs. Build commands and verification scope: [ToolMods.md → Zaaack source build](ToolMods.md#zaaack-source-build). The comparison scores above are historical and need an interactive recount against the installed build.
+
+`~/src/tools/patches/patch-zaaack.py` is the legacy installed-bundle patcher for Marketplace versions. Do not apply it to the local source build.
 
 ### Markdown Preview Theme (auto-switch)
 

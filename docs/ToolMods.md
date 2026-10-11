@@ -8,7 +8,42 @@ Patch and modification procedures. See Tools.md for tool preferences, standings,
 
 ## VS Code / Cursor: Zaaack Markdown Editor
 
+### Zaaack source build
+
+The editable source checkout is `~/src/vscode-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz GitHub fork](https://github.com/BrianHoltz/vscode-markdown-editor), based on the [MIT-licensed upstream extension](https://github.com/zaaack/vscode-markdown-editor). Local version `0.1.22-local.2` retains extension ID `zaaack.markdown-editor` and the existing custom editor ID, settings, and shortcuts. The source build is intended for VS Code; the Cursor installation is separate.
+
+Source ownership:
+
+- `media-src/src/lang.ts` and `media-src/build.js`: bundle Vditor's own locale dictionaries for English, Japanese, Korean, and Chinese. The legacy i18n intercept initialized `window.VditorI18n` to `{}`, which produced `undefined` toolbar tooltips and submenu labels; there is no English fallback for those strings.
+- `src/outline.ts`: registers `markdownEditorOutline` under the valid `explorer` view container. The built-in `outline` is a view ID, not a view container. VS Code's public extension API does not expose a built-in Outline provider for these webview editors; Markdown Outline is a separate tree in Explorer. Both custom-editor and command-mode panels register with the same provider. Sidebar focus does not clear the tree; text-editor activation does.
+- `media-src/src/headings.ts` and `src/headings.ts`: Vditor parses the full Markdown document into headings, skipping code fences and handling Setext headings and inline formatting. Sidebar navigation uses heading indexes to distinguish duplicates; anchor links use Unicode-aware slugs with duplicate suffixes.
+- `media-src/src/utils.ts`: capture-phase link handling precedes Vditor's editing click handler. Plain click follows links; Option/Alt-click edits them. `markdown-editor.followLinksOnClick=false` requires Cmd/Ctrl-click instead.
+- `src/extension.ts`: resolves relative file links separately from fragments, reports opening failures, and supports cross-document Markdown anchors. Command-mode editors keep independent per-document panels.
+- `media-src/src/search.ts`: toolbar and Cmd/Ctrl+F share one non-mutating find bar. The active Vditor mode selects the search root, and matches can span inline formatting. The stable app host is observed across theme and mode changes.
+- `media-src/src/responsive-toolbar.ts` and `media-src/src/main.css`: a single-row toolbar with a `»` overflow tray. ResizeObserver moves existing Vditor controls into the tray in their original order, preserving upstream handlers. Save, Find, More, and edit-mode controls have the strongest retention preference. The optional line-number gutter does not pad the toolbar. Escape and outside clicks dismiss the tray; keyboard Tab reaches the overflow controls. Submenus anchor below the tray to fit narrow panes.
+
+For another Mac, download the VSIX from [GitHub Releases](https://github.com/BrianHoltz/vscode-markdown-editor/releases) and run **Extensions: Install from VSIX**, then reload the window. For source work, clone the fork into `~/src/vscode-markdown-editor` and select `brian/markdown-ux`. The fork's default branch is the maintained local branch. The local checkout keeps `upstream` pointed at Zaaack and `origin` pointed at BrianHoltz.
+
+Build, validate, and install from the source checkout:
+
+```sh
+cd ~/src/vscode-markdown-editor
+npx --yes pnpm@10.32.1 install --frozen-lockfile
+npx --yes pnpm@10.32.1 build
+npx --yes pnpm@10.32.1 --filter media-src exec tsc --noEmit
+npx --yes pnpm@10.32.1 exec playwright install chromium
+npx --yes pnpm@10.32.1 test
+npx --yes --package @vscode/vsce vsce package --no-dependencies --out markdown-editor-local.vsix
+code --install-extension markdown-editor-local.vsix --force
+```
+
+Reload VS Code with **Developer: Reload Window**. Disable auto-update for Markdown Editor through its extension gear menu to retain the source build. Do not run `patch-zaaack.py` against it; maintain fixes in source and rebuild. Marketplace installation remains the rollback route.
+
+Automated validation covers the real bundled Vditor toolbar and submenu labels, sidebar hierarchy and focus lifecycle, duplicate/Unicode/inline-formatted heading navigation, relative and external link dispatch, Option-click editing, all three search modes, theme reinitialization, and unchanged Markdown after search. Toolbar geometry is checked at 240, 320, 450, 700, and 1200 pixels, including the real line-number script, keyboard traversal, overflow dismissal, and submenu bounds. The browser harness loads synthetic Markdown and Vditor assets locally. Live VS Code rendering requires a reload and an interactive check of Markdown Outline in Explorer; the standard Outline view can still show its unsupported-editor message.
+
 ### Multi-panel Editor + Outline + Find + Anchor Nav (`patch-zaaack.py`)
+
+This section describes the legacy installed-bundle patcher, not the source build above.
 
 The ⚙️ rows in the comparison table — find in file, structure, internal links — are added by `~/src/tools/patches/patch-zaaack.py` (canonical, lives in the `~/src/tools` repo and syncs across laptops via git). The `~/bin/patches/patch-zaaack.py` compatibility path resolves to the same script. It patches four files — `media/dist/main.js`, `media/dist/main.css`, `out/extension.js`, and `package.json` — in **both** `~/.vscode/extensions/zaaack.markdown-editor-<version>/` and `~/.cursor/extensions/zaaack.markdown-editor-<version>/` (each IDE has its own extensions dir). **Supports Zaaack 0.1.13, 0.1.15, 0.1.17, and 0.1.21**; the script globs all matching versioned dirs and supports their bundled Vditor variants via `P2_VARIANTS`.
 
@@ -82,7 +117,7 @@ The ⚙️ rows in the comparison table — find in file, structure, internal li
 
 **CSP note.** The webview HTML in `extension.js`'s `_getHtmlForWebview()` sets no `Content-Security-Policy` meta tag, so inline scripts in `main.js` execute freely. If a future Zaaack version adds CSP, the enhancer needs to move to a separate file registered via `webview.asWebviewUri()`.
 
-**vditor i18n 404 (Zaaack 0.1.15 / vditor 3.11.2, cosmetic).** `GET https://unpkg.com/vditor@3.11.2/dist/js/i18n/en_US.js net::ERR_ABORTED 404` appears in the webview console after upgrade. Vditor fetches the i18n file lazily from CDN; in 3.11.2 that path doesn't exist on unpkg. Vditor falls back to default (English) UI strings — toolbar tooltips remain English, functionality is unaffected. No fix applied; upstream issue with the unpkg publish for 3.11.2.
+**Vditor localization.** The legacy CDN intercept suppresses localization loading and supplies an empty dictionary. This breaks toolbar and submenu labels; Vditor does not supply an English fallback. The [source build](#zaaack-source-build) bundles the dictionaries instead.
 
 **Reapply procedure** (after Zaaack extension update, OS migration, or fresh checkout):
 
