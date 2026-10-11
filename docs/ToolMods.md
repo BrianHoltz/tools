@@ -10,7 +10,7 @@ Patch and modification procedures. See Tools.md for tool preferences, standings,
 
 ### Zaaack source build
 
-The editable source checkout is `~/src/vscode-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz GitHub fork](https://github.com/BrianHoltz/vscode-markdown-editor), based on the [MIT-licensed upstream extension](https://github.com/zaaack/vscode-markdown-editor). Local version `0.1.22-local.3` retains extension ID `zaaack.markdown-editor` and the existing custom editor ID, settings, and shortcuts. The source build is intended for VS Code; the Cursor installation is separate.
+The editable source checkout is `~/src/vscode-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz GitHub fork](https://github.com/BrianHoltz/vscode-markdown-editor), based on the [MIT-licensed upstream extension](https://github.com/zaaack/vscode-markdown-editor). Local version `0.1.22-local.4` retains extension ID `zaaack.markdown-editor` and the existing custom editor ID, settings, and shortcuts. The source build is intended for VS Code; the Cursor installation is separate.
 
 Source ownership:
 
@@ -25,6 +25,8 @@ Source ownership:
 
 For another Mac, download the VSIX from [GitHub Releases](https://github.com/BrianHoltz/vscode-markdown-editor/releases) and run **Extensions: Install from VSIX**, then reload the window. For source work, clone the fork into `~/src/vscode-markdown-editor` and select `brian/markdown-ux`. The fork's default branch is the maintained local branch. The local checkout keeps `upstream` pointed at Zaaack and `origin` pointed at BrianHoltz.
 
+Hiding the toolbar also hides raw HTML markup automatically; restoring the toolbar restores the independent HTML preference. The raw-HTML toggle can be in the `»` tray in narrow panes. Toolbar and menu hover/focus tooltips use a viewport-clamped overlay, avoiding Vditor's CSS suppression below 520px.
+
 Build, validate, and install from the source checkout:
 
 ```sh
@@ -34,15 +36,15 @@ npx --yes pnpm@10.32.1 build
 npx --yes pnpm@10.32.1 --filter media-src exec tsc --noEmit
 npx --yes pnpm@10.32.1 exec playwright install chromium
 npx --yes pnpm@10.32.1 test
-npx --yes --package @vscode/vsce vsce package --no-dependencies --out markdown-editor-0.1.22-local.3.vsix
+npx --yes --package @vscode/vsce vsce package --no-dependencies --out markdown-editor-0.1.22-local.4.vsix
 STAMP=$(date "+%Y%m%d.%a.%H%M")
-OUT="$HOME/Downloads/markdown-editor-0.1.22-local.3-$STAMP-hideui.vsix"
-cp -p markdown-editor-0.1.22-local.3.vsix "$OUT"
-cmp markdown-editor-0.1.22-local.3.vsix "$OUT"
+OUT="$HOME/Downloads/markdown-editor-0.1.22-local.4-$STAMP-tooltips.vsix"
+cp -p markdown-editor-0.1.22-local.4.vsix "$OUT"
+cmp markdown-editor-0.1.22-local.4.vsix "$OUT"
 code --install-extension "$OUT" --force
 ```
 
-Keep the canonical VSIX in the repository root (`vsce package`'s normal output location) and install from the timestamped Downloads copy, following the [Local Build Artifact Rule](Tools.md#local-build-artifact-rule). Capture the completion timestamp immediately after successful packaging; `hideui` is the newest-fix label. GitHub release uploads use the same timestamped filename as the Downloads copy.
+Keep the canonical VSIX in the repository root (`vsce package`'s normal output location) and install from the timestamped Downloads copy, following the [Local Build Artifact Rule](Tools.md#local-build-artifact-rule). Capture the completion timestamp immediately after successful packaging; `tooltips` is the newest-fix label. GitHub release uploads use the same timestamped filename as the Downloads copy. Delete previous Markdown Editor Downloads installers after verifying the replacement.
 
 Reload VS Code with **Developer: Reload Window**. Disable auto-update for Markdown Editor through its extension gear menu to retain the source build. Do not run `patch-zaaack.py` against it; maintain fixes in source and rebuild. Marketplace installation remains the rollback route.
 
