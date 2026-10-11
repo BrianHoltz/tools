@@ -215,9 +215,10 @@ Link the skill to its SKILL.md when one is responsible; omit `via` when no skill
 
 ## Browser Automation
 
-- When an agent needs to inspect a live page, take screenshots, or read DOM content, prefer a terminal-launched Chrome with `--remote-debugging-port` (CDP) over VS Code browser tabs.
-- Default pattern on personal laptop: launch Google Chrome from the terminal with CDP enabled, then drive it via the DevTools protocol using a single shared agent profile directory, not the user's personal profile.
-- Agents must never point CDP Chrome at the user's personal Chrome profile, and must never copy cookies or other session state out of the personal profile into an agent profile.
+- Agents must always use Google Chrome Canary when driving a browser on the user's behalf, including CDP, headless, and UI automation. Never use regular Google Chrome or the user's personal browser profile. If Canary is unavailable, resolve that prerequisite before continuing; do not fall back to regular Chrome.
+- When an agent needs to inspect a live page, take screenshots, or read DOM content, prefer terminal-launched Chrome Canary with `--remote-debugging-port` (CDP) over VS Code browser tabs.
+- Default pattern on personal laptop: launch Google Chrome Canary from the terminal with CDP enabled, then drive it via the DevTools protocol using a single shared agent profile directory.
+- Agents must never point Chrome Canary at the user's personal browser profile, and must never copy cookies or other session state out of a personal profile into an agent profile.
 - Use one stable shared agent profile path for browser automation work, for example `--user-data-dir="$HOME/.agent-chrome-profile"`, so all agents converge on the same non-personal session state instead of creating ad hoc profiles. Do not use `/tmp` for the profile; reboot can clear cached sessions.
 - For bot-protected government sites, assume direct `curl`/`fetch_webpage` may be blocked even when an interactive browser succeeds. Treat CDP browser context as the source of truth.
 - Prefer direct, parameterized page URLs when available (for example `view=electronic`) instead of brittle click navigation.
