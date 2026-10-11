@@ -161,13 +161,22 @@ TypeDown WYSIWYG markdown editor (tarikkavaz.typedown-markdown-editor) has no se
 
 ### Font Size Patch + 2026.2 Compat
 
-Shuzijun Markdown Editor plugin (com.shuzijun.markdown-editor) uses Vditor, which hardcodes `font-size: 16px` for body text in `.vditor-reset`, `.vditor-sv`, and `.vditor-ir`. That's too large for IDEA's 13px UI font. Theme follows IDE via `UIUtil.isUnderDarcula()` — no separate theme setting. If the editor renders dark while IDE is light (e.g. after OS theme auto-switch), close and re-open the tab to fix.
+Shuzijun Markdown Editor plugin (com.shuzijun.markdown-editor) uses Vditor, which hardcodes `font-size: 16px` for body text in `.vditor-reset`, `.vditor-sv`, and `.vditor-ir`. That's too large for IDEA's 13px UI font. Shuzijun 2.0.7 derives its palette from the IDE editor color scheme. An existing Vditor tab can retain dark colors after the IDE switches to light; closing and reopening the document recreates the editor.
 
 - CSS in `vditor/style.css` inside `markdown-editor-2.0.5.jar`:
   - Added `font-size: 13px !important` override on `.vditor .vditor-reset`, `.vditor .vditor-sv`, `.vditor .vditor-ir` — overrides the Vditor default 16px across preview, split-view, and IR editing modes
-- **System-appearance fallback:** added a `matchMedia("(prefers-color-scheme: dark)")` fallback and change listener to `template/default.html`. IDEA's New UI auto-detection can report false from `UIUtil.isUnderDarcula()` despite macOS dark appearance; this keeps Vditor dark at launch and switches it live with macOS. Marker: `__shuzijunSystemAppearance__`.
-- Patches apply to `~/Library/Application Support/JetBrains/IntelliJIdea2026.2/plugins/markdown-editor/lib/markdown-editor-2.0.5.jar`. Patches are overwritten on plugin update — reapply after each update. Restart IDEA after patching (tab close/reopen is not enough — IDEA caches plugin JAR resources at startup).
+- **IDE appearance synchronization:** [patch-shuzijun.py](../patches/patch-shuzijun.py) patches `template/default.html` to queue theme changes until Vditor is ready, reapply the palette after initialization, and synchronize from IDEA's generated stylesheet when it changes or the tab becomes visible. It also handles a theme update arriving before the initial style element exists. Marker: `__shuzijunIdeaAppearance__`. The IDE stylesheet is authoritative; a browser media query does not override the chosen IDE scheme.
+- The appearance patch is installed in `~/Library/Application Support/JetBrains/IntelliJIdea2026.2/plugins/markdown-editor/lib/markdown-editor-2.0.7.jar`. It preserves the other JAR entries and the file inode, saves a backup, rejects unknown template layouts, and is idempotent. Plugin updates overwrite JAR patches; reapply afterward. Restart IDEA after patching because the running IDE caches plugin resources.
 - Patch procedure: extract `vditor/style.css` from the JAR, add the override, repack with `jar uf`
+
+Apply the appearance patch to the installed plugin JAR (use its installed version in the path):
+
+```sh
+python3 ~/src/tools/patches/patch-shuzijun.py \
+  "$HOME/Library/Application Support/JetBrains/IntelliJIdea2026.2/plugins/markdown-editor/lib/markdown-editor-2.0.7.jar"
+```
+
+Append `--dry-run` to check compatibility without writing. After restarting IDEA, verify that the Markdown Editor tab matches the IDE in both light and dark appearance.
 
 **IDEA 2026.2 compatibility patch** — Shuzijun 2.0.5 crashes in IDEA 2026.2 with `NoClassDefFoundError: com/intellij/ui/jcef/JBCefApp` because IDEA 2026.2 moved `JBCefApp` from core to the `com.intellij.modules.jcef` plugin module (`jcef-plugin/lib/modules/intellij.platform.ui.jcef.jar`). Shuzijun's plugin.xml only declares `<depends>com.intellij.modules.lang</depends>`, so the class is invisible to its classloader and `MarkdownPreviewFileEditorProvider.accept()` throws on every markdown open, causing the WYSIWYG tab to disappear.
 
