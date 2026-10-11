@@ -33,9 +33,15 @@ npx --yes pnpm@10.32.1 build
 npx --yes pnpm@10.32.1 --filter media-src exec tsc --noEmit
 npx --yes pnpm@10.32.1 exec playwright install chromium
 npx --yes pnpm@10.32.1 test
-npx --yes --package @vscode/vsce vsce package --no-dependencies --out markdown-editor-local.vsix
-code --install-extension markdown-editor-local.vsix --force
+npx --yes --package @vscode/vsce vsce package --no-dependencies --out markdown-editor-0.1.22-local.2.vsix
+STAMP=$(date "+%Y%m%d.%a.%H%M")
+OUT="$HOME/Downloads/markdown-editor-0.1.22-local.2-$STAMP-toolbar.vsix"
+cp -p markdown-editor-0.1.22-local.2.vsix "$OUT"
+cmp markdown-editor-0.1.22-local.2.vsix "$OUT"
+code --install-extension "$OUT" --force
 ```
+
+Keep the canonical VSIX in the repository root (`vsce package`'s normal output location) and install from the timestamped Downloads copy, following the [Local Build Artifact Rule](Tools.md#local-build-artifact-rule). Capture the completion timestamp immediately after successful packaging; `toolbar` is the newest-fix label. GitHub release uploads use the same timestamped filename as the Downloads copy.
 
 Reload VS Code with **Developer: Reload Window**. Disable auto-update for Markdown Editor through its extension gear menu to retain the source build. Do not run `patch-zaaack.py` against it; maintain fixes in source and rebuild. Marketplace installation remains the rollback route.
 
