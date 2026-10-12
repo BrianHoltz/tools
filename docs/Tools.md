@@ -143,9 +143,9 @@ Score rubric
 
 ## Agent Harnesses
 
-Harness behavior is rated separately from IDE and Markdown-editor behavior. Voice ratings reflect Brian's VS Code experience (2026.10.12), not a product-wide benchmark. ? means the exact behavior has not been established; it does not mean unsupported.
+This flat comparison records the tested harness/IDE combinations without expanding into a multidimensional matrix. Voice ratings reflect Brian's VS Code experience (2026.10.12), not a product-wide benchmark. Claude Code findings apply only to its VS Code extension; an IntelliJ integration has not been investigated or tested by Brian. ? means the exact behavior has not been established; it does not mean unsupported.
 
-| Feature | Wibey | Code Puppy | Copilot | Codex | Claude Code | Antigravity |
+| Feature | Wibey | Code Puppy | Copilot in VS Code | Codex in VS Code | Claude Code in VS Code | Antigravity |
 | --- | --- | --- | --- | --- | --- | --- |
 | Host observed | IDEA / VS Code / Cursor | IDEA / VS Code / Cursor | VS Code | VS Code | VS Code | VS Code |
 | Queue next prompt | ✅ local IDEA build; VS Code/Cursor documented | ? host/build check | ? distinguish from steering | ? distinguish from steering | ? distinguish from steering | ? |
