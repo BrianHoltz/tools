@@ -54,3 +54,5 @@ export PATH="/Users/b0h0166/.local/bin:$PATH"
 
 # Added by Wibey CLI installation
 export BUN_INSTALL_CACHE_DIR="/Users/b0h0166/.local/share/bun/cache"
+
+

@@ -2,7 +2,7 @@
 
 ## Local Modifications in Use
 
-- **Code Puppy JetBrains + VS Code + Cursor 0.27.0** — same `feature/active-context-pill` branch of `~/src/code-puppy-ide` builds all three; the active-editor-context suggestion is implemented in the shared webview/protocol packages so it applies everywhere. JetBrains additionally carries local JDK 21 build detection and the JCEF-proxy-warm startup workaround (no JCEF in VS Code/Cursor, so those don't need it). The VS Code/Cursor extension was built and installed for the first time 2026.10.02 — previously source-only, never packaged. (Editable conversation titles and universal-constructor visibility shipped upstream and no longer need a local patch.)
+- **Code Puppy JetBrains + VS Code + Cursor (JetBrains/VS Code at 0.28.0 as of 2026.10.09; Cursor still 0.27.0)** — same `feature/active-context-pill` branch of `~/src/code-puppy-ide` builds all three; the active-editor-context suggestion is implemented in the shared webview/protocol packages so it applies everywhere. JetBrains additionally carries local JDK 21 build detection and the JCEF-proxy-warm startup workaround (no JCEF in VS Code/Cursor, so those don't need it). The VS Code/Cursor extension was built and installed for the first time 2026.10.02 — previously source-only, never packaged. (Editable conversation titles and universal-constructor visibility shipped upstream and no longer need a local patch.)
 - **Wibey JetBrains 1.0.28** — upstream GPT model support and context-window work, combined locally with persistent editable conversation titles, editable queued follow-up prompts, image paste, focused-editor file/selection context, prompt queuing, and quota snapshots.
 - **Zaaack Markdown Editor for VS Code and Cursor** — adds multipanel editing, outline navigation, find, anchor links, and dark-theme/readability improvements.
 - **TypeDown for VS Code and Cursor** — compacts prose, table, and list spacing; preserves editor focus and cursor position through paste.
@@ -98,8 +98,8 @@ Verify with `code --list-extensions --show-versions | grep puppy` (same flag wor
 | Score                          | 33.5         | 20.5         | 19.5                    |
 | IDE                            | 2026.2.3     | 1.135.0      | 3.21.13                 |
 | VSCode engine                  | —            | —            | 1.105.1                 |
-| Wibey                          | 1.0.28       | 1.0.20       | 1.0.18                  |
-| Code Puppy                    | 0.27.0       | 0.27.0       | 0.27.0                  |
+| Wibey                          | 1.0.28       | 1.0.31       | 1.0.18                  |
+| Code Puppy                    | 0.28.1       | 0.28.0       | 0.27.0                  |
 | └ parallel agents              | ✅            | ✅            | ✅                       |
 | └ enqueue next prompt          | ❌            | ✅            | ✅                       |
 | └ context += @ file            | ✅            | 🟡<100KB     | 🟡<100KB                |
@@ -591,7 +591,7 @@ Currently applied: font size patch (13px body text), IDEA 2026.2 compat fix (`JB
 
 ### Wibey Extension Patches
 
-New conversation bug fix (`clearMessages` on `newParallelSession`). Full procedure: **ToolMods.md → Wibey Extension**.
+New conversation bug fix (`clearMessages` on `newParallelSession`) — still unfixed upstream as of 1.0.31; reapplied to the VS Code install 2026.10.09 (marketplace updates overwrite it). Full procedure: **ToolMods.md → Wibey Extension**.
 
 ### Wibey IDEA — Image Paste Fix
 
