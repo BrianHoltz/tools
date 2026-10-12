@@ -21,23 +21,23 @@ ssh-keygen -t ed25519 -C "brianholtz1965@gmail.com"
 brew install gh
 gh auth login
 
-# ~/bin/ shell integrations
+# ~/src/tools/ shell integrations
 mkdir -p ~/src
 git clone git@github.com:BrianHoltz/tools.git ~/src/tools
 ln -sfn ~/src/tools ~/bin
 mkdir -p ~/.claude
-ln -sf ~/bin/docs/AgentRules.md ~/.claude/CLAUDE.md
-ln -sf ~/bin/shellrc/zprofile ~/.zprofile
-ln -sf ~/bin/shellrc/zshrc ~/.zshrc
-ln -sf ~/bin/shellrc/bash_profile ~/.bash_profile
-ln -sf ~/bin/shellrc/bashrc ~/.bashrc
-ln -sf ~/bin/shellrc/shellrc.common ~/.shellrc.common
+ln -sf ~/src/tools/docs/AgentRules.md ~/.claude/CLAUDE.md
+ln -sf ~/src/tools/shellrc/zprofile ~/.zprofile
+ln -sf ~/src/tools/shellrc/zshrc ~/.zshrc
+ln -sf ~/src/tools/shellrc/bash_profile ~/.bash_profile
+ln -sf ~/src/tools/shellrc/bashrc ~/.bashrc
+ln -sf ~/src/tools/shellrc/shellrc.common ~/.shellrc.common
 ln -sfn ~/My\ Drive ~/gdrive
 ln -sfn ~/Library/CloudStorage/GoogleDrive-*/Shared\ drives/LP\ SCC\ Financial ~/lpscc
 
 # Wibey custom commands (hardlinks, not symlinks — glob loop never drifts)
 mkdir -p ~/.wibey/commands
-for f in ~/bin/.wibey/commands/*.md; do ln -f "$f" ~/.wibey/commands/; done
+for f in ~/src/tools/.wibey/commands/*.md; do ln -f "$f" ~/.wibey/commands/; done
 
 # Editor choice — install either IntelliJ IDEA or VS Code
 # Option A: IntelliJ IDEA (recommended)

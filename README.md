@@ -72,18 +72,23 @@ Custom slash commands in Claude markdown format. Install paths:
 
 Commands:
 
-- **`commitz`** — cluster the next dirty IDEA git root into themed buckets; uses `commitz_ui` for deterministic file inventory.
-- **`convo`** — render a timestamped markdown banner summarizing the current conversation (date, repo, branch, last-3-turns summary).
+- **`commitz`** — adapter to the canonical cross-harness skill; clusters dirty IDE Git roots into repository-local commit buckets using `commitz_ui`.
+- **`convo`** — adapter to the canonical cross-harness skill; renders a timestamped conversation banner.
 - **`say`** — render a timestamped markdown banner with custom user-provided message text.
 
 #### Skills (`wibey/skills/`)
 
-Markdown context documents invoked as skills in Wibey; usable as `@file` references in Claude Code.
-
-For GitHub Copilot, any `.github/copilot-instructions.md` or `.github/skills/...` under a workspace is only an adapter layer. Keep the canonical content in this repo and project it into workspace-local Copilot hooks only where needed.
+Canonical portable skill sources live in `.wibey/skills/`. Wibey and Claude
+commands delegate to these files; user-level Agent Skills directories use
+symlinks so Copilot, Claude, Codex-compatible agents, and other supported
+harnesses read the same content. Run `./install-agent-skills.sh` on each
+personal laptop after pulling this repo. The installer creates only missing
+symlinks and refuses to replace existing files or conflicting links.
 
 - **`doc-audit`** — consolidated reference for documentation authoring, task record format, audit checklist, and DRY principles.
 - **`ftm`** — Family Tree Maker 2019 automation for Claude Desktop (screenshot + mouse/keyboard); navigates, edits, and sources facts in the Holtz Lusin tree.
+- **`commitz`** — shared commit-bucketing and explicit commit/push workflow.
+- **`convo`** — shared timestamped conversation-banner workflow.
 
 ### Documentation
 
@@ -130,7 +135,7 @@ Hardlinks (not symlinks — required by Wibey):
 | `~/.wibey/commands/commitz.md` | `wibey/commands/commitz.md` |
 | `~/.wibey/commands/convo.md`   | `wibey/commands/convo.md`   |
 
-For IDE workspace roots, use `~/lpscc` (the symlink) instead of `~/My Drive/Libertarian/LPSCC`; that keeps the LPSCC root attached to the shared-drive root rather than the local folder tree.
+For IDE workspace roots, use `~/lpscc` (the symlink) instead of the long Google Drive path; that keeps the LPSCC root attached to the `Shared drives/LP SCC Financial` root rather than the local folder tree.
 
 ## SEE ALSO
 

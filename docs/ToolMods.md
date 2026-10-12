@@ -8,9 +8,54 @@ Patch and modification procedures. See Tools.md for tool preferences, standings,
 
 ## VS Code / Cursor: Zaaack Markdown Editor
 
+### Zaaack source build
+
+The editable source checkout is `~/src/vscode-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz GitHub fork](https://github.com/BrianHoltz/vscode-markdown-editor), based on the [MIT-licensed upstream extension](https://github.com/zaaack/vscode-markdown-editor). Local version `0.1.22-local.6` retains extension ID `zaaack.markdown-editor` and the existing custom editor ID, settings, and shortcuts. The source build is intended for VS Code; the Cursor installation is separate.
+
+Source ownership:
+
+- `media-src/src/lang.ts` and `media-src/build.js`: bundle Vditor's own locale dictionaries for English, Japanese, Korean, and Chinese. The legacy i18n intercept initialized `window.VditorI18n` to `{}`, which produced `undefined` toolbar tooltips and submenu labels; there is no English fallback for those strings.
+- `src/outline.ts`: registers `markdownEditorOutline` under the valid `explorer` view container. The built-in `outline` is a view ID, not a view container. VS Code's public extension API does not expose a built-in Outline provider for these webview editors; Markdown Outline is a separate tree in Explorer. Both custom-editor and command-mode panels register with the same provider. Sidebar focus does not clear the tree; text-editor activation does.
+- `media-src/src/headings.ts` and `src/headings.ts`: Vditor parses the full Markdown document into headings, skipping code fences and handling Setext headings and inline formatting. Sidebar navigation uses heading indexes to distinguish duplicates; anchor links use Unicode-aware slugs with duplicate suffixes.
+- `media-src/src/utils.ts`: capture-phase link handling precedes Vditor's editing click handler. Plain click follows links; Option/Alt-click edits them. `markdown-editor.followLinksOnClick=false` requires Cmd/Ctrl-click instead.
+- `src/extension.ts`: resolves relative file links separately from fragments, reports opening failures, and supports cross-document Markdown anchors. Command-mode editors keep independent per-document panels. **Add Active File to Copilot Chat** resolves text, custom-editor, and this extension's webview tabs, then sends the URI to VS Code Chat's native attachment action.
+- `media-src/src/search.ts`: toolbar and Cmd/Ctrl+F share one non-mutating find bar. The active Vditor mode selects the search root, and matches can span inline formatting. The stable app host is observed across theme and mode changes.
+- `media-src/src/responsive-toolbar.ts` and `media-src/src/main.css`: a single-row toolbar with a `»` overflow tray. ResizeObserver moves existing Vditor controls into the tray in their original order, preserving upstream handlers. Save, Find, More, and edit-mode controls have the strongest retention preference. The optional line-number gutter does not pad the toolbar. Escape and outside clicks dismiss the tray; keyboard Tab reaches the overflow controls. Submenus anchor below the tray to fit narrow panes.
+- `media-src/src/appearance.ts`: persistent toolbar and raw-HTML visibility. The upper-right button hides/restores the toolbar; hidden mode removes the row, H1-H6 and other margin annotations, and line-number gutter, reducing rich-editor side padding to 12px. The raw-HTML toolbar button hides tag syntax and HTML-only rows without hiding rendered HTML blocks or fenced examples. Source mode is unaffected. Named HTML anchors remain navigable; search ignores hidden HTML markup. Show raw HTML or switch to source mode to edit tags. Preferences live in extension global state and participate in Settings Sync, without modifying documents.
+- `media-src/src/main.ts` and `media-src/src/main.css`: dark editor themes switch the default GitHub code palette to GitHub Dark and remove Vditor's repeating light-grid image from fenced code blocks. Explicitly selected non-GitHub code palettes remain unchanged.
+
+For another Mac, download the VSIX from [GitHub Releases](https://github.com/BrianHoltz/vscode-markdown-editor/releases) and run **Extensions: Install from VSIX**, then reload the window. For source work, clone the fork into `~/src/vscode-markdown-editor` and select `brian/markdown-ux`. The fork's default branch is the maintained local branch. The local checkout keeps `upstream` pointed at Zaaack and `origin` pointed at BrianHoltz.
+
+Hiding the toolbar also hides raw HTML markup automatically; restoring the toolbar restores the independent HTML preference. The raw-HTML toggle can be in the `»` tray in narrow panes. Toolbar and menu hover/focus tooltips use a viewport-clamped overlay, avoiding Vditor's CSS suppression below 520px.
+
+Build, validate, and install from the source checkout:
+
+```sh
+cd ~/src/vscode-markdown-editor
+npx --yes pnpm@10.32.1 install --frozen-lockfile
+npx --yes pnpm@10.32.1 build
+npx --yes pnpm@10.32.1 --filter media-src exec tsc --noEmit
+npx --yes pnpm@10.32.1 exec playwright install chromium
+npx --yes pnpm@10.32.1 test
+npx --yes --package @vscode/vsce vsce package --no-dependencies --out markdown-editor-0.1.22-local.6.vsix
+STAMP=$(date "+%Y%m%d.%a.%H%M")
+OUT="$HOME/Downloads/markdown-editor-0.1.22-local.6-$STAMP-copilot.vsix"
+cp -p markdown-editor-0.1.22-local.6.vsix "$OUT"
+cmp markdown-editor-0.1.22-local.6.vsix "$OUT"
+code --install-extension "$OUT" --force
+```
+
+Keep the canonical VSIX in the repository root (`vsce package`'s normal output location) and install from the timestamped Downloads copy, following the [Local Build Artifact Rule](Tools.md#local-build-artifact-rule). Capture the completion timestamp immediately after successful packaging; `darkcode` is the newest-fix label. GitHub release uploads use the same timestamped filename as the Downloads copy. Delete previous Markdown Editor Downloads installers after verifying the replacement.
+
+Reload VS Code with **Developer: Reload Window**. Disable auto-update for Markdown Editor through its extension gear menu to retain the source build. Do not run `patch-zaaack.py` against it; maintain fixes in source and rebuild. Marketplace installation remains the rollback route.
+
+Automated validation covers the real bundled Vditor toolbar and submenu labels, sidebar hierarchy and focus lifecycle, duplicate/Unicode/inline-formatted heading navigation, relative and external link dispatch, Option-click editing, all three search modes, theme reinitialization, and unchanged Markdown after search. Toolbar geometry is checked at 240, 320, 450, 700, and 1200 pixels, including the real line-number script, keyboard traversal, overflow dismissal, and submenu bounds. The browser harness loads synthetic Markdown and Vditor assets locally. Live VS Code rendering requires a reload and an interactive check of Markdown Outline in Explorer; the standard Outline view can still show its unsupported-editor message.
+
 ### Multi-panel Editor + Outline + Find + Anchor Nav (`patch-zaaack.py`)
 
-The ⚙️ rows in the comparison table — find in file, structure, internal links — are added by `~/bin/patches/patch-zaaack.py` (canonical, lives in `~/bin/` repo and syncs across laptops via git). It patches four files — `media/dist/main.js`, `media/dist/main.css`, `out/extension.js`, and `package.json` — in **both** `~/.vscode/extensions/zaaack.markdown-editor-<version>/` and `~/.cursor/extensions/zaaack.markdown-editor-<version>/` (each IDE has its own extensions dir). **Supports Zaaack 0.1.13, 0.1.15, 0.1.17, and 0.1.21**; the script globs all matching versioned dirs and supports their bundled Vditor variants via `P2_VARIANTS`.
+This section describes the legacy installed-bundle patcher, not the source build above.
+
+The ⚙️ rows in the comparison table — find in file, structure, internal links — are added by `~/src/tools/patches/patch-zaaack.py` (canonical, lives in the `~/src/tools` repo and syncs across laptops via git). The `~/bin/patches/patch-zaaack.py` compatibility path resolves to the same script. It patches four files — `media/dist/main.js`, `media/dist/main.css`, `out/extension.js`, and `package.json` — in **both** `~/.vscode/extensions/zaaack.markdown-editor-<version>/` and `~/.cursor/extensions/zaaack.markdown-editor-<version>/` (each IDE has its own extensions dir). **Supports Zaaack 0.1.13, 0.1.15, 0.1.17, and 0.1.21**; the script globs all matching versioned dirs and supports their bundled Vditor variants via `P2_VARIANTS`.
 
 **Why patch instead of switching editors.** Every webview-based WYSIWYG competitor (typedown, IDEA shuzijun, Mark Sharp, Unotes, vscode-markdown-wysiwyg, Teddy Editor) shares the same Cmd+F gap — VS Code's find UI doesn't reach into webview content, and vditor doesn't expose a public search API. The only extension with native find is `remcohaszing.markdown-decorations`, but it's decoration-only and loses the rich WYSIWYG rendering that makes zaaack the best choice. So patching zaaack beats every alternative on the market as of 2026.05.
 
@@ -82,12 +127,12 @@ The ⚙️ rows in the comparison table — find in file, structure, internal li
 
 **CSP note.** The webview HTML in `extension.js`'s `_getHtmlForWebview()` sets no `Content-Security-Policy` meta tag, so inline scripts in `main.js` execute freely. If a future Zaaack version adds CSP, the enhancer needs to move to a separate file registered via `webview.asWebviewUri()`.
 
-**vditor i18n 404 (Zaaack 0.1.15 / vditor 3.11.2, cosmetic).** `GET https://unpkg.com/vditor@3.11.2/dist/js/i18n/en_US.js net::ERR_ABORTED 404` appears in the webview console after upgrade. Vditor fetches the i18n file lazily from CDN; in 3.11.2 that path doesn't exist on unpkg. Vditor falls back to default (English) UI strings — toolbar tooltips remain English, functionality is unaffected. No fix applied; upstream issue with the unpkg publish for 3.11.2.
+**Vditor localization.** The legacy CDN intercept suppresses localization loading and supplies an empty dictionary. This breaks toolbar and submenu labels; Vditor does not supply an English fallback. The [source build](#zaaack-source-build) bundles the dictionaries instead.
 
 **Reapply procedure** (after Zaaack extension update, OS migration, or fresh checkout):
 
 1. Confirm installed version(s): `ls ~/.vscode/extensions/ ~/.cursor/extensions/ 2>/dev/null | grep zaaack`. The script auto-globs every matching dir under both IDEs.
-2. `python3 ~/bin/patches/patch-zaaack.py` — for each target dir: applies multi-file editor patch to `extension.js` (step MP1–MP5), then patches `main.js` (3 sites), `main.css` (1 site), `extension.js` outline (6 sites), and `package.json` (2 sites). Re-running strips + re-injects where applicable (marker-based idempotency) and creates `.bak.<unix-ts>` backups of all files before patching.
+2. `python3 ~/src/tools/patches/patch-zaaack.py` — for each target dir: applies multi-file editor patch to `extension.js` (step MP1–MP5), then patches `main.js` (3 sites), `main.css` (1 site), `extension.js` outline (6 sites), and `package.json` (2 sites). Re-running strips + re-injects where applicable (marker-based idempotency) and creates `.bak.<unix-ts>` backups of all files before patching.
    - If a new Zaaack version ships a new vditor version, add a new tuple to `P2_VARIANTS` and update `MULTIPANEL_SINGLETON_OLD` if TypeScript recompilation changed the `_a` var references.
 3. Sanity check:
 
@@ -99,7 +144,7 @@ The ⚙️ rows in the comparison table — find in file, structure, internal li
 
 **Multi-file editor patch baked in.** `patch_extension_js_multipanel()` runs automatically before the outline patches, converting the singleton `EditorPanel.currentPanel` to a per-file `EditorPanel.panelsByPath` Map. Idempotent: re-running is safe. The outline patches depend on `panelsByPath` and are skipped if it is absent.
 
-**Recreating the patch from scratch** (if `~/bin/patches/patch-zaaack.py` is ever lost): use the main.js anchor strings + enhancer/TreeView responsibilities described above, add one marker-guarded CSS block in `main.css` for dark tables/outline width, and add the `extension.js` + `package.json` TreeView patches. All patch sites use anchor checks plus marker-comment idempotency.
+**Recreating the patch from scratch** (if `~/src/tools/patches/patch-zaaack.py` is ever lost): use the main.js anchor strings + enhancer/TreeView responsibilities described above, add one marker-guarded CSS block in `main.css` for dark tables/outline width, and add the `extension.js` + `package.json` TreeView patches. All patch sites use anchor checks plus marker-comment idempotency.
 
 **Fallbacks if the patch ever breaks:**
 
@@ -159,36 +204,43 @@ TypeDown WYSIWYG markdown editor (tarikkavaz.typedown-markdown-editor) has no se
 
 ## IDEA: Shuzijun Markdown Editor
 
-### Font Size Patch + 2026.2 Compat
+### Shuzijun source build
 
-Shuzijun Markdown Editor plugin (com.shuzijun.markdown-editor) uses Vditor, which hardcodes `font-size: 16px` for body text in `.vditor-reset`, `.vditor-sv`, and `.vditor-ir`. That's too large for IDEA's 13px UI font. Theme follows IDE via `UIUtil.isUnderDarcula()` — no separate theme setting. If the editor renders dark while IDE is light (e.g. after OS theme auto-switch), close and re-open the tab to fix.
+The editable source checkout is `~/src/idea-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz fork](https://github.com/BrianHoltz/markdown-editor) of the [Apache-licensed upstream plugin](https://github.com/shuzijun/markdown-editor). Keep `origin` pointed at the fork and `upstream` at Shuzijun; the fork makes these local improvements available to other machines without pushing personal changes to the upstream maintainer. Local version `2.0.7-local.3` retains plugin ID `com.shuzijun.markdown-editor` and builds against the installed IDEA 2026.2.3 runtime instead of downloading another IntelliJ distribution.
 
-- CSS in `vditor/style.css` inside `markdown-editor-2.0.5.jar`:
-  - Added `font-size: 13px !important` override on `.vditor .vditor-reset`, `.vditor .vditor-sv`, `.vditor .vditor-ir` — overrides the Vditor default 16px across preview, split-view, and IR editing modes
-- **System-appearance fallback:** added a `matchMedia("(prefers-color-scheme: dark)")` fallback and change listener to `template/default.html`. IDEA's New UI auto-detection can report false from `UIUtil.isUnderDarcula()` despite macOS dark appearance; this keeps Vditor dark at launch and switches it live with macOS. Marker: `__shuzijunSystemAppearance__`.
-- Patches apply to `~/Library/Application Support/JetBrains/IntelliJIdea2026.2/plugins/markdown-editor/lib/markdown-editor-2.0.5.jar`. Patches are overwritten on plugin update — reapply after each update. Restart IDEA after patching (tab close/reopen is not enough — IDEA caches plugin JAR resources at startup).
-- Patch procedure: extract `vditor/style.css` from the JAR, add the override, repack with `jar uf`
+The VS Code improvements map to IDEA as follows:
 
-**IDEA 2026.2 compatibility patch** — Shuzijun 2.0.5 crashes in IDEA 2026.2 with `NoClassDefFoundError: com/intellij/ui/jcef/JBCefApp` because IDEA 2026.2 moved `JBCefApp` from core to the `com.intellij.modules.jcef` plugin module (`jcef-plugin/lib/modules/intellij.platform.ui.jcef.jar`). Shuzijun's plugin.xml only declares `<depends>com.intellij.modules.lang</depends>`, so the class is invisible to its classloader and `MarkdownPreviewFileEditorProvider.accept()` throws on every markdown open, causing the WYSIWYG tab to disappear.
+- Shuzijun already has JCEF browser find through `CefBrowser.find()`, IntelliJ Structure View through `getStructureViewBuilder()`, Vditor outline, one `FileEditor` instance per Markdown file, and locally bundled Vditor translations. The VS Code search overlay, Explorer TreeView, multipanel registry, and locale bundler are unnecessary.
+- `src/main/resources/template/default.html` and `vditor/style.css` supply a single-row adaptive toolbar with a keyboard-accessible `»` overflow tray, viewport-clamped tooltips for narrow panes, a persistent upper-right distraction-free toggle, and a raw-HTML visibility toggle. Hidden-toolbar mode also removes rich-editor margin annotations and hides raw HTML markup without changing the Markdown source.
+- Plain clicks use Vditor's link handling; Option-click positions the caret for editing. Same-document fragments resolve duplicate and Unicode heading slugs plus named HTML anchors, including anchors whose raw markup is hidden. Relative Markdown links with fragments open the target IDEA editor and queue navigation until its JCEF page finishes loading.
+- `MarkdownHtmlPanel` persists the two appearance preferences in IntelliJ `PropertiesComponent`, so they apply across Markdown files and IDE restarts.
+- IDE appearance synchronization is source-integrated: theme changes wait for Vditor initialization, replace or create the generated stylesheet safely, and reapply Vditor's light or dark content theme.
+- `META-INF/plugin.xml` declares `com.intellij.modules.jcef` as a required dependency, replacing the installed-JAR compatibility patch.
+- `build.gradle.kts` accepts `-PlocalIdePath=...`, avoiding the slow platform download, and reuses the base `2.0.7` changelog entry for local version metadata.
+- Bundled JavaScript, CSS, locales, icons, and Lute use a startup-specific resource URL prefix, preventing cached assets from another plugin installation from mixing with the active bundle. Browser console warnings and errors are forwarded to `idea.log`.
+- Rich text uses the VS Code custom-CSS system sans-serif stack at 13px with 1.2 line height; source mode and code retain IDEA's editor font. Tables inherit the rich-text font, occupy the available content width, and wrap cells, including long unbroken URLs. Symmetric 35px rich-editor padding prevents Vditor's centered-column padding from wasting pane width; distraction-free mode uses 12px.
 
-Fix: add `<depends>com.intellij.modules.jcef</depends>` to `META-INF/plugin.xml` inside the JAR:
+`node --test test/asset-compatibility.test.cjs` checks Lute's Vditor initialization API, cache-isolated template references, and typography/table CSS invariants. A jsdom smoke test verifies startup and computed typography and cell-wrapping styles for synthetic nine-column tables in IR and WYSIWYG modes. It does not measure browser layout geometry or establish interactive feature parity in installed JCEF.
+
+Build and preserve the installable ZIP:
 
 ```sh
-# Backup and patch (2026.2 copy):
-JAR=~/Library/Application\ Support/JetBrains/IntelliJIdea2026.2/plugins/markdown-editor/lib/markdown-editor-2.0.5.jar
-cp "$JAR" "${JAR}.bak.$(date +%s)"
-mkdir /tmp/shuzijun_patch && cd /tmp/shuzijun_patch
-jar xf "$JAR"
-# In META-INF/plugin.xml, after the existing <depends>com.intellij.modules.lang</depends> line, add:
-#   <depends>com.intellij.modules.jcef</depends>
-# Then repack:
-jar uf "$JAR" META-INF/plugin.xml
-# Verify:
-mkdir /tmp/verify && cd /tmp/verify && jar xf "$JAR" META-INF/plugin.xml && grep "modules.jcef" META-INF/plugin.xml
-rm -rf /tmp/shuzijun_patch /tmp/verify
+cd ~/src/idea-markdown-editor
+export JAVA_HOME="$HOME/Applications/IntelliJ IDEA 2026.2.3.app/Contents/jbr/Contents/Home"
+./gradlew --no-daemon \
+  -PlocalIdePath="$HOME/Applications/IntelliJ IDEA 2026.2.3.app" \
+  clean buildPlugin
+STAMP=$(date "+%Y%m%d.%a.%H%M")
+OUT="$HOME/Downloads/markdown-editor-2.0.7-local.3-$STAMP-layout.zip"
+cp -p build/distributions/markdown-editor-2.0.7-local.3.zip "$OUT"
+cmp build/distributions/markdown-editor-2.0.7-local.3.zip "$OUT"
 ```
 
-Applied to 2026.2 on 2026.06.30. The 2025.3 copy did not need this patch (JBCefApp was in core there). Reapply after any Shuzijun update. Restart IDEA after patching.
+Install the Downloads copy with **Settings → Plugins → gear → Install Plugin from Disk**, then restart IDEA. The source build replaces the Marketplace plugin because it retains the same plugin ID.
+
+### Legacy installed-JAR patch
+
+`~/src/tools/patches/patch-shuzijun.py` remains a rollback tool for Marketplace 2.0.7. It patches `template/default.html` in the installed JAR to synchronize Vditor with IDEA appearance changes. Do not apply it to the local source build; maintain changes in `~/src/idea-markdown-editor` and rebuild.
 
 ---
 
@@ -384,3 +436,5 @@ History of tool use practices and modifications.
 - 2026.08.06 Thu: Reinstalled all IDEA mods on request. Wibey JetBrains plugin had silently auto-updated to stock `1.0.24.jar` (no custom fields — title-bar rename patch gone, though upstream now ships its own native clipboard-paste). First pass rebuilt `~/src/wibey-jetbrains-plugin` branch `brian/local-combined` as-is (still based on upstream 1.0.23) via `./gradlew clean buildAndInstall`, confirming our patches restore correctly. Then, per follow-up request, merged `origin/main` into `brian/local-combined` (38 commits, including the 1.0.24 bump, bridge-daemon rewrite, and workspace-path fixes) — clean merge, no conflicts, our patched files (`NativeChatToolWindowPanel.kt`, `InputAttachmentManager.kt`) merged without collision. Rebuilt + reinstalled again; `javap` confirmed the installed JAR is genuinely `1.0.24` **and** still has `sessionTitleLabel`/`sessionRenameTrigger`/`sessionTitleBar`/`startSessionRenameInline` (title rename) and `setupClipboardPaste`/`handleImagePaste` (image paste) compiled in. Re-verified the other four mods untouched throughout: JCEF remote disabled, readonly-fragments-notification, Shuzijun `com.intellij.modules.jcef` depends + 13px font, MCP Server `serviceViewContributor` suppression — all still present. Merge commit made locally on `brian/local-combined`; not pushed. Restart IDEA required.
 - 2026.07.17 Thu: IDEA 2026.2 EAP shipped as GA/stable (build 262.8665.258, released 2026.07.16) on the Walmart laptop. Config dir `IntelliJIdea2026.2` carried over intact from EAP → GA, so all EAP-era patches survived the upgrade. Full audit (Code Puppy) of the running GA build confirmed present: JCEF remote disabled (`-Djcef.remote.enabled=false` in `idea.vmoptions`), Shuzijun `com.intellij.modules.jcef` depends + 13px font (`markdown-editor-2.0.5.jar`), MCP Server `serviceViewContributor` suppression (`mcpserver.jar`, `__mcpNoServicesPanel__` marker), keymap overrides (`macOS copy.xml`: zoom/GotoFile/line-numbers), and the patched Wibey plugin `1.0.23.jar` from `brian/local-combined` — verified via `javap` that `InputAttachmentManager.setupClipboardPaste()`/`handleImagePaste(Clipboard)` (image paste) and `NativeChatToolWindowPanel.sessionTitleLabel`/`sessionTitleBar`/`startSessionRenameInline` (title features) are all compiled in. Source repo on `brian/local-combined`, up to date with origin/main (nothing to merge). **One gap, now closed:** `idea.readonly.fragments.notification.enabled=false` was missing from `early-access-registry.txt` after the EAP→GA carry-over. Reapplied 2026.07.17 via the file method after quitting IDEA (appended key+value, `.bak` created). Restart IDEA to take effect. Updated Tools.md: IDE version cells `2026.2 EAP` → `2026.2`, IDEA status bullet, Markdown Preview section headers.
 - 2026.10.09 Fri: VS Code mods refreshed. Wibey 1.0.31 (marketplace auto-update) had lost the `newParallelSession` clear patch — reapplied to `webview.js` (backup `.bak.<ts>`, `node --check` ok); reload window. Code Puppy: merged `origin/main` (native CLI update tray, 1 commit) into `feature/active-context-pill` (clean, local merge commit 7fb72c1, not pushed), built `releases/code-puppy-vscode-0.28.0.vsix` (update tray + active-context pill both confirmed in dist), staged `~/Downloads/code-puppy-vscode-0.28.0-20261009.Fri.1119-updtray.vsix`, installed in VS Code (0.27.0 → 0.28.0). Cursor Code Puppy left at 0.27.0.
+
+*[doc-audit](https://github.com/BrianHoltz/tools/blob/main/.wibey/skills/doc-audit/SKILL.md): 2026.10.11.Sun*

@@ -6,10 +6,8 @@
 - **Wibey JetBrains 1.0.28** — upstream GPT model support and context-window work, combined locally with persistent editable conversation titles, editable queued follow-up prompts, image paste, focused-editor file/selection context, prompt queuing, and quota snapshots.
 - **Zaaack Markdown Editor for VS Code and Cursor** — adds multipanel editing, outline navigation, find, anchor links, and dark-theme/readability improvements.
 - **TypeDown for VS Code and Cursor** — compacts prose, table, and list spacing; preserves editor focus and cursor position through paste.
-- **Shuzijun Markdown Editor for IntelliJ IDEA** — improves body-text readability and supplies the JCEF dependency required by IDEA 2026.2.
+- **Shuzijun Markdown Editor for IntelliJ IDEA** — local source build adds an adaptive toolbar, narrow-pane tooltips, distraction-free and raw-HTML visibility controls, persistent appearance preferences, anchor navigation, IDE theme synchronization, and the JCEF dependency required by IDEA 2026.2.
 - **IntelliJ IDEA MCP Server plugin** — prevents MCP connections from stealing focus to the Services tool window.
-
-
 
 ### Local Build Artifact Rule
 
@@ -92,11 +90,10 @@ Verify with `code --list-extensions --show-versions | grep puppy` (same flag wor
 
 ## IDEs
 
-
-| Feature                        | IDEA         | VS Code      | Cursor                  |
-| ------------------------------ | ------------ | ------------ | ----------------------- |
-| Score                          | 33.5         | 20.5         | 19.5                    |
-| IDE                            | 2026.2.3     | 1.135.0      | 3.21.13                 |
+| Feature                        | IDEA          | VS Code       | Cursor                  |
+| ------------------------------ | ------------- | ------------- | ----------------------- |
+| Score                          | 33.5          | 29.0 | 19.5                    |
+| IDE                            | 2026.2.3      | 1.141.0       | 3.21.13                 |
 | VSCode engine                  | —            | —            | 1.105.1                 |
 | Wibey                          | 1.0.28       | 1.0.31       | 1.0.18                  |
 | Code Puppy                    | 0.28.1       | 0.28.0       | 0.27.0                  |
@@ -111,15 +108,16 @@ Verify with `code --list-extensions --show-versions | grep puppy` (same flag wor
 | └ convo timestamps             | ✅            | ✅            | ✅                       |
 | └ convo bookmark               | ✅            | ✅            | ✅                       |
 | └ rich/linked paste            | ❌            | ❌            | ❌                       |
-| Github Copilot                 | 1.11.2-251   | 0.39.0       | 1.388.0 ????            |
+| Github Copilot                 | 1.11.2-251   | 0.39.0       | 1.1.685                 |
 | └ parallel agents              | ✅            | ✅            | ✅                       |
 | └ context += selection         | ✅ auto       | ❌            | ❌                       |
 | └ convo title                  | 🟡 manual    | ✅ auto       | ✅ auto                  |
+| Claude Code                    | —            | 2.1.296      | —                       |
 | AI diff review                 | ✅ per delta  | 🟡 per file  | 🟡 per file             |
 | AI diff in linked repo         | ✅            | ❌            | ❌                       |
 | git ops in linked repo         | ✅            | ✅            | ✅                       |
 | approval UX                    | ✅            | ✅            | ✅                       |
-| md preview                     | ✅            | 🟡 only 1    | ✅✅ wysiwyg              |
+| md preview                     | ✅            | ✅✅ independent | ✅✅ wysiwyg              |
 | md preview search              | ✅            | ✅            | ❌❌ neither              |
 | md table format                | ✅✅ auto      | 🟡 manual    | 🟡 manual               |
 | md pastes details block        | ❌            | ✔️           | ✔️                      |
@@ -140,54 +138,63 @@ Score rubric
 - **IDEA patches (baked-in as of 2026.09.29):** image-paste-fix + conversation-title-features are merged into local `brian/local-combined` build (Wibey 1.0.28), alongside upstream 1.0.28 updates. Scores reflect working features; ⚙️ notation removed. Recount after IDE/extension updates.
 - Editor score: each IDE gets the maximum score achievable by any editor available to it
   - IDEA: native WYSIWYG editor (8.0 pts); beats viewer (7.0) and shuzijun (3.5)
-  - VS Code: typedown (3.5 pts); zaaack broken ~2026.06.01 (was 7 pts w/ patch)
+  - VS Code: Zaaack local source build 9.5 pts + IDE row subtotal 19.5 pts = 29.0 pts. Ratings use Brian's reported Markdown behavior and the documented local build; external-file reread and images remain unverified. [Build details](ToolMods.md#zaaack-source-build).
   - Cursor: typedown (3.5 pts); zaaack broken ~2026.06.01 (was 7 pts w/ patch)
 - Final score = IDE row subtotal + best editor subtotal
 
+## Agent Harnesses
 
+This flat comparison records the tested harness/IDE combinations without expanding into a multidimensional matrix. Voice ratings reflect Brian's VS Code experience (2026.10.12), not a product-wide benchmark. Claude Code findings apply only to its VS Code extension; an IntelliJ integration has not been investigated or tested by Brian. ? means the exact behavior has not been established; it does not mean unsupported.
+
+| Feature | Wibey | Code Puppy | Copilot in VS Code | Codex in VS Code | Claude Code in VS Code | Antigravity |
+| --- | --- | --- | --- | --- | --- | --- |
+| Host observed | IDEA / VS Code / Cursor | IDEA / VS Code / Cursor | VS Code | VS Code | VS Code | VS Code |
+| Queue next prompt | ✅ local IDEA build; VS Code/Cursor documented | ? host/build check | ? distinguish from steering | ? distinguish from steering | ? distinguish from steering | ? |
+| Steer running task | ? | ? | ? | ? | ? | ? |
+| Voice typing experience | ? | ? | ✅ record then transcribe | ✅ record then transcribe | ✅✅ preferred, live words | ? |
+| Words visible while speaking | ? | ? | ❌ waveform during recording | ❌ waveform during recording | ✅ word by word | ? |
+| Transcription after recording | ? | ? | ~2–3s reported | ~2–3s reported | Live text reported | ? |
+
+Queuing holds a follow-up for execution after the active task; steering delivers new instructions during the active task. Brian reports some form of queuing or steering in Copilot, Codex, and Claude Code, but the separate behaviors require confirmation. The maintained Wibey IDEA build documents prompt queuing and editable queued prompts; the legacy IDE matrix's enqueue row and Top Frictions claim conflict with that build description. Code Puppy's installed-host behavior needs confirmation before assigning the local queuing patch to it.
+
+Voice typing is a strongly weighted selection criterion for Brian. His reported preference is Claude Code's live word-by-word transcription over Copilot and Codex's recording followed by delayed transcription. Transcription accuracy is not scored separately without comparative evidence. Harness ratings are excluded from the existing IDE score; TODO: reconcile legacy harness rows and weights before using the aggregate score to choose an IDE.
 
 ## Markdown Viewers/ Editors
 
 - VSCode md preview hangs for big files, but zaaack handles them
-  - zaaack lacks: string search; intra-doc link nav; outline view. Wibey fixed them all!
+  - The local Zaaack source build includes string search, intra-document link navigation, and a separate Markdown Outline sidebar tree. [Build and maintenance](ToolMods.md#zaaack-source-build).
 - typedown and zaaack work in both VS Code and Cursor
 
-
-| Behavior                 | IDEA viewer | IDEA editor | typedown    | zaaack                            | Cursor native |
-| ------------------------ | ----------- | ----------- | ----------- | --------------------------------- | ------------- |
-| version                  | 2026.2      | 2026.2      | 1.1.7       | 0.1.17 (VSCode) / 0.1.13 (Cursor) | 2.6.19        |
-| >1 tab at a time         | ✅           | ✅✅          | ✅✅          | ✅✅                                | ✅✅            |
+| Behavior                 | IDEA viewer | IDEA editor | typedown     | zaaack                            | Cursor native |
+| ------------------------ | ----------- | ----------- | ------------ | --------------------------------- | ------------- |
+| version                  | 2026.2      | 2026.2      | 1.1.7        | 0.1.22-local.6 (VSCode) / 0.1.13 (Cursor) | 2.6.19        |
+| >1 tab at a time         | ✅          | ✅✅        | ✅✅         | ✅✅                              | ✅✅          |
 | re-read changed file     | ?           | ?           | ✅           | ?                                 | ?             |
-| wide tables              | ✅           | ✅           | ❌ truncates | ✅✅                                | ❌ truncates   |
-| non-bloated side padding | ✅           | ✅           | ❌           | ✅                                 | ❌             |
-| shows images             | ✅           | ✅           | ?           | ?                                 | ?             |
-| find in file             | ✅           | ✅           | ❌           | ✅ ⚙️                              | ❌             |
-| structure                | ✅           | ✅           | ❌           | ✅ ⚙️                              | ❌             |
-| internal links           | ✅           | ❌           | ?           | ✅ ⚙️                              | ?             |
-| link editing             | ?           | ✔️          | ❌           | ✔️                                | ❌             |
-| toolbar                  | -           | ✔️          | ✔️          | ✔️                                | ❌             |
+| wide tables              | ✅          | ✅          | ❌ truncates | ✅✅                              | ❌ truncates  |
+| non-bloated side padding | ✅          | ✅          | ❌           | ✅                                | ❌            |
+| shows images             | ✅          | ✅          | ?            | ?                                 | ?             |
+| find in file             | ✅          | ✅          | ❌           | ✅ unified Cmd+F † | ❌            |
+| structure                | ✅          | ✅          | ❌           | ✅ ⚙️                           | ❌            |
+| internal links           | ✅          | ❌          | ?            | ✅ plain-click anchors † | ?             |
+| link editing             | ?           | ✔️        | ❌           | ✔️                              | ❌            |
+| toolbar                  | -           | ✔️        | ✔️         | ✅ single row + overflow † | ❌            |
 
-
-
+† Zaaack ratings for unified Cmd+F, plain-click intra-document links, and the single-row adaptive toolbar with overflow are confirmed by Brian's use of the VS Code local build (2026.10.12). Wide tables retain ✅✅; independent Markdown previews are supported by the [multiple-preview configuration](#multiple-markdown-tabs-no-reuse). These confirmations do not establish parity for the Cursor installation or for unsaved-edit recovery.
 
 ### IDE Keybindings
 
-
-| Action         | IDEA             | VS Code     | Cursor      |
-| -------------- | ---------------- | ----------- | ----------- |
+| Action         | IDEA                     | VS Code           | Cursor            |
+| -------------- | ------------------------ | ----------------- | ----------------- |
 | zoom in / out  | `^⌥=` / `^⌥-` ⚠️ | `⌘=` / `⌘-` | `⌘=` / `⌘-` |
-| open file      | `⇧⌘O` ⚠️         | `⌘P`        | `⌘P`        |
-| search project | `⇧⌘F`            | `⇧⌘F`       | `⇧⌘F`       |
-| Wibey history  | ?                | ?           | ?           |
-| Wibey new chat | ?                | ?           | ?           |
-
+| open file      | `⇧⌘O` ⚠️           | `⌘P`           | `⌘P`           |
+| search project | `⇧⌘F`                | `⇧⌘F`         | `⇧⌘F`         |
+| Wibey history  | ?                        | ?                 | ?                 |
+| Wibey new chat | ?                        | ?                 | ?                 |
 
 IDEA keybinding overrides (defaults shown in table, actual bindings below):
 
 - ⚠️ **zoom** `^⌥=` / `^⌥-` (`ZoomInIdeAction` / `ZoomOutIdeAction`) → remapped to `⌘=` / `⌘-`. Displaced `CollapseRegion` / `ExpandRegion` (fold/unfold) — unbound and unneeded.
 - **open file** `⇧⌘O` (`GotoFile`) → remapped to `⌘P`. Displaced `FileChooser.TogglePathBar` from `⌘P` — unneeded.
-
-
 
 ### IDEA — Code Puppy tool window font size
 
@@ -198,14 +205,12 @@ Code Puppy (JetBrains plugin) scales its webview text from **IDEA's UI font size
 What this means in practice:
 
 - If you want the Code Puppy window **one point bigger**, bump the UI font size by 1:
-Preferences → Appearance & Behavior → Appearance → enable **Use custom font** (if needed) →
-increase **Size**.
+  Preferences → Appearance & Behavior → Appearance → enable **Use custom font** (if needed) →
+  increase **Size**.
 - If you want Code Puppy to **match Markdown preview / Wibey tool windows**, make the UI font
-size match your editor font size (Preferences → Editor → Font).
+  size match your editor font size (Preferences → Editor → Font).
 - There is no per-tool-window font setting; this is global UI font. (If you don’t want the whole
-IDE bigger, you’re into "open DevTools and inject CSS" territory.)
-
-
+  IDE bigger, you’re into "open DevTools and inject CSS" territory.)
 
 ### Keybindings (swapped from defaults in VS Code and Cursor)
 
@@ -222,18 +227,36 @@ Extension command IDs:
 - `typedown.openWysiwygEditor` (when `!typedown.editorIsActive`) / `typedown.openDefaultEditor` (when `typedown.editorIsActive`)
 - `markdown-editor.openEditor` (when `editorTextFocus && editorLangId == markdown`)
 
+### Add the active file to Copilot Chat
 
+In VS Code, **⌃⌥⌘⇧C** invokes **Markdown Editor: Add Active File to Copilot Chat**. It attaches the active tab's file URI through VS Code's native `workbench.action.chat.attachFile` action, including Zaaack Markdown Editor custom and webview tabs that Copilot's implicit active-editor lookup can miss. Focus the intended tab before invoking it; the file is attached to the active/last-focused VS Code Chat and is not sent automatically. Local, remote, and untitled files are supported; unsupported tabs produce an information message.
+
+### Add the active file to Codex
+
+In VS Code, **⌃⌥⌘C** (Control–Option–Command–C) invokes **Codex: Add Active File to Codex**. Focus the file tab, including a TypeDown or Zaaack Markdown visual editor, and press the shortcut to attach its file reference to the active Codex chat. The command opens the Codex sidebar; it does not submit a prompt. Reload the VS Code window if a newly installed extension is not active.
+
+The local **Codex File Context** extension lives in [vscode/codex-file-context](../vscode/codex-file-context/package.json). Its [adapter](../vscode/codex-file-context/extension.js) resolves the active tab's file URI for both standard text editors and custom editors, then passes that URI explicitly to [Codex's Add File to Thread command](https://developers.openai.com/codex/ide/commands). A direct keybinding to the built-in command can miss custom editors because its implicit lookup uses the active text editor. Resolving the tab also avoids attaching a stale text editor's file. Unsaved untitled documents and tabs without a local file URI produce a message instead of an attachment. The adapter attaches a path, not a snapshot of unsaved buffer contents.
+
+The binding is contributed by the extension, rather than added to user keybindings. Change it in Settings → Keyboard Shortcuts by searching for **Add Active File to Codex**. Installed extension ID: `brianholtz.codex-file-context`. Installation and mocked text/custom-tab resolution are verified; live keystroke delivery inside the Markdown webviews requires an interactive check.
+
+### Generalizing active-file attachment
+
+The reusable design separates **editor lookup** from **chat attachment**: capture the focused file before moving focus to chat, then call the chosen harness's attachment command with an explicit file reference. Selection support also needs the range and, when unsaved edits matter, the selected buffer text. A keybinding, editor-toolbar button, and active-file suggestion pill can share this action. Ordering recent files in an @ menu requires changes to the harness's picker; the attachment adapter alone does not control that menu.
+
+- **VS Code and Cursor:** the tab lookup is reusable across compatible extensions. Each target harness needs a verified command and argument format; the Codex adapter cannot attach to Wibey, Code Puppy, Copilot, or Claude merely by changing the model. Cursor also needs its own installation and a compatibility check against its VS Code engine.
+- **IntelliJ IDEA:** implement the equivalent as a keymap action using the selected file editor's file, rather than requiring a text editor. The [IntelliJ editor API](https://plugins.jetbrains.com/docs/intellij/editors.html) supports file editors, including custom editors; attachment still depends on the target plugin's action or API. [Codex in JetBrains AI Assistant](https://www.jetbrains.com/help/ai-assistant/codex-agent.html#collect-ide-context) already has an IDE-context toggle that supplies the active file name and selection with each prompt. [AI Assistant chat](https://www.jetbrains.com/help/ai-assistant/chat-mode.html#use-mentions) documents @thisFile and file attachments. Neither establishes that an explicit shortcut works inside the Shuzijun visual editor; that integration needs verification.
+- **Other agent harnesses:** use their exposed attachment API or add an adapter to a locally maintained integration. Choose the destination chat explicitly when multiple harnesses are open. Supplying editor context through a tool can help an agent discover a file, but it does not itself add a visible attachment to the chat composer.
+
+The VS Code Codex shortcut is implemented. IDEA, Cursor, other-harness routing, selection attachment, and picker ordering are design options, not installed features.
 
 ## Top Frictions
 
 - **All IDEA patches currently applied and stable** (verified 2026.09.29). Wibey 1.0.28 from `brian/local-combined` includes upstream main plus image-paste-fix and conversation-title-features. Rebuild from that branch to keep the local plugin current.
 - Parallel Wibey agents now available in all three IDEs (as of 2026.06).
 - Top silly frictions: let me buffer up my next prompt, and make it super-easy to reference the current file and selection.
-  - Wibey allows enqueuing the next prompt while busy in VS Code and Cursor, but not in IDEA. Allowing this in IDEA would give 30% of the value of parallel agents. I don't like interrupting agents to add their next prompt and then tell them to first finish the previous one.
+  - Prompt queuing and steering are distinct requirements; see [Agent Harnesses](#agent-harnesses) for host/build-specific evidence and unresolved legacy ratings.
   - In no IDE does Wibey automatically track the current selection as context, which Github Copilot does in IDEA and VSCode, probably Cursor too.
   - Cursor+Wibey: Cmd-L broke! It now inserts selection context into builtin chat, not Wibey Chat.
-
-
 
 ## Copilot
 
@@ -273,13 +296,129 @@ confirmation.
   - **Multi-file edits in agent mode with @workspace**
   - *No MCP (Model Context Protocol) support*
 
-
-
 ### IDEA Copilot Session History
 
 Copilot chat history is stored per session in `~/.config/github-copilot/iu/chat-agent-sessions/<session-id>/copilot-agent-sessions-nitrite.db`; background agent state lives under `bg-agent-sessions/`. Cross-session history and sync only work when `cloudSessionStorageEnabled` is on, so an empty history pane after restart usually means either a fresh session/profile or that cloud session storage is disabled for this account/org. Current local session DBs I saw were `3FMXwLrUerHmiiZCqfXVjWufjm7`, `3FLCWBn65rrleMeg45Km2BjhCNf`, `3FjwlRcsTTFtmIbTOVR9yags5jH`, and `3GCdRF0lFhyiiQ9zf2TUGxaFHGH`.
 
 **Caution:** IDEA project/root cleanup is not purely cosmetic. Editing attached roots, `.idea/modules.xml`, `*.iml`, `.idea/vcs.xml`, or Copilot-related project state can make IDEA reopen as a different project/session, which can reset UI customizations and cause Copilot to reconnect to a different set of local conversations after restart. Before agent edits, back up the affected IDEA config files and treat root changes as a smallest-possible patch, not a broad "tidy up" pass.
+
+## Antigravity and Gemini
+
+### Maximally Permissive Agent Policy
+
+Antigravity (`agy` language server and CLI), standalone Gemini CLI (`@google/gemini-cli` / `a2a-server`), and the macOS `Gemini.app` desktop client are configured for maximally permissive local agent execution: Turbo permission preset, eager command auto-execution, unsandboxed terminal execution, unrestricted file/gitignore/URL/browser-JS/MCP access, and no artifact review pauses.
+
+### Antigravity Global and Project Settings (`~/.gemini/config/`)
+
+Antigravity stores global user settings in `~/.gemini/config/config.json` (`UserSettings` protobuf in `~/.gemini/bin/agy`) and per-workspace overrides in `~/.gemini/config/projects/<project-id>.json` plus `~/.gemini/config/projects/outside-of-project.json` (`ProjectSettings` protobuf). Both layers must be set so project-level defaults do not shadow global settings:
+
+- **Global `userSettings` (`~/.gemini/config/config.json`):**
+  ```json
+  {
+    "userSettings": {
+      "permissionPreset": "AGENT_PERMISSION_PRESET_TURBO",
+      "autoExecutionPolicy": "CASCADE_COMMANDS_AUTO_EXECUTION_EAGER",
+      "artifactReviewMode": "ARTIFACT_REVIEW_MODE_TURBO",
+      "browserJsExecutionPolicy": "BROWSER_JS_EXECUTION_POLICY_TURBO",
+      "nonWorkspaceFileAccessPolicy": "AGENT_SETTING_POLICY_ALLOW",
+      "internetAccessPolicy": "AGENT_SETTING_POLICY_ALLOW",
+      "allowAgentAccessNonWorkspaceFiles": true,
+      "allowAgentAccessGitignoreFiles": true,
+      "allowCascadeAccessGitignoreFiles": true,
+      "enableTerminalSandbox": false,
+      "sandboxAllowNetwork": true,
+      "enablePersonalCustomizations": true,
+      "permissionGrantsV2Migrated": true,
+      "globalPermissionGrants": {
+        "allow": [
+          "command(*)",
+          "unsandboxed(*)",
+          "read_file(*)",
+          "read_file(/)",
+          "write_file(*)",
+          "write_file(/)",
+          "read_url(*)",
+          "execute_url(*)",
+          "mcp(*)"
+        ]
+      }
+    }
+  }
+  ```
+- **Per-project `settings` and `permissionGrants` (`~/.gemini/config/projects/*.json`):**
+  ```json
+  {
+    "permissionGrants": {
+      "v2Migrated": true,
+      "permissionGrants": {
+        "allow": [
+          "command(*)",
+          "unsandboxed(*)",
+          "read_file(*)",
+          "read_file(/)",
+          "write_file(*)",
+          "write_file(/)",
+          "read_url(*)",
+          "execute_url(*)",
+          "mcp(*)"
+        ]
+      }
+    },
+    "settings": {
+      "permissionPreset": "AGENT_PERMISSION_PRESET_TURBO",
+      "autoExecutionPolicy": "CASCADE_COMMANDS_AUTO_EXECUTION_EAGER",
+      "artifactReviewMode": "ARTIFACT_REVIEW_MODE_TURBO",
+      "fileAccessPolicy": "AGENT_SETTING_POLICY_ALLOW",
+      "internetPolicy": "AGENT_SETTING_POLICY_ALLOW",
+      "sandboxMode": false
+    }
+  }
+  ```
+
+### Antigravity Operational Techniques for Agents
+
+- **Bypassing the `read_file`/`write_file` config boundary:** Antigravity's native file tools (`view_file`, `write_to_file`, `replace_file_content`) enforce a hardcoded protection boundary on `~/.gemini/config/config.json` (`Matches hardcoded system protection boundary rule`). Once `enableTerminalSandbox: false` and `autoExecutionPolicy: "CASCADE_COMMANDS_AUTO_EXECUTION_EAGER"` are active, `run_command` executes unsandboxed and can inspect or update `~/.gemini/config/*.json` directly in place.
+- **Why URL fetches prompt even in Turbo mode:** Selecting the Turbo preset in the UI sets `permissionPreset` and `autoExecutionPolicy`, but leaves `userSettings.internetAccessPolicy` and project `settings.internetPolicy` unset, causing `read_url_content` to prompt on every new domain unless `AGENT_SETTING_POLICY_ALLOW` and `"read_url(*)"` / `"execute_url(*)"` are explicitly present.
+- **Belt-and-suspenders `PreToolUse` `fhold` + auto-allow hook (`~/.gemini/config/hooks.json` and `~/.gemini/config/fhold-pre-tool-hook.py`):** `hooks.json` is reloaded on every turn without restarting `agy`. It invokes `/Users/brian/.gemini/config/fhold-pre-tool-hook.py` on `PreToolUse` (`matcher: ".*"`), which:
+  - Auto-approves all non-write and non-Markdown tool calls with `{"decision":"allow"}`.
+  - Denies direct IDE writes to symlink paths so agents resolve and edit the canonical target per `AgentRules.md`.
+  - On IDE write tools (`replace_file_content`, `multi_replace_file_content`, `write_to_file`, `code_action`, `file_change`) targeting an existing git-tracked `.md` file, runs `/Users/brian/src/tools/fhold status`: blocks IDE edit tools in `unreviewed` (permit) mode (`{"decision":"deny"}`), automatically registers/refreshes a review hold (`antigravity-<convId>`) in `reviewed` mode, auto-releases stale holds (>5 min), and blocks with contention details if another agent holds an active review hold (≤5 min).
+- **Inode preservation verified:** Both `replace_file_content` and `write_to_file` (`Overwrite: true`) in Antigravity preserve the existing file inode (`stat -f %i`) on macOS.
+- **Aligned multi-root workspace config:** `~/.gemini/config/projects/afc98200-c0e0-4311-875f-64aef4b663ed.json` (`projectResources.resources`), `~/.gemini/projects.json`, `~/.gemini/trustedFolders.json`, and `~/Personal.code-workspace` are aligned to the six canonical roots (`Documents`, `Documents/HoltzDotOrg/Thoughts/wiki`, `My Drive`, `lpscc` via stable `/Users/brian/lpscc` symlink, `src`, and `src/tools`), excluding the legacy `~/bin` symlink.
+- **Global agent rules stub (`~/.gemini/GEMINI.md` and symlink `~/.gemini/config/GEMINI.md`):** Points to canonical `/Users/brian/src/tools/docs/AgentRules.md`, summarizes the non-negotiable rules, and includes a `TODO` to trim `AgentRules.md` (~41.8 KB) under Gemini/Antigravity's 24,000-byte (`24 KB`) per-file rule cap so `~/.gemini/GEMINI.md` can become a direct symlink.
+- **Hot reload:** `~/.gemini/bin/agy` watches `~/.gemini/config/config.json`, `~/.gemini/config/projects/*.json`, and `~/.gemini/config/hooks.json`, applying permission changes without restarting VS Code or the language server.
+- **Binary schema inspection:** `~/.gemini/bin/agy` embeds protobuf descriptors (`jetbox_state.proto`, `codeium_common.proto`, `project.proto`, `cortex.proto`). Search the binary for `UserSettings`, `ProjectSettings`, `PermissionGrantsConfig`, or enum prefixes (`AGENT_SETTING_POLICY_`, `CASCADE_COMMANDS_AUTO_EXECUTION_`) when auditing new releases.
+
+### Standalone Gemini CLI (`~/.gemini/settings.json` and `trustedFolders.json`)
+
+For `@google/gemini-cli` and `a2a-server` sessions, `~/.gemini/settings.json` disables folder-trust gating and sandboxing while enabling tool auto-acceptance:
+
+```json
+{
+  "security": { "folderTrust": { "enabled": false } },
+  "tools": {
+    "sandbox": false,
+    "autoAccept": true,
+    "allowed": [
+      "run_shell_command",
+      "write_file",
+      "replace",
+      "read_file",
+      "read_many_files",
+      "web_fetch",
+      "google_web_search"
+    ]
+  },
+  "ide": { "enabled": true }
+}
+```
+
+`~/.gemini/trustedFolders.json` marks `/Users/brian`, `/Users/brian/Documents`, `/Users/brian/Documents/HoltzDotOrg/Thoughts/wiki`, `/Users/brian/My Drive`, `/Users/brian/lpscc`, `/Users/brian/src`, and `/Users/brian/src/tools` as `"TRUST_FOLDER"`.
+
+### macOS `Gemini.app` (`com.google.GeminiMacOS`)
+
+- **App settings SQLite database (`~/Library/Application Support/com.google.GeminiMacOS/Data/app-settings.store`):** In table `ZPERSISTENTSETTINGS`, set `ZENABLEADDITIONALSANDBOXOPTIONS = 1` (exposes sandbox controls in chat), `ZENABLEADVANCEDBACKUPS = 1` (backs up only modified files in connected folders rather than copying entire trees into `~/.gemini/tasks/<id>/backup/`), and `ZPREVENTSLEEPDURINGTASKS = 1`.
+- **Feature and confirmation flags (`~/Library/Preferences/com.google.GeminiMacOS.plist`):** `ClientFlagsService` (`UserDefaultsFlagStorage`) stores each flag under `<userAlias>_<flagName>` as UTF-8 JSON `Data` using Swift's synthesized enum coding (`{"overriddenValue":{"_0":true}}` vs `{"defaultValue":{"_0":false}}`). Set `user1_backup_warning_suppressed_for_all` to `true`, `user1_enableRunCommandBlockAppleScript` to `{"overriddenValue":{"_0":false}}`, and override to `true`: `user1_enableCommandToolYoloMode`, `user1_bundledMcpBypassConfirmation`, `user1_disableNetworkAccessConfirmation`, `user1_enableComputerUseAnyApp`, `user1_enableRunAppleScriptTool`, `user1_enablePythonTool`, `user1_enableMcpCustomLocal`, `user1_enableLocalPlugins`, `user1_enablePlugins`, `user1_enableLocalCCTool`, and `user1_enableCCAutoEnrollOnSubmit`.
 
 ## Cursor
 
@@ -334,8 +473,6 @@ This is useful for repositioning panels between left and right sidebars as neede
   - **Tab completion with diff preview**
   - *Closed source, can't self-host or audit*
 
-
-
 ## VS Code
 
 - **Supports Copilot**
@@ -346,8 +483,6 @@ This is useful for repositioning panels between left and right sidebars as neede
   - **Remote development (SSH, containers, WSL)**
   - *Chat panel context limited vs dedicated AI IDEs*
 - *Accept All in diff review simply accepts what's on disk and ends the review — safe even if the user made local edits during review.*
-
-
 
 ### Human-vs-Agent Conflict Diff
 
@@ -396,8 +531,6 @@ Current `http.noProxy` in `~/Library/Application Support/Code/User/settings.json
 "markdown.preview.lineHeight": 1.2,
 ```
 
-
-
 ### Markdown WYSIWYG Editor Font → Match Preview Font
 
 VS Code's `[markdown]` language-specific `editor.fontFamily` applies to the raw source editor — setting it to a proportional font breaks pipe-delimited tables. **Do not use it.** Each WYSIWYG editor has its own font control:
@@ -442,7 +575,9 @@ Observed result: this workflow successfully enables independent previews per mar
 
 ### Zaaack Find / Outline / Anchor Nav (patched)
 
-⚙️ rows — find in file, structure, internal links — are added by `~/bin/patches/patch-zaaack.py`. Run after each Zaaack update; the script globs both `~/.vscode/extensions/` and `~/.cursor/extensions/` so one run covers both IDEs. Full patch procedure and implementation notes: **ToolMods.md → Zaaack**.
+The VS Code source build lives in `~/src/vscode-markdown-editor`, branch `brian/markdown-ux`, version `0.1.22-local.6`. It includes bundled toolbar/menu translations, Markdown Outline in Explorer, plain-click links (Option-click to edit), a unified toolbar/Cmd+F search bar, a single-row adaptive toolbar with a `»` overflow tray, and explicit active-file attachment to Copilot Chat for text, custom-editor, and Markdown Editor webview tabs. The upper-right button hides the toolbar, margin annotations, line-number gutter, and raw HTML to reclaim vertical and horizontal space; a separate toolbar toggle controls raw HTML while the toolbar is shown. Toolbar and menu tooltips remain visible in narrow panes. Dark themes use dark fenced-code highlighting without Vditor's light grid background. The [GitHub fork](https://github.com/BrianHoltz/vscode-markdown-editor) and [VSIX releases](https://github.com/BrianHoltz/vscode-markdown-editor/releases) make the source and installer available to other Macs. Build commands and verification scope: [ToolMods.md → Zaaack source build](ToolMods.md#zaaack-source-build). The comparison credits Brian's confirmed VS Code Markdown behavior; external-file reread and image rendering still require interactive verification.
+
+`~/src/tools/patches/patch-zaaack.py` is the legacy installed-bundle patcher for Marketplace versions. Do not apply it to the local source build.
 
 ### Markdown Preview Theme (auto-switch)
 
@@ -474,7 +609,7 @@ Line-height, table padding, list spacing, and focus bug patches. Full procedure:
 - **Currently on 2026.2 GA/stable** (build 262.8665.258, released 2026.07.16; installed on Walmart laptop 2026.07.16). The 2026.2 EAP (auto-updated ~2026.06.27) has now shipped as stable — the config dir (`IntelliJIdea2026.2`) carried over from EAP → GA, so all EAP-era JAR patches survived the upgrade. The two 2026.2 breaking changes still require JAR patches (see ToolMods.md).
 - **Current local tool versions (2026.10.02):** IntelliJ IDEA 2026.2.3; Wibey 1.0.28 from `brian/local-combined`; Code Puppy JetBrains 0.27.0 from the local `feature/active-context-pill` build (repo `~/src/code-puppy-ide`, fork `r0b0m29/code-puppy-ide`); Code Puppy Desktop 0.3.0. The Code Puppy artifact includes active-editor context suggestion, JDK 21 build detection, and the JCEF startup workaround — image paste and universal-constructor rendering are now stock upstream behavior, so the local `ImageAttachmentCache` duplicate was retired in favor of upstream's `ImageCache`.
 - **2026.10.02 lesson:** the JetBrains marketplace plugin update silently replaced the local-combined build with a stock v0.27.0 build, dropping the active-context-pill feature. After any Code Puppy JetBrains marketplace update, re-check the installed plugin version/jar against `~/src/code-puppy-ide`'s `feature/active-context-pill` branch before assuming local mods survived — `unzip -p <plugin jar> META-INF/plugin.xml | grep version` against the installed plugin dir shows the truth.
-- **Patch audit 2026.07.17 (Walmart laptop, 2026.2 GA):** verified all fixes present in the running build — JCEF remote disabled (`idea.vmoptions`), Shuzijun `com.intellij.modules.jcef` depends + 13px font (`markdown-editor-2.0.5.jar`), MCP Server Services-panel suppression (`mcpserver.jar`), keymap overrides (`macOS copy.xml`), and the patched Wibey plugin from `brian/local-combined` (image-paste `setupClipboardPaste`/`handleImagePaste` + session-title fields all confirmed via `javap`). The one gap — the "Allow Edits to Sensitive Files" dialog suppression (`idea.readonly.fragments.notification.enabled=false`) missing from `early-access-registry.txt` — was reapplied (IDEA quit first; file method). All patches now applied.
+- **Patch audit 2026.10.09 (personal Mac, 2026.2.3):** restored the missing JCEF remote-mode override (`idea.vmoptions`), Shuzijun 2.0.7 JCEF dependency + 13px font, MCP Server Services-panel suppression, sensitive-file dialog suppression, and built-in Markdown preview light/dark stylesheet. The active `VSCode OSX` keymap is supplied by the installed `keymap-vscode` plugin; no stale custom keymap XML was recreated.
 - *command-approval constipation*
 - *Parallel agents now supported (as of 2026.06)*
 - *Cannot paste file/line reference!?*
@@ -485,8 +620,6 @@ Line-height, table padding, list spacing, and focus bug patches. Full procedure:
   - **Unmatched refactoring for Java/Kotlin (type-aware renames, extract method)**
   - **Built-in profiler and memory analysis**
   - *Expensive ($249/yr commercial, $169 w/ AI Assistant)*
-
-
 
 ### IDEA Keybindings
 
@@ -501,8 +634,6 @@ IDEA keybinding overrides are stored in `~/Library/Application Support/JetBrains
 - **Toggle Line Numbers**: `⌥L`
   - Action ID: `EditorToggleShowLineNumbers`
   - Keystroke format: `alt l`
-
-
 
 ### IDEA Workspace Roots
 
@@ -520,7 +651,6 @@ IDEA keybinding overrides are stored in `~/Library/Application Support/JetBrains
   `lpscc`, `My Drive [GDrive]`, and `src`. Attach the real directories in IDEA
   rather than only opening `~/src/tools`; the tools checkout is nested under
   `~/src` but should also have its own VCS mapping when it is being edited.
-
 - Preferred LPSCC root: `~/lpscc` (the symlink to the shared-drive root).
 - In Project view and attached directories, use `~/lpscc` rather than `~/My Drive/Libertarian/LPSCC`.
 - For the tools repo, attach the **real repo path** `~/src/tools` as both an IDEA content root and a VCS root. Do **not** rely on the `~/bin` symlink for IDE root configuration.
@@ -529,8 +659,6 @@ IDEA keybinding overrides are stored in `~/Library/Application Support/JetBrains
 - For the tools repo specifically, the desired pair is a module pointing at `file://$USER_HOME$/src/tools` and a VCS mapping for `$USER_HOME$/src/tools`.
 - If the wrong root shows up, remove the direct `My Drive/.../LPSCC` entry and reattach the symlinked root so the workspace stays stable across Drive remounts.
 - Do not let agents rewrite unrelated module/root config while doing this cleanup; even removing one stale root can have side effects on IDEA layout state and Copilot's local session/history mapping after restart.
-
-
 
 ### Markdown Preview
 
@@ -552,13 +680,18 @@ The built-in Markdown preview uses `options/markdown.xml` under `MarkdownSetting
 
 **To apply custom CSS in 2026.2:** Settings → Languages & Frameworks → Markdown → choose "Custom stylesheet text" (inline mode) and paste CSS there. Do not use the file-path option unless the CSS file lives inside the current project.
 
+**Light/dark fix (2026.2.3):** the inline stylesheet is restored in
+`~/Library/Application Support/JetBrains/IntelliJIdea2026.2/options/markdown.xml`.
+It supplies explicit light colors and a `prefers-color-scheme: dark` block for
+the page background, body text, links, code blocks, blockquotes, and tables.
+If IDEA is running while this file is changed, restart IDEA before judging the
+result; the Markdown preview tab may also need to be closed and reopened.
+
 Quick notes:
 
 - `MarkdownSettings.fontSize` lives in `options/markdown.xml`, not `editor-font.xml`.
 - Editing `markdown.xml` while IDEA is running has no effect — IDEA reads settings at startup and writes them on exit (overwriting any manual edits made while running). Use the Settings UI instead.
 - After changing font size via the Settings UI, close/reopen the Markdown tab to see the change in the JCEF preview.
-
-
 
 ### Disable "Allow Edits to Sensitive Files" Dialog
 
@@ -577,9 +710,9 @@ false
 
 ⚠️ Do NOT edit this file while IDEA is running — IDEA reads the registry at startup and rewrites this file on exit, clobbering any manual additions.
 
-### Shuzijun Markdown Editor Patches
+### Shuzijun Markdown Editor Source Build
 
-Currently applied: font size patch (13px body text), IDEA 2026.2 compat fix (`JBCefApp` classloader), MCP Server plugin Services panel suppression. Full procedures: **ToolMods.md → Shuzijun** and **ToolMods.md → MCP Server Plugin**.
+The maintained IDEA source checkout is `~/src/idea-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz fork](https://github.com/BrianHoltz/markdown-editor) of the [Apache-licensed upstream project](https://github.com/shuzijun/markdown-editor). Keep `origin` pointed at the fork and `upstream` at Shuzijun. Local version `2.0.7-local.3` ports the applicable Zaaack improvements into Shuzijun's Vditor/JCEF architecture, isolates bundled assets from stale browser caches, and matches the VS Code custom typography with wrapping, pane-width tables. IDEA supplies native browser find, IntelliJ Structure View, and independent editors per file. Installed-JCEF feature parity requires interactive verification. Build and feature details: [ToolMods.md → Shuzijun source build](ToolMods.md#shuzijun-source-build).
 
 ### JCEF Remote Mode (built-in Markdown preview + Shuzijun both broken)
 
@@ -587,7 +720,7 @@ Currently applied: font size patch (13px body text), IDEA 2026.2 compat fix (`JB
 
 **Root cause:** IDEA 2026.2 enables JCEF out-of-process (remote) mode by default; native CEF objects are null in remote mode, breaking all JCEF consumers. Full root cause chain and fix: **ToolMods.md → JCEF Remote Mode**.
 
-**Fix summary:** add `-Djcef.remote.enabled=false` to `~/Library/Application Support/JetBrains/IntelliJIdea2026.2/idea.vmoptions`. Restart IDEA. **Applied:** 2026.07.02.
+**Fix summary:** add `-Djcef.remote.enabled=false` to `~/Library/Application Support/JetBrains/IntelliJIdea2026.2/idea.vmoptions`. Restart IDEA. **Applied:** 2026.07.02; restored for the 2026.2.3 config on 2026.10.09.
 
 ### Wibey Extension Patches
 
@@ -624,11 +757,7 @@ To install the build in the active IDEA instance, run `./gradlew buildAndInstall
 
 ---
 
-
-
 ## Wibey Skills
-
-
 
 ### usage-dashboard: UTC day-boundary bug
 
@@ -659,3 +788,5 @@ Files that implement auto-regen (keep in sync):
 
 - `~/.claude/hooks/session-end-usage.py` (active hook)
 - `~/.wibey/skills/usage-dashboard/scripts/session-end-usage.py` (skill source)
+
+*[doc-audit](https://github.com/BrianHoltz/tools/blob/main/.wibey/skills/doc-audit/SKILL.md): 2026.10.11.Sun*

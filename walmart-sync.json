@@ -16,6 +16,8 @@
   ],
   "personal_only": [
     ".wibey/skills/ftm",
+    ".wibey/skills/commitz",
+    ".wibey/skills/convo",
     ".wibey/commands/avoid-numbering.md",
     ".wibey/commands/commitz.md",
     ".wibey/commands/convo.md",
