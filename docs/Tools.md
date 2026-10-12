@@ -355,25 +355,13 @@ Antigravity stores global user settings in `~/.gemini/config/config.json` (`User
 
 - **Bypassing the `read_file`/`write_file` config boundary:** Antigravity's native file tools (`view_file`, `write_to_file`, `replace_file_content`) enforce a hardcoded protection boundary on `~/.gemini/config/config.json` (`Matches hardcoded system protection boundary rule`). Once `enableTerminalSandbox: false` and `autoExecutionPolicy: "CASCADE_COMMANDS_AUTO_EXECUTION_EAGER"` are active, `run_command` executes unsandboxed and can inspect or update `~/.gemini/config/*.json` directly in place.
 - **Why URL fetches prompt even in Turbo mode:** Selecting the Turbo preset in the UI sets `permissionPreset` and `autoExecutionPolicy`, but leaves `userSettings.internetAccessPolicy` and project `settings.internetPolicy` unset, causing `read_url_content` to prompt on every new domain unless `AGENT_SETTING_POLICY_ALLOW` and `"read_url(*)"` / `"execute_url(*)"` are explicitly present.
-- **Belt-and-suspenders `PreToolUse` auto-allow hook (`~/.gemini/config/hooks.json`):** `hooks.json` is reloaded on every turn without restarting `agy`. Adding a global `PreToolUse` hook returning `{"decision":"allow"}` auto-approves any tool call that would otherwise fall back to an interactive `Ask` prompt:
-  ```json
-  {
-    "hooks": {
-      "PreToolUse": [
-        {
-          "matcher": ".*",
-          "hooks": [
-            {
-              "type": "command",
-              "command": "printf '{\"decision\":\"allow\"}\\n'",
-              "timeout": 5
-            }
-          ]
-        }
-      ]
-    }
-  }
-  ```
+- **Belt-and-suspenders `PreToolUse` `fhold` + auto-allow hook (`~/.gemini/config/hooks.json` and `~/.gemini/config/fhold-pre-tool-hook.py`):** `hooks.json` is reloaded on every turn without restarting `agy`. It invokes `/Users/brian/.gemini/config/fhold-pre-tool-hook.py` on `PreToolUse` (`matcher: ".*"`), which:
+  - Auto-approves all non-write and non-Markdown tool calls with `{"decision":"allow"}`.
+  - Denies direct IDE writes to symlink paths so agents resolve and edit the canonical target per `AgentRules.md`.
+  - On IDE write tools (`replace_file_content`, `multi_replace_file_content`, `write_to_file`, `code_action`, `file_change`) targeting an existing git-tracked `.md` file, runs `/Users/brian/src/tools/fhold status`: blocks IDE edit tools in `unreviewed` (permit) mode (`{"decision":"deny"}`), automatically registers/refreshes a review hold (`antigravity-<convId>`) in `reviewed` mode, auto-releases stale holds (>5 min), and blocks with contention details if another agent holds an active review hold (≤5 min).
+- **Inode preservation verified:** Both `replace_file_content` and `write_to_file` (`Overwrite: true`) in Antigravity preserve the existing file inode (`stat -f %i`) on macOS.
+- **Aligned multi-root workspace config:** `~/.gemini/config/projects/afc98200-c0e0-4311-875f-64aef4b663ed.json` (`projectResources.resources`), `~/.gemini/projects.json`, `~/.gemini/trustedFolders.json`, and `~/Personal.code-workspace` are aligned to the six canonical roots (`Documents`, `Documents/HoltzDotOrg/Thoughts/wiki`, `My Drive`, `lpscc` via stable `/Users/brian/lpscc` symlink, `src`, and `src/tools`), excluding the legacy `~/bin` symlink.
+- **Global agent rules stub (`~/.gemini/GEMINI.md` and symlink `~/.gemini/config/GEMINI.md`):** Points to canonical `/Users/brian/src/tools/docs/AgentRules.md`, summarizes the non-negotiable rules, and includes a `TODO` to trim `AgentRules.md` (~41.8 KB) under Gemini/Antigravity's 24,000-byte (`24 KB`) per-file rule cap so `~/.gemini/GEMINI.md` can become a direct symlink.
 - **Hot reload:** `~/.gemini/bin/agy` watches `~/.gemini/config/config.json`, `~/.gemini/config/projects/*.json`, and `~/.gemini/config/hooks.json`, applying permission changes without restarting VS Code or the language server.
 - **Binary schema inspection:** `~/.gemini/bin/agy` embeds protobuf descriptors (`jetbox_state.proto`, `codeium_common.proto`, `project.proto`, `cortex.proto`). Search the binary for `UserSettings`, `ProjectSettings`, `PermissionGrantsConfig`, or enum prefixes (`AGENT_SETTING_POLICY_`, `CASCADE_COMMANDS_AUTO_EXECUTION_`) when auditing new releases.
 
@@ -401,7 +389,7 @@ For `@google/gemini-cli` and `a2a-server` sessions, `~/.gemini/settings.json` di
 }
 ```
 
-`~/.gemini/trustedFolders.json` marks `/Users/brian`, `/Users/brian/Documents`, `/Users/brian/My Drive`, `/Users/brian/lpscc`, `/Users/brian/src`, and `/Users/brian/src/tools` as `"TRUST_FOLDER"`.
+`~/.gemini/trustedFolders.json` marks `/Users/brian`, `/Users/brian/Documents`, `/Users/brian/Documents/HoltzDotOrg/Thoughts/wiki`, `/Users/brian/My Drive`, `/Users/brian/lpscc`, `/Users/brian/src`, and `/Users/brian/src/tools` as `"TRUST_FOLDER"`.
 
 ### macOS `Gemini.app` (`com.google.GeminiMacOS`)
 
@@ -563,7 +551,7 @@ Observed result: this workflow successfully enables independent previews per mar
 
 ### Zaaack Find / Outline / Anchor Nav (patched)
 
-The VS Code source build lives in `~/src/vscode-markdown-editor`, branch `brian/markdown-ux`, version `0.1.22-local.4`. It includes bundled toolbar/menu translations, Markdown Outline in Explorer, plain-click links (Option-click to edit), a unified toolbar/Cmd+F search bar, and a single-row adaptive toolbar with a `»` overflow tray. The upper-right button hides the toolbar, margin annotations, line-number gutter, and raw HTML to reclaim vertical and horizontal space; a separate toolbar toggle controls raw HTML while the toolbar is shown. Toolbar and menu tooltips remain visible in narrow panes. The [GitHub fork](https://github.com/BrianHoltz/vscode-markdown-editor) and [VSIX releases](https://github.com/BrianHoltz/vscode-markdown-editor/releases) make the source and installer available to other Macs. Build commands and verification scope: [ToolMods.md → Zaaack source build](ToolMods.md#zaaack-source-build). The comparison scores above are historical and need an interactive recount against the installed build.
+The VS Code source build lives in `~/src/vscode-markdown-editor`, branch `brian/markdown-ux`, version `0.1.22-local.5`. It includes bundled toolbar/menu translations, Markdown Outline in Explorer, plain-click links (Option-click to edit), a unified toolbar/Cmd+F search bar, and a single-row adaptive toolbar with a `»` overflow tray. The upper-right button hides the toolbar, margin annotations, line-number gutter, and raw HTML to reclaim vertical and horizontal space; a separate toolbar toggle controls raw HTML while the toolbar is shown. Toolbar and menu tooltips remain visible in narrow panes. Dark themes now use dark fenced-code highlighting without Vditor's light grid background. The [GitHub fork](https://github.com/BrianHoltz/vscode-markdown-editor) and [VSIX releases](https://github.com/BrianHoltz/vscode-markdown-editor/releases) make the source and installer available to other Macs. Build commands and verification scope: [ToolMods.md → Zaaack source build](ToolMods.md#zaaack-source-build). The comparison scores above are historical and need an interactive recount against the installed build.
 
 `~/src/tools/patches/patch-zaaack.py` is the legacy installed-bundle patcher for Marketplace versions. Do not apply it to the local source build.
 
