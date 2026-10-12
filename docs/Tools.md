@@ -141,6 +141,23 @@ Score rubric
   - Cursor: typedown (3.5 pts); zaaack broken ~2026.06.01 (was 7 pts w/ patch)
 - Final score = IDE row subtotal + best editor subtotal
 
+## Agent Harnesses
+
+Harness behavior is rated separately from IDE and Markdown-editor behavior. Voice ratings reflect Brian's VS Code experience (2026.10.12), not a product-wide benchmark. ? means the exact behavior has not been established; it does not mean unsupported.
+
+| Feature | Wibey | Code Puppy | Copilot | Codex | Claude Code | Antigravity |
+| --- | --- | --- | --- | --- | --- | --- |
+| Host observed | IDEA / VS Code / Cursor | IDEA / VS Code / Cursor | VS Code | VS Code | VS Code | VS Code |
+| Queue next prompt | ✅ local IDEA build; VS Code/Cursor documented | ? host/build check | ? distinguish from steering | ? distinguish from steering | ? distinguish from steering | ? |
+| Steer running task | ? | ? | ? | ? | ? | ? |
+| Voice typing experience | ? | ? | ✅ record then transcribe | ✅ record then transcribe | ✅✅ preferred, live words | ? |
+| Words visible while speaking | ? | ? | ❌ waveform during recording | ❌ waveform during recording | ✅ word by word | ? |
+| Transcription after recording | ? | ? | ~2–3s reported | ~2–3s reported | Live text reported | ? |
+
+Queuing holds a follow-up for execution after the active task; steering delivers new instructions during the active task. Brian reports some form of queuing or steering in Copilot, Codex, and Claude Code, but the separate behaviors require confirmation. The maintained Wibey IDEA build documents prompt queuing and editable queued prompts; the legacy IDE matrix's enqueue row and Top Frictions claim conflict with that build description. Code Puppy's installed-host behavior needs confirmation before assigning the local queuing patch to it.
+
+Voice typing is a strongly weighted selection criterion for Brian. His reported preference is Claude Code's live word-by-word transcription over Copilot and Codex's recording followed by delayed transcription. Transcription accuracy is not scored separately without comparative evidence. Harness ratings are excluded from the existing IDE score; TODO: reconcile legacy harness rows and weights before using the aggregate score to choose an IDE.
+
 ## Markdown Viewers/ Editors
 
 - VSCode md preview hangs for big files, but zaaack handles them
@@ -236,7 +253,7 @@ The VS Code Codex shortcut is implemented. IDEA, Cursor, other-harness routing, 
 - **All IDEA patches currently applied and stable** (verified 2026.09.29). Wibey 1.0.28 from `brian/local-combined` includes upstream main plus image-paste-fix and conversation-title-features. Rebuild from that branch to keep the local plugin current.
 - Parallel Wibey agents now available in all three IDEs (as of 2026.06).
 - Top silly frictions: let me buffer up my next prompt, and make it super-easy to reference the current file and selection.
-  - Wibey allows enqueuing the next prompt while busy in VS Code and Cursor, but not in IDEA. Allowing this in IDEA would give 30% of the value of parallel agents. I don't like interrupting agents to add their next prompt and then tell them to first finish the previous one.
+  - Prompt queuing and steering are distinct requirements; see [Agent Harnesses](#agent-harnesses) for host/build-specific evidence and unresolved legacy ratings.
   - In no IDE does Wibey automatically track the current selection as context, which Github Copilot does in IDEA and VSCode, probably Cursor too.
   - Cursor+Wibey: Cmd-L broke! It now inserts selection context into builtin chat, not Wibey Chat.
 
