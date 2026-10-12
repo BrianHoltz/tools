@@ -10,7 +10,7 @@ Patch and modification procedures. See Tools.md for tool preferences, standings,
 
 ### Zaaack source build
 
-The editable source checkout is `~/src/vscode-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz GitHub fork](https://github.com/BrianHoltz/vscode-markdown-editor), based on the [MIT-licensed upstream extension](https://github.com/zaaack/vscode-markdown-editor). Local version `0.1.22-local.4` retains extension ID `zaaack.markdown-editor` and the existing custom editor ID, settings, and shortcuts. The source build is intended for VS Code; the Cursor installation is separate.
+The editable source checkout is `~/src/vscode-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz GitHub fork](https://github.com/BrianHoltz/vscode-markdown-editor), based on the [MIT-licensed upstream extension](https://github.com/zaaack/vscode-markdown-editor). Local version `0.1.22-local.5` retains extension ID `zaaack.markdown-editor` and the existing custom editor ID, settings, and shortcuts. The source build is intended for VS Code; the Cursor installation is separate.
 
 Source ownership:
 
@@ -22,6 +22,7 @@ Source ownership:
 - `media-src/src/search.ts`: toolbar and Cmd/Ctrl+F share one non-mutating find bar. The active Vditor mode selects the search root, and matches can span inline formatting. The stable app host is observed across theme and mode changes.
 - `media-src/src/responsive-toolbar.ts` and `media-src/src/main.css`: a single-row toolbar with a `»` overflow tray. ResizeObserver moves existing Vditor controls into the tray in their original order, preserving upstream handlers. Save, Find, More, and edit-mode controls have the strongest retention preference. The optional line-number gutter does not pad the toolbar. Escape and outside clicks dismiss the tray; keyboard Tab reaches the overflow controls. Submenus anchor below the tray to fit narrow panes.
 - `media-src/src/appearance.ts`: persistent toolbar and raw-HTML visibility. The upper-right button hides/restores the toolbar; hidden mode removes the row, H1-H6 and other margin annotations, and line-number gutter, reducing rich-editor side padding to 12px. The raw-HTML toolbar button hides tag syntax and HTML-only rows without hiding rendered HTML blocks or fenced examples. Source mode is unaffected. Named HTML anchors remain navigable; search ignores hidden HTML markup. Show raw HTML or switch to source mode to edit tags. Preferences live in extension global state and participate in Settings Sync, without modifying documents.
+- `media-src/src/main.ts` and `media-src/src/main.css`: dark editor themes switch the default GitHub code palette to GitHub Dark and remove Vditor's repeating light-grid image from fenced code blocks. Explicitly selected non-GitHub code palettes remain unchanged.
 
 For another Mac, download the VSIX from [GitHub Releases](https://github.com/BrianHoltz/vscode-markdown-editor/releases) and run **Extensions: Install from VSIX**, then reload the window. For source work, clone the fork into `~/src/vscode-markdown-editor` and select `brian/markdown-ux`. The fork's default branch is the maintained local branch. The local checkout keeps `upstream` pointed at Zaaack and `origin` pointed at BrianHoltz.
 
@@ -36,15 +37,15 @@ npx --yes pnpm@10.32.1 build
 npx --yes pnpm@10.32.1 --filter media-src exec tsc --noEmit
 npx --yes pnpm@10.32.1 exec playwright install chromium
 npx --yes pnpm@10.32.1 test
-npx --yes --package @vscode/vsce vsce package --no-dependencies --out markdown-editor-0.1.22-local.4.vsix
+npx --yes --package @vscode/vsce vsce package --no-dependencies --out markdown-editor-0.1.22-local.5.vsix
 STAMP=$(date "+%Y%m%d.%a.%H%M")
-OUT="$HOME/Downloads/markdown-editor-0.1.22-local.4-$STAMP-tooltips.vsix"
-cp -p markdown-editor-0.1.22-local.4.vsix "$OUT"
-cmp markdown-editor-0.1.22-local.4.vsix "$OUT"
+OUT="$HOME/Downloads/markdown-editor-0.1.22-local.5-$STAMP-darkcode.vsix"
+cp -p markdown-editor-0.1.22-local.5.vsix "$OUT"
+cmp markdown-editor-0.1.22-local.5.vsix "$OUT"
 code --install-extension "$OUT" --force
 ```
 
-Keep the canonical VSIX in the repository root (`vsce package`'s normal output location) and install from the timestamped Downloads copy, following the [Local Build Artifact Rule](Tools.md#local-build-artifact-rule). Capture the completion timestamp immediately after successful packaging; `tooltips` is the newest-fix label. GitHub release uploads use the same timestamped filename as the Downloads copy. Delete previous Markdown Editor Downloads installers after verifying the replacement.
+Keep the canonical VSIX in the repository root (`vsce package`'s normal output location) and install from the timestamped Downloads copy, following the [Local Build Artifact Rule](Tools.md#local-build-artifact-rule). Capture the completion timestamp immediately after successful packaging; `darkcode` is the newest-fix label. GitHub release uploads use the same timestamped filename as the Downloads copy. Delete previous Markdown Editor Downloads installers after verifying the replacement.
 
 Reload VS Code with **Developer: Reload Window**. Disable auto-update for Markdown Editor through its extension gear menu to retain the source build. Do not run `patch-zaaack.py` against it; maintain fixes in source and rebuild. Marketplace installation remains the rollback route.
 
@@ -205,7 +206,7 @@ TypeDown WYSIWYG markdown editor (tarikkavaz.typedown-markdown-editor) has no se
 
 ### Shuzijun source build
 
-The editable source checkout is `~/src/idea-markdown-editor`, branch `brian/markdown-ux`, based on the [Apache-licensed upstream plugin](https://github.com/shuzijun/markdown-editor). Local version `2.0.7-local.3` retains plugin ID `com.shuzijun.markdown-editor` and builds against the installed IDEA 2026.2.3 runtime instead of downloading another IntelliJ distribution.
+The editable source checkout is `~/src/idea-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz fork](https://github.com/BrianHoltz/markdown-editor) of the [Apache-licensed upstream plugin](https://github.com/shuzijun/markdown-editor). Keep `origin` pointed at the fork and `upstream` at Shuzijun; the fork makes these local improvements available to other machines without pushing personal changes to the upstream maintainer. Local version `2.0.7-local.3` retains plugin ID `com.shuzijun.markdown-editor` and builds against the installed IDEA 2026.2.3 runtime instead of downloading another IntelliJ distribution.
 
 The VS Code improvements map to IDEA as follows:
 

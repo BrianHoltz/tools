@@ -688,7 +688,7 @@ false
 
 ### Shuzijun Markdown Editor Source Build
 
-The maintained IDEA source checkout is `~/src/idea-markdown-editor`, branch `brian/markdown-ux`, based on the [Apache-licensed upstream project](https://github.com/shuzijun/markdown-editor). Local version `2.0.7-local.3` ports the applicable Zaaack improvements into Shuzijun's Vditor/JCEF architecture, isolates bundled assets from stale browser caches, and matches the VS Code custom typography with wrapping, pane-width tables. IDEA supplies native browser find, IntelliJ Structure View, and independent editors per file. Installed-JCEF feature parity requires interactive verification. Build and feature details: [ToolMods.md → Shuzijun source build](ToolMods.md#shuzijun-source-build).
+The maintained IDEA source checkout is `~/src/idea-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz fork](https://github.com/BrianHoltz/markdown-editor) of the [Apache-licensed upstream project](https://github.com/shuzijun/markdown-editor). Keep `origin` pointed at the fork and `upstream` at Shuzijun. Local version `2.0.7-local.3` ports the applicable Zaaack improvements into Shuzijun's Vditor/JCEF architecture, isolates bundled assets from stale browser caches, and matches the VS Code custom typography with wrapping, pane-width tables. IDEA supplies native browser find, IntelliJ Structure View, and independent editors per file. Installed-JCEF feature parity requires interactive verification. Build and feature details: [ToolMods.md → Shuzijun source build](ToolMods.md#shuzijun-source-build).
 
 ### JCEF Remote Mode (built-in Markdown preview + Shuzijun both broken)
 
