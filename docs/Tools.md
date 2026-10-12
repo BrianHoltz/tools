@@ -207,6 +207,24 @@ Extension command IDs:
 - `typedown.openWysiwygEditor` (when `!typedown.editorIsActive`) / `typedown.openDefaultEditor` (when `typedown.editorIsActive`)
 - `markdown-editor.openEditor` (when `editorTextFocus && editorLangId == markdown`)
 
+### Add the active file to Codex
+
+In VS Code, **⌃⌥⌘C** (Control–Option–Command–C) invokes **Codex: Add Active File to Codex**. Focus the file tab, including a TypeDown or Zaaack Markdown visual editor, and press the shortcut to attach its file reference to the active Codex chat. The command opens the Codex sidebar; it does not submit a prompt. Reload the VS Code window if a newly installed extension is not active.
+
+The local **Codex File Context** extension lives in [vscode/codex-file-context](../vscode/codex-file-context/package.json). Its [adapter](../vscode/codex-file-context/extension.js) resolves the active tab's file URI for both standard text editors and custom editors, then passes that URI explicitly to [Codex's Add File to Thread command](https://developers.openai.com/codex/ide/commands). A direct keybinding to the built-in command can miss custom editors because its implicit lookup uses the active text editor. Resolving the tab also avoids attaching a stale text editor's file. Unsaved untitled documents and tabs without a local file URI produce a message instead of an attachment. The adapter attaches a path, not a snapshot of unsaved buffer contents.
+
+The binding is contributed by the extension, rather than added to user keybindings. Change it in Settings → Keyboard Shortcuts by searching for **Add Active File to Codex**. Installed extension ID: `brianholtz.codex-file-context`. Installation and mocked text/custom-tab resolution are verified; live keystroke delivery inside the Markdown webviews requires an interactive check.
+
+### Generalizing active-file attachment
+
+The reusable design separates **editor lookup** from **chat attachment**: capture the focused file before moving focus to chat, then call the chosen harness's attachment command with an explicit file reference. Selection support also needs the range and, when unsaved edits matter, the selected buffer text. A keybinding, editor-toolbar button, and active-file suggestion pill can share this action. Ordering recent files in an @ menu requires changes to the harness's picker; the attachment adapter alone does not control that menu.
+
+- **VS Code and Cursor:** the tab lookup is reusable across compatible extensions. Each target harness needs a verified command and argument format; the Codex adapter cannot attach to Wibey, Code Puppy, Copilot, or Claude merely by changing the model. Cursor also needs its own installation and a compatibility check against its VS Code engine.
+- **IntelliJ IDEA:** implement the equivalent as a keymap action using the selected file editor's file, rather than requiring a text editor. The [IntelliJ editor API](https://plugins.jetbrains.com/docs/intellij/editors.html) supports file editors, including custom editors; attachment still depends on the target plugin's action or API. [Codex in JetBrains AI Assistant](https://www.jetbrains.com/help/ai-assistant/codex-agent.html#collect-ide-context) already has an IDE-context toggle that supplies the active file name and selection with each prompt. [AI Assistant chat](https://www.jetbrains.com/help/ai-assistant/chat-mode.html#use-mentions) documents @thisFile and file attachments. Neither establishes that an explicit shortcut works inside the Shuzijun visual editor; that integration needs verification.
+- **Other agent harnesses:** use their exposed attachment API or add an adapter to a locally maintained integration. Choose the destination chat explicitly when multiple harnesses are open. Supplying editor context through a tool can help an agent discover a file, but it does not itself add a visible attachment to the chat composer.
+
+The VS Code Codex shortcut is implemented. IDEA, Cursor, other-harness routing, selection attachment, and picker ordering are design options, not installed features.
+
 ## Top Frictions
 
 - **All IDEA patches currently applied and stable** (verified 2026.09.29). Wibey 1.0.28 from `brian/local-combined` includes upstream main plus image-paste-fix and conversation-title-features. Rebuild from that branch to keep the local plugin current.

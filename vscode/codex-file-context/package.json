@@ -1,0 +1,30 @@
+{
+  "name": "codex-file-context",
+  "displayName": "Codex File Context",
+  "description": "Add the active text or Markdown visual-editor file to Codex.",
+  "version": "0.1.0",
+  "publisher": "brianholtz",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "main": "./extension.js",
+  "extensionDependencies": [
+    "openai.chatgpt"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "brianholtz.addActiveFileToCodex",
+        "title": "Add Active File to Codex",
+        "category": "Codex"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "brianholtz.addActiveFileToCodex",
+        "key": "ctrl+alt+c",
+        "mac": "ctrl+alt+cmd+c"
+      }
+    ]
+  }
+}
