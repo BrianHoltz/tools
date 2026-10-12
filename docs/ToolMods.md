@@ -203,45 +203,43 @@ TypeDown WYSIWYG markdown editor (tarikkavaz.typedown-markdown-editor) has no se
 
 ## IDEA: Shuzijun Markdown Editor
 
-### Font Size Patch + 2026.2 Compat
+### Shuzijun source build
 
-Shuzijun Markdown Editor plugin (com.shuzijun.markdown-editor) uses Vditor, which hardcodes `font-size: 16px` for body text in `.vditor-reset`, `.vditor-sv`, and `.vditor-ir`. That's too large for IDEA's 13px UI font. Shuzijun 2.0.7 derives its palette from the IDE editor color scheme. An existing Vditor tab can retain dark colors after the IDE switches to light; closing and reopening the document recreates the editor.
+The editable source checkout is `~/src/idea-markdown-editor`, branch `brian/markdown-ux`, based on the [Apache-licensed upstream plugin](https://github.com/shuzijun/markdown-editor). Local version `2.0.7-local.3` retains plugin ID `com.shuzijun.markdown-editor` and builds against the installed IDEA 2026.2.3 runtime instead of downloading another IntelliJ distribution.
 
-- CSS in `vditor/style.css` inside `markdown-editor-2.0.5.jar`:
-  - Added `font-size: 13px !important` override on `.vditor .vditor-reset`, `.vditor .vditor-sv`, `.vditor .vditor-ir` — overrides the Vditor default 16px across preview, split-view, and IR editing modes
-- **IDE appearance synchronization:** [patch-shuzijun.py](../patches/patch-shuzijun.py) patches `template/default.html` to queue theme changes until Vditor is ready, reapply the palette after initialization, and synchronize from IDEA's generated stylesheet when it changes or the tab becomes visible. It also handles a theme update arriving before the initial style element exists. Marker: `__shuzijunIdeaAppearance__`. The IDE stylesheet is authoritative; a browser media query does not override the chosen IDE scheme.
-- The appearance patch is installed in `~/Library/Application Support/JetBrains/IntelliJIdea2026.2/plugins/markdown-editor/lib/markdown-editor-2.0.7.jar`. It preserves the other JAR entries and the file inode, saves a backup, rejects unknown template layouts, and is idempotent. Plugin updates overwrite JAR patches; reapply afterward. Restart IDEA after patching because the running IDE caches plugin resources.
-- Patch procedure: extract `vditor/style.css` from the JAR, add the override, repack with `jar uf`
+The VS Code improvements map to IDEA as follows:
 
-Apply the appearance patch to the installed plugin JAR (use its installed version in the path):
+- Shuzijun already has JCEF browser find through `CefBrowser.find()`, IntelliJ Structure View through `getStructureViewBuilder()`, Vditor outline, one `FileEditor` instance per Markdown file, and locally bundled Vditor translations. The VS Code search overlay, Explorer TreeView, multipanel registry, and locale bundler are unnecessary.
+- `src/main/resources/template/default.html` and `vditor/style.css` supply a single-row adaptive toolbar with a keyboard-accessible `»` overflow tray, viewport-clamped tooltips for narrow panes, a persistent upper-right distraction-free toggle, and a raw-HTML visibility toggle. Hidden-toolbar mode also removes rich-editor margin annotations and hides raw HTML markup without changing the Markdown source.
+- Plain clicks use Vditor's link handling; Option-click positions the caret for editing. Same-document fragments resolve duplicate and Unicode heading slugs plus named HTML anchors, including anchors whose raw markup is hidden. Relative Markdown links with fragments open the target IDEA editor and queue navigation until its JCEF page finishes loading.
+- `MarkdownHtmlPanel` persists the two appearance preferences in IntelliJ `PropertiesComponent`, so they apply across Markdown files and IDE restarts.
+- IDE appearance synchronization is source-integrated: theme changes wait for Vditor initialization, replace or create the generated stylesheet safely, and reapply Vditor's light or dark content theme.
+- `META-INF/plugin.xml` declares `com.intellij.modules.jcef` as a required dependency, replacing the installed-JAR compatibility patch.
+- `build.gradle.kts` accepts `-PlocalIdePath=...`, avoiding the slow platform download, and reuses the base `2.0.7` changelog entry for local version metadata.
+- Bundled JavaScript, CSS, locales, icons, and Lute use a startup-specific resource URL prefix, preventing cached assets from another plugin installation from mixing with the active bundle. Browser console warnings and errors are forwarded to `idea.log`.
+- Rich text uses the VS Code custom-CSS system sans-serif stack at 13px with 1.2 line height; source mode and code retain IDEA's editor font. Tables inherit the rich-text font, occupy the available content width, and wrap cells, including long unbroken URLs. Symmetric 35px rich-editor padding prevents Vditor's centered-column padding from wasting pane width; distraction-free mode uses 12px.
 
-```sh
-python3 ~/src/tools/patches/patch-shuzijun.py \
-  "$HOME/Library/Application Support/JetBrains/IntelliJIdea2026.2/plugins/markdown-editor/lib/markdown-editor-2.0.7.jar"
-```
+`node --test test/asset-compatibility.test.cjs` checks Lute's Vditor initialization API, cache-isolated template references, and typography/table CSS invariants. A jsdom smoke test verifies startup and computed typography and cell-wrapping styles for synthetic nine-column tables in IR and WYSIWYG modes. It does not measure browser layout geometry or establish interactive feature parity in installed JCEF.
 
-Append `--dry-run` to check compatibility without writing. After restarting IDEA, verify that the Markdown Editor tab matches the IDE in both light and dark appearance.
-
-**IDEA 2026.2 compatibility patch** — Shuzijun 2.0.5 crashes in IDEA 2026.2 with `NoClassDefFoundError: com/intellij/ui/jcef/JBCefApp` because IDEA 2026.2 moved `JBCefApp` from core to the `com.intellij.modules.jcef` plugin module (`jcef-plugin/lib/modules/intellij.platform.ui.jcef.jar`). Shuzijun's plugin.xml only declares `<depends>com.intellij.modules.lang</depends>`, so the class is invisible to its classloader and `MarkdownPreviewFileEditorProvider.accept()` throws on every markdown open, causing the WYSIWYG tab to disappear.
-
-Fix: add `<depends>com.intellij.modules.jcef</depends>` to `META-INF/plugin.xml` inside the JAR:
+Build and preserve the installable ZIP:
 
 ```sh
-# Backup and patch (2026.2 copy):
-JAR=~/Library/Application\ Support/JetBrains/IntelliJIdea2026.2/plugins/markdown-editor/lib/markdown-editor-2.0.5.jar
-cp "$JAR" "${JAR}.bak.$(date +%s)"
-mkdir /tmp/shuzijun_patch && cd /tmp/shuzijun_patch
-jar xf "$JAR"
-# In META-INF/plugin.xml, after the existing <depends>com.intellij.modules.lang</depends> line, add:
-#   <depends>com.intellij.modules.jcef</depends>
-# Then repack:
-jar uf "$JAR" META-INF/plugin.xml
-# Verify:
-mkdir /tmp/verify && cd /tmp/verify && jar xf "$JAR" META-INF/plugin.xml && grep "modules.jcef" META-INF/plugin.xml
-rm -rf /tmp/shuzijun_patch /tmp/verify
+cd ~/src/idea-markdown-editor
+export JAVA_HOME="$HOME/Applications/IntelliJ IDEA 2026.2.3.app/Contents/jbr/Contents/Home"
+./gradlew --no-daemon \
+  -PlocalIdePath="$HOME/Applications/IntelliJ IDEA 2026.2.3.app" \
+  clean buildPlugin
+STAMP=$(date "+%Y%m%d.%a.%H%M")
+OUT="$HOME/Downloads/markdown-editor-2.0.7-local.3-$STAMP-layout.zip"
+cp -p build/distributions/markdown-editor-2.0.7-local.3.zip "$OUT"
+cmp build/distributions/markdown-editor-2.0.7-local.3.zip "$OUT"
 ```
 
-Applied to 2026.2 on 2026.06.30. The 2025.3 copy did not need this patch (JBCefApp was in core there). Reapply after any Shuzijun update. Restart IDEA after patching.
+Install the Downloads copy with **Settings → Plugins → gear → Install Plugin from Disk**, then restart IDEA. The source build replaces the Marketplace plugin because it retains the same plugin ID.
+
+### Legacy installed-JAR patch
+
+`~/src/tools/patches/patch-shuzijun.py` remains a rollback tool for Marketplace 2.0.7. It patches `template/default.html` in the installed JAR to synchronize Vditor with IDEA appearance changes. Do not apply it to the local source build; maintain changes in `~/src/idea-markdown-editor` and rebuild.
 
 ---
 
@@ -429,3 +427,5 @@ History of tool use practices and modifications.
 - 2026.06.18 Wed: Switched primary IDE from VS Code to IDEA. Added "IDEA editor" column to markdown table (native WYSIWYG, replaces shuzijun column). Native editor scores 8.0 pts (vs shuzijun 3.5), lifting IDEA total from 21.5 → 28.5. Parallel agents now ✅ in IDEA (was ❌); "type @ busy Wibey" renamed to "enqueue next prompt" and inverted — VS Code/Cursor now ✅, IDEA ❌. Score recalc: IDEA 28.5, VS Code 20.5, Cursor 19.5.
 - 2026.08.06 Thu: Reinstalled all IDEA mods on request. Wibey JetBrains plugin had silently auto-updated to stock `1.0.24.jar` (no custom fields — title-bar rename patch gone, though upstream now ships its own native clipboard-paste). First pass rebuilt `~/src/wibey-jetbrains-plugin` branch `brian/local-combined` as-is (still based on upstream 1.0.23) via `./gradlew clean buildAndInstall`, confirming our patches restore correctly. Then, per follow-up request, merged `origin/main` into `brian/local-combined` (38 commits, including the 1.0.24 bump, bridge-daemon rewrite, and workspace-path fixes) — clean merge, no conflicts, our patched files (`NativeChatToolWindowPanel.kt`, `InputAttachmentManager.kt`) merged without collision. Rebuilt + reinstalled again; `javap` confirmed the installed JAR is genuinely `1.0.24` **and** still has `sessionTitleLabel`/`sessionRenameTrigger`/`sessionTitleBar`/`startSessionRenameInline` (title rename) and `setupClipboardPaste`/`handleImagePaste` (image paste) compiled in. Re-verified the other four mods untouched throughout: JCEF remote disabled, readonly-fragments-notification, Shuzijun `com.intellij.modules.jcef` depends + 13px font, MCP Server `serviceViewContributor` suppression — all still present. Merge commit made locally on `brian/local-combined`; not pushed. Restart IDEA required.
 - 2026.07.17 Thu: IDEA 2026.2 EAP shipped as GA/stable (build 262.8665.258, released 2026.07.16) on the Walmart laptop. Config dir `IntelliJIdea2026.2` carried over intact from EAP → GA, so all EAP-era patches survived the upgrade. Full audit (Code Puppy) of the running GA build confirmed present: JCEF remote disabled (`-Djcef.remote.enabled=false` in `idea.vmoptions`), Shuzijun `com.intellij.modules.jcef` depends + 13px font (`markdown-editor-2.0.5.jar`), MCP Server `serviceViewContributor` suppression (`mcpserver.jar`, `__mcpNoServicesPanel__` marker), keymap overrides (`macOS copy.xml`: zoom/GotoFile/line-numbers), and the patched Wibey plugin `1.0.23.jar` from `brian/local-combined` — verified via `javap` that `InputAttachmentManager.setupClipboardPaste()`/`handleImagePaste(Clipboard)` (image paste) and `NativeChatToolWindowPanel.sessionTitleLabel`/`sessionTitleBar`/`startSessionRenameInline` (title features) are all compiled in. Source repo on `brian/local-combined`, up to date with origin/main (nothing to merge). **One gap, now closed:** `idea.readonly.fragments.notification.enabled=false` was missing from `early-access-registry.txt` after the EAP→GA carry-over. Reapplied 2026.07.17 via the file method after quitting IDEA (appended key+value, `.bak` created). Restart IDEA to take effect. Updated Tools.md: IDE version cells `2026.2 EAP` → `2026.2`, IDEA status bullet, Markdown Preview section headers.
+
+*[doc-audit](https://github.com/BrianHoltz/tools/blob/main/.wibey/skills/doc-audit/SKILL.md): 2026.10.11.Sun*
