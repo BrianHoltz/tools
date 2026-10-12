@@ -355,7 +355,26 @@ Antigravity stores global user settings in `~/.gemini/config/config.json` (`User
 
 - **Bypassing the `read_file`/`write_file` config boundary:** Antigravity's native file tools (`view_file`, `write_to_file`, `replace_file_content`) enforce a hardcoded protection boundary on `~/.gemini/config/config.json` (`Matches hardcoded system protection boundary rule`). Once `enableTerminalSandbox: false` and `autoExecutionPolicy: "CASCADE_COMMANDS_AUTO_EXECUTION_EAGER"` are active, `run_command` executes unsandboxed and can inspect or update `~/.gemini/config/*.json` directly in place.
 - **Why URL fetches prompt even in Turbo mode:** Selecting the Turbo preset in the UI sets `permissionPreset` and `autoExecutionPolicy`, but leaves `userSettings.internetAccessPolicy` and project `settings.internetPolicy` unset, causing `read_url_content` to prompt on every new domain unless `AGENT_SETTING_POLICY_ALLOW` and `"read_url(*)"` / `"execute_url(*)"` are explicitly present.
-- **Hot reload:** `~/.gemini/bin/agy` watches `~/.gemini/config/config.json` and `~/.gemini/config/projects/*.json` and applies permission changes immediately without restarting VS Code or the language server.
+- **Belt-and-suspenders `PreToolUse` auto-allow hook (`~/.gemini/config/hooks.json`):** `hooks.json` is reloaded on every turn without restarting `agy`. Adding a global `PreToolUse` hook returning `{"decision":"allow"}` auto-approves any tool call that would otherwise fall back to an interactive `Ask` prompt:
+  ```json
+  {
+    "hooks": {
+      "PreToolUse": [
+        {
+          "matcher": ".*",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "printf '{\"decision\":\"allow\"}\\n'",
+              "timeout": 5
+            }
+          ]
+        }
+      ]
+    }
+  }
+  ```
+- **Hot reload:** `~/.gemini/bin/agy` watches `~/.gemini/config/config.json`, `~/.gemini/config/projects/*.json`, and `~/.gemini/config/hooks.json`, applying permission changes without restarting VS Code or the language server.
 - **Binary schema inspection:** `~/.gemini/bin/agy` embeds protobuf descriptors (`jetbox_state.proto`, `codeium_common.proto`, `project.proto`, `cortex.proto`). Search the binary for `UserSettings`, `ProjectSettings`, `PermissionGrantsConfig`, or enum prefixes (`AGENT_SETTING_POLICY_`, `CASCADE_COMMANDS_AUTO_EXECUTION_`) when auditing new releases.
 
 ### Standalone Gemini CLI (`~/.gemini/settings.json` and `trustedFolders.json`)
