@@ -2,7 +2,7 @@
 
 ## Local Modifications in Use
 
-- **Code Puppy JetBrains + VS Code + Cursor (JetBrains/VS Code at 0.28.0 as of 2026.10.09; Cursor still 0.27.0)** — same `feature/active-context-pill` branch of `~/src/code-puppy-ide` builds all three; the active-editor-context suggestion is implemented in the shared webview/protocol packages so it applies everywhere. JetBrains additionally carries local JDK 21 build detection and the JCEF-proxy-warm startup workaround (no JCEF in VS Code/Cursor, so those don't need it). The VS Code/Cursor extension was built and installed for the first time 2026.10.02 — previously source-only, never packaged. (Editable conversation titles and universal-constructor visibility shipped upstream and no longer need a local patch.)
+- **Code Puppy JetBrains + VS Code + Cursor** — VS Code has the local 0.28.2 build from [brian/vscode-0.28.2-local](https://gecgithub01.walmart.com/r0b0m29/code-puppy-ide/tree/brian/vscode-0.28.2-local), installed 2026.10.12; JetBrains remains under separate Wibey repair, and Cursor remains 0.27.0. The isolated VS Code branch merges upstream 0.28.2 with `feature/active-context-pill`, preserving active-file/selection suggestions and distinct selection identities. Its timestamped Downloads VSIX is `code-puppy-vscode-0.28.2-20261012.Mon.1210-context.vsix`; the canonical artifact is in `~/src/code-puppy-ide/releases/`. Typechecks, ESLint, and all 1,719 TypeScript unit tests pass; the bridge suite passes 350 tests with one skipped. On Node 25, run webview tests with `NODE_OPTIONS=--no-experimental-webstorage` so jsdom owns localStorage. Interactive extension-host and browser E2E checks are separate from these validations. JetBrains-only JDK/JCEF patches do not apply to VS Code.
 - **Wibey JetBrains 1.0.28** — upstream GPT model support and context-window work, combined locally with persistent editable conversation titles, editable queued follow-up prompts, image paste, focused-editor file/selection context, prompt queuing, and quota snapshots.
 - **Zaaack Markdown Editor for VS Code and Cursor** — adds multipanel editing, outline navigation, find, anchor links, and dark-theme/readability improvements.
 - **TypeDown for VS Code and Cursor** — compacts prose, table, and list spacing; preserves editor focus and cursor position through paste.
@@ -86,7 +86,7 @@ code --install-extension ~/Downloads/code-puppy-vscode-<version>-<stamp>-<blah>.
 cursor --install-extension ~/Downloads/code-puppy-vscode-<version>-<stamp>-<blah>.vsix
 ```
 
-Verify with `code --list-extensions --show-versions | grep puppy` (same flag works for `cursor`). Unlike the JetBrains side, there's no marketplace auto-update to silently clobber this — it only changes when you rebuild and reinstall it yourself.
+For VS Code 0.28.2, build from [brian/vscode-0.28.2-local](https://gecgithub01.walmart.com/r0b0m29/code-puppy-ide/tree/brian/vscode-0.28.2-local), not the JetBrains repair checkout. Build the shared webview before packaging: `pnpm --filter @code-puppy/webview build`, then `pnpm --filter code-puppy-vscode package`. Verify the installed version with `code --list-extensions --show-versions` (or `cursor` for Cursor). Installing a stock VSIX can replace local modifications even when the version matches; reinstall the timestamped local Downloads VSIX with `--force` afterward.
 
 ## IDEs
 
@@ -237,7 +237,7 @@ In VS Code, **⌃⌥⌘C** (Control–Option–Command–C) invokes **Codex: Add
 
 The local **Codex File Context** extension lives in [vscode/codex-file-context](../vscode/codex-file-context/package.json). Its [adapter](../vscode/codex-file-context/extension.js) resolves the active tab's file URI for both standard text editors and custom editors, then passes that URI explicitly to [Codex's Add File to Thread command](https://developers.openai.com/codex/ide/commands). A direct keybinding to the built-in command can miss custom editors because its implicit lookup uses the active text editor. Resolving the tab also avoids attaching a stale text editor's file. Unsaved untitled documents and tabs without a local file URI produce a message instead of an attachment. The adapter attaches a path, not a snapshot of unsaved buffer contents.
 
-The binding is contributed by the extension, rather than added to user keybindings. Change it in Settings → Keyboard Shortcuts by searching for **Add Active File to Codex**. Installed extension ID: `brianholtz.codex-file-context`. Installation and mocked text/custom-tab resolution are verified; live keystroke delivery inside the Markdown webviews requires an interactive check.
+The binding is contributed by the extension, rather than added to user keybindings. Change it in Settings → Keyboard Shortcuts by searching for **Add Active File to Codex**. Extension ID: `brianholtz.codex-file-context`. On the work laptop, the helper is marked uninstalled and its `openai.chatgpt` dependency is absent (2026.10.12); the shortcut is unavailable there. Mocked text/custom-tab resolution is verified; live keystroke delivery inside the Markdown webviews requires an interactive check.
 
 ### Generalizing active-file attachment
 
