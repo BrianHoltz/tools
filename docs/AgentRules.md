@@ -67,6 +67,8 @@ This file is the global layer; a repo's AGENTS.md supplies project/team context,
 
 The canonical repository is `~/src/tools/`, the local checkout of the public [tools repo](https://github.com/BrianHoltz/tools). [AgentRules.md](AgentRules.md) lives at `~/src/tools/docs/AgentRules.md`. `~/bin/` is just a legacy symlink to `~/src/tools/`, retained for compatibility with existing paths and PATH settings. Use the canonical path for edits, commits, new configuration, scripts, and adapter targets. Git synchronizes the repository across laptops.
 
+Name this repository `~/src/tools/` in conversation, status reports, and commit messages — never `~/bin/`. Referring to it by the legacy symlink reads as confusion about which path is canonical, even when the underlying file is the same. If a tool's own output names the `~/bin/` path (e.g. a command's `-h` text or an error message), relay that verbatim but describe the repo itself as `~/src/tools/`.
+
 Agent adapter installation targets link to `~/src/tools/docs/AgentRules.md`; installed adapters depend on the host and agent:
 
 - `~/.codex/AGENTS.md` — Codex global instructions; see [Codex Integration](#codex-integration) for profiles, overrides, and setup.
