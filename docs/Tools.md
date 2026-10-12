@@ -207,6 +207,10 @@ Extension command IDs:
 - `typedown.openWysiwygEditor` (when `!typedown.editorIsActive`) / `typedown.openDefaultEditor` (when `typedown.editorIsActive`)
 - `markdown-editor.openEditor` (when `editorTextFocus && editorLangId == markdown`)
 
+### Add the active file to Copilot Chat
+
+In VS Code, **⌃⌥⌘⇧C** invokes **Markdown Editor: Add Active File to Copilot Chat**. It attaches the active tab's file URI through VS Code's native `workbench.action.chat.attachFile` action, including Zaaack Markdown Editor custom and webview tabs that Copilot's implicit active-editor lookup can miss. Focus the intended tab before invoking it; the file is attached to the active/last-focused VS Code Chat and is not sent automatically. Local, remote, and untitled files are supported; unsupported tabs produce an information message.
+
 ### Add the active file to Codex
 
 In VS Code, **⌃⌥⌘C** (Control–Option–Command–C) invokes **Codex: Add Active File to Codex**. Focus the file tab, including a TypeDown or Zaaack Markdown visual editor, and press the shortcut to attach its file reference to the active Codex chat. The command opens the Codex sidebar; it does not submit a prompt. Reload the VS Code window if a newly installed extension is not active.
@@ -551,7 +555,7 @@ Observed result: this workflow successfully enables independent previews per mar
 
 ### Zaaack Find / Outline / Anchor Nav (patched)
 
-The VS Code source build lives in `~/src/vscode-markdown-editor`, branch `brian/markdown-ux`, version `0.1.22-local.5`. It includes bundled toolbar/menu translations, Markdown Outline in Explorer, plain-click links (Option-click to edit), a unified toolbar/Cmd+F search bar, and a single-row adaptive toolbar with a `»` overflow tray. The upper-right button hides the toolbar, margin annotations, line-number gutter, and raw HTML to reclaim vertical and horizontal space; a separate toolbar toggle controls raw HTML while the toolbar is shown. Toolbar and menu tooltips remain visible in narrow panes. Dark themes now use dark fenced-code highlighting without Vditor's light grid background. The [GitHub fork](https://github.com/BrianHoltz/vscode-markdown-editor) and [VSIX releases](https://github.com/BrianHoltz/vscode-markdown-editor/releases) make the source and installer available to other Macs. Build commands and verification scope: [ToolMods.md → Zaaack source build](ToolMods.md#zaaack-source-build). The comparison scores above are historical and need an interactive recount against the installed build.
+The VS Code source build lives in `~/src/vscode-markdown-editor`, branch `brian/markdown-ux`, version `0.1.22-local.6`. It includes bundled toolbar/menu translations, Markdown Outline in Explorer, plain-click links (Option-click to edit), a unified toolbar/Cmd+F search bar, a single-row adaptive toolbar with a `»` overflow tray, and explicit active-file attachment to Copilot Chat for text, custom-editor, and Markdown Editor webview tabs. The upper-right button hides the toolbar, margin annotations, line-number gutter, and raw HTML to reclaim vertical and horizontal space; a separate toolbar toggle controls raw HTML while the toolbar is shown. Toolbar and menu tooltips remain visible in narrow panes. Dark themes use dark fenced-code highlighting without Vditor's light grid background. The [GitHub fork](https://github.com/BrianHoltz/vscode-markdown-editor) and [VSIX releases](https://github.com/BrianHoltz/vscode-markdown-editor/releases) make the source and installer available to other Macs. Build commands and verification scope: [ToolMods.md → Zaaack source build](ToolMods.md#zaaack-source-build). The comparison scores above are historical and need an interactive recount against the installed build.
 
 `~/src/tools/patches/patch-zaaack.py` is the legacy installed-bundle patcher for Marketplace versions. Do not apply it to the local source build.
 

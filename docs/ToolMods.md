@@ -10,7 +10,7 @@ Patch and modification procedures. See Tools.md for tool preferences, standings,
 
 ### Zaaack source build
 
-The editable source checkout is `~/src/vscode-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz GitHub fork](https://github.com/BrianHoltz/vscode-markdown-editor), based on the [MIT-licensed upstream extension](https://github.com/zaaack/vscode-markdown-editor). Local version `0.1.22-local.5` retains extension ID `zaaack.markdown-editor` and the existing custom editor ID, settings, and shortcuts. The source build is intended for VS Code; the Cursor installation is separate.
+The editable source checkout is `~/src/vscode-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz GitHub fork](https://github.com/BrianHoltz/vscode-markdown-editor), based on the [MIT-licensed upstream extension](https://github.com/zaaack/vscode-markdown-editor). Local version `0.1.22-local.6` retains extension ID `zaaack.markdown-editor` and the existing custom editor ID, settings, and shortcuts. The source build is intended for VS Code; the Cursor installation is separate.
 
 Source ownership:
 
@@ -18,7 +18,7 @@ Source ownership:
 - `src/outline.ts`: registers `markdownEditorOutline` under the valid `explorer` view container. The built-in `outline` is a view ID, not a view container. VS Code's public extension API does not expose a built-in Outline provider for these webview editors; Markdown Outline is a separate tree in Explorer. Both custom-editor and command-mode panels register with the same provider. Sidebar focus does not clear the tree; text-editor activation does.
 - `media-src/src/headings.ts` and `src/headings.ts`: Vditor parses the full Markdown document into headings, skipping code fences and handling Setext headings and inline formatting. Sidebar navigation uses heading indexes to distinguish duplicates; anchor links use Unicode-aware slugs with duplicate suffixes.
 - `media-src/src/utils.ts`: capture-phase link handling precedes Vditor's editing click handler. Plain click follows links; Option/Alt-click edits them. `markdown-editor.followLinksOnClick=false` requires Cmd/Ctrl-click instead.
-- `src/extension.ts`: resolves relative file links separately from fragments, reports opening failures, and supports cross-document Markdown anchors. Command-mode editors keep independent per-document panels.
+- `src/extension.ts`: resolves relative file links separately from fragments, reports opening failures, and supports cross-document Markdown anchors. Command-mode editors keep independent per-document panels. **Add Active File to Copilot Chat** resolves text, custom-editor, and this extension's webview tabs, then sends the URI to VS Code Chat's native attachment action.
 - `media-src/src/search.ts`: toolbar and Cmd/Ctrl+F share one non-mutating find bar. The active Vditor mode selects the search root, and matches can span inline formatting. The stable app host is observed across theme and mode changes.
 - `media-src/src/responsive-toolbar.ts` and `media-src/src/main.css`: a single-row toolbar with a `»` overflow tray. ResizeObserver moves existing Vditor controls into the tray in their original order, preserving upstream handlers. Save, Find, More, and edit-mode controls have the strongest retention preference. The optional line-number gutter does not pad the toolbar. Escape and outside clicks dismiss the tray; keyboard Tab reaches the overflow controls. Submenus anchor below the tray to fit narrow panes.
 - `media-src/src/appearance.ts`: persistent toolbar and raw-HTML visibility. The upper-right button hides/restores the toolbar; hidden mode removes the row, H1-H6 and other margin annotations, and line-number gutter, reducing rich-editor side padding to 12px. The raw-HTML toolbar button hides tag syntax and HTML-only rows without hiding rendered HTML blocks or fenced examples. Source mode is unaffected. Named HTML anchors remain navigable; search ignores hidden HTML markup. Show raw HTML or switch to source mode to edit tags. Preferences live in extension global state and participate in Settings Sync, without modifying documents.
@@ -37,11 +37,11 @@ npx --yes pnpm@10.32.1 build
 npx --yes pnpm@10.32.1 --filter media-src exec tsc --noEmit
 npx --yes pnpm@10.32.1 exec playwright install chromium
 npx --yes pnpm@10.32.1 test
-npx --yes --package @vscode/vsce vsce package --no-dependencies --out markdown-editor-0.1.22-local.5.vsix
+npx --yes --package @vscode/vsce vsce package --no-dependencies --out markdown-editor-0.1.22-local.6.vsix
 STAMP=$(date "+%Y%m%d.%a.%H%M")
-OUT="$HOME/Downloads/markdown-editor-0.1.22-local.5-$STAMP-darkcode.vsix"
-cp -p markdown-editor-0.1.22-local.5.vsix "$OUT"
-cmp markdown-editor-0.1.22-local.5.vsix "$OUT"
+OUT="$HOME/Downloads/markdown-editor-0.1.22-local.6-$STAMP-copilot.vsix"
+cp -p markdown-editor-0.1.22-local.6.vsix "$OUT"
+cmp markdown-editor-0.1.22-local.6.vsix "$OUT"
 code --install-extension "$OUT" --force
 ```
 
