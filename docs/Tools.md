@@ -92,7 +92,7 @@ Verify with `code --list-extensions --show-versions | grep puppy` (same flag wor
 
 | Feature                        | IDEA          | VS Code       | Cursor                  |
 | ------------------------------ | ------------- | ------------- | ----------------------- |
-| Score                          | 33.5          | 20.5          | 19.5                    |
+| Score                          | 33.5          | 29.0 | 19.5                    |
 | IDE                            | 2026.2.3      | 1.141.0       | 3.21.13                 |
 | VSCode engine                  | —            | —            | 1.105.1                 |
 | Wibey                          | 1.0.28        | 1.0.20        | 1.0.18                  |
@@ -117,7 +117,7 @@ Verify with `code --list-extensions --show-versions | grep puppy` (same flag wor
 | AI diff in linked repo         | ✅            | ❌            | ❌                      |
 | git ops in linked repo         | ✅            | ✅            | ✅                      |
 | approval UX                    | ✅            | ✅            | ✅                      |
-| md preview                     | ✅            | 🟡 only 1     | ✅✅ wysiwyg            |
+| md preview                     | ✅            | ✅✅ independent | ✅✅ wysiwyg            |
 | md preview search              | ✅            | ✅            | ❌❌ neither            |
 | md table format                | ✅✅ auto     | 🟡 manual     | 🟡 manual               |
 | md pastes details block        | ❌            | ✔️          | ✔️                    |
@@ -137,7 +137,7 @@ Score rubric
 - **IDEA patches (baked-in as of 2026.09.29):** image-paste-fix + conversation-title-features are merged into local `brian/local-combined` build (Wibey 1.0.28), alongside upstream 1.0.28 updates. Scores reflect working features; ⚙️ notation removed. Recount after IDE/extension updates.
 - Editor score: each IDE gets the maximum score achievable by any editor available to it
   - IDEA: native WYSIWYG editor (8.0 pts); beats viewer (7.0) and shuzijun (3.5)
-  - VS Code: historical typedown score 3.5 pts; Zaaack local source build requires an interactive recount ([build details](ToolMods.md#zaaack-source-build)).
+  - VS Code: Zaaack local source build 9.5 pts + IDE row subtotal 19.5 pts = 29.0 pts. Ratings use Brian's reported Markdown behavior and the documented local build; external-file reread and images remain unverified. [Build details](ToolMods.md#zaaack-source-build).
   - Cursor: typedown (3.5 pts); zaaack broken ~2026.06.01 (was 7 pts w/ patch)
 - Final score = IDE row subtotal + best editor subtotal
 
@@ -149,17 +149,19 @@ Score rubric
 
 | Behavior                 | IDEA viewer | IDEA editor | typedown     | zaaack                            | Cursor native |
 | ------------------------ | ----------- | ----------- | ------------ | --------------------------------- | ------------- |
-| version                  | 2026.2      | 2026.2      | 1.1.7        | 0.1.17 (VSCode) / 0.1.13 (Cursor) | 2.6.19        |
+| version                  | 2026.2      | 2026.2      | 1.1.7        | 0.1.22-local.6 (VSCode) / 0.1.13 (Cursor) | 2.6.19        |
 | >1 tab at a time         | ✅          | ✅✅        | ✅✅         | ✅✅                              | ✅✅          |
 | re-read changed file     | ?           | ?           | ✅           | ?                                 | ?             |
 | wide tables              | ✅          | ✅          | ❌ truncates | ✅✅                              | ❌ truncates  |
 | non-bloated side padding | ✅          | ✅          | ❌           | ✅                                | ❌            |
 | shows images             | ✅          | ✅          | ?            | ?                                 | ?             |
-| find in file             | ✅          | ✅          | ❌           | ✅ ⚙️                           | ❌            |
+| find in file             | ✅          | ✅          | ❌           | ✅ unified Cmd+F † | ❌            |
 | structure                | ✅          | ✅          | ❌           | ✅ ⚙️                           | ❌            |
-| internal links           | ✅          | ❌          | ?            | ✅ ⚙️                           | ?             |
+| internal links           | ✅          | ❌          | ?            | ✅ plain-click anchors † | ?             |
 | link editing             | ?           | ✔️        | ❌           | ✔️                              | ❌            |
-| toolbar                  | -           | ✔️        | ✔️         | ✔️                              | ❌            |
+| toolbar                  | -           | ✔️        | ✔️         | ✅ single row + overflow † | ❌            |
+
+† Zaaack ratings for unified Cmd+F, plain-click intra-document links, and the single-row adaptive toolbar with overflow are confirmed by Brian's use of the VS Code local build (2026.10.12). Wide tables retain ✅✅; independent Markdown previews are supported by the [multiple-preview configuration](#multiple-markdown-tabs-no-reuse). These confirmations do not establish parity for the Cursor installation or for unsaved-edit recovery.
 
 ### IDE Keybindings
 
@@ -555,7 +557,7 @@ Observed result: this workflow successfully enables independent previews per mar
 
 ### Zaaack Find / Outline / Anchor Nav (patched)
 
-The VS Code source build lives in `~/src/vscode-markdown-editor`, branch `brian/markdown-ux`, version `0.1.22-local.6`. It includes bundled toolbar/menu translations, Markdown Outline in Explorer, plain-click links (Option-click to edit), a unified toolbar/Cmd+F search bar, a single-row adaptive toolbar with a `»` overflow tray, and explicit active-file attachment to Copilot Chat for text, custom-editor, and Markdown Editor webview tabs. The upper-right button hides the toolbar, margin annotations, line-number gutter, and raw HTML to reclaim vertical and horizontal space; a separate toolbar toggle controls raw HTML while the toolbar is shown. Toolbar and menu tooltips remain visible in narrow panes. Dark themes use dark fenced-code highlighting without Vditor's light grid background. The [GitHub fork](https://github.com/BrianHoltz/vscode-markdown-editor) and [VSIX releases](https://github.com/BrianHoltz/vscode-markdown-editor/releases) make the source and installer available to other Macs. Build commands and verification scope: [ToolMods.md → Zaaack source build](ToolMods.md#zaaack-source-build). The comparison scores above are historical and need an interactive recount against the installed build.
+The VS Code source build lives in `~/src/vscode-markdown-editor`, branch `brian/markdown-ux`, version `0.1.22-local.6`. It includes bundled toolbar/menu translations, Markdown Outline in Explorer, plain-click links (Option-click to edit), a unified toolbar/Cmd+F search bar, a single-row adaptive toolbar with a `»` overflow tray, and explicit active-file attachment to Copilot Chat for text, custom-editor, and Markdown Editor webview tabs. The upper-right button hides the toolbar, margin annotations, line-number gutter, and raw HTML to reclaim vertical and horizontal space; a separate toolbar toggle controls raw HTML while the toolbar is shown. Toolbar and menu tooltips remain visible in narrow panes. Dark themes use dark fenced-code highlighting without Vditor's light grid background. The [GitHub fork](https://github.com/BrianHoltz/vscode-markdown-editor) and [VSIX releases](https://github.com/BrianHoltz/vscode-markdown-editor/releases) make the source and installer available to other Macs. Build commands and verification scope: [ToolMods.md → Zaaack source build](ToolMods.md#zaaack-source-build). The comparison credits Brian's confirmed VS Code Markdown behavior; external-file reread and image rendering still require interactive verification.
 
 `~/src/tools/patches/patch-zaaack.py` is the legacy installed-bundle patcher for Marketplace versions. Do not apply it to the local source build.
 
