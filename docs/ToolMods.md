@@ -6,6 +6,18 @@ Patch and modification procedures. See Tools.md for tool preferences, standings,
 
 ---
 
+## Code Puppy: maintained source builds
+
+Source: `~/src/code-puppy-ide`; JetBrains uses [feature/active-context-pill](https://gecgithub01.walmart.com/r0b0m29/code-puppy-ide/tree/feature/active-context-pill), while the isolated VS Code build uses [brian/vscode-0.28.2-local](https://gecgithub01.walmart.com/r0b0m29/code-puppy-ide/tree/brian/vscode-0.28.2-local). See [Tools.md](Tools.md#rebuilding-the-local-code-puppy-jetbrains-plugin) for builds, artifact naming, installation, and Marketplace overwrite precautions.
+
+- **Editor context:** active-file and selection suggestions preserve distinct selection identities. Shared webview changes serve both IDE hosts; JetBrains-only runtime fixes do not apply to VS Code.
+- **JDK discovery and startup:** `scripts/gradle-jetbrains.sh` locates and validates JDK 21; the JetBrains host warms proxy settings before JCEF initialization.
+- **CEF callback compatibility:** `WebviewAssetScheme.ResourceHandler` extends the runtime `CefResourceHandlerAdapter`, supplying defaults for newer CEF callbacks instead of directly implementing an older interface. This avoids the IDEA 2026.2.3 / Chromium 144 callback incompatibility.
+- **Navigation fallback:** `CpWebviewSchemeSetup.CUSTOM_SCHEME_ENABLED` is false in the maintained build. Registration succeeded but custom-scheme main-frame navigation failed on IDEA build 262.10968.63; the verified rendering path uses `http://cpwebview/`. The registration code and contract tests remain for future compatibility probes.
+- **IDE zoom:** `CodePuppyWebviewPanel` listens to UI settings as well as look-and-feel and editor-scheme changes. It refreshes theme tokens and whole-browser zoom from IDEA's label-font size, including fixed-pixel controls and code. Conversation font harmonization remains separate from this zoom fix.
+
+Validation: the 2026.10.12 JetBrains build and all 205 JVM tests pass. The built Downloads ZIP includes the callback, navigation, and zoom fixes; source changes do not establish that a running IDE has loaded the rebuilt plugin. VS Code 0.28.2 installation and its separate validation are recorded in [Tools.md](Tools.md#local-modifications-in-use).
+
 ## VS Code / Cursor: Zaaack Markdown Editor
 
 ### Zaaack source build
