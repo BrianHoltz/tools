@@ -6,7 +6,7 @@
 - **Wibey JetBrains 1.0.28** — Walmart-internal technology, maintained and built on the Walmart work laptop only; its absence from a personal laptop and its Downloads folder is expected. Upstream GPT model support and context-window work are combined locally with persistent editable conversation titles, editable queued follow-up prompts, image paste, focused-editor file/selection context, prompt queuing, and quota snapshots.
 - **Zaaack Markdown Editor for VS Code and Cursor** — adds multipanel editing, outline navigation, find, anchor links, and dark-theme/readability improvements. The current VS Code package is `0.1.22-local.6`, built from the latest source with the bundled Vditor runtime; its Downloads installer is `markdown-editor-0.1.22-local.6-20261012.Mon.2129-bundled.vsix`.
 - **TypeDown for VS Code and Cursor** — compacts prose, table, and list spacing; preserves editor focus and cursor position through paste.
-- **Shuzijun Markdown Editor for IntelliJ IDEA** — local source build adds an adaptive toolbar, narrow-pane tooltips, distraction-free and raw-HTML visibility controls, persistent appearance preferences, anchor navigation, IDE theme synchronization, dark-theme content overrides, and the JCEF dependency required by IDEA 2026.2. The `2.0.7-local.8` package follows the preview font stack and standard font-size preference, uses 1.4 prose line height, scales with whole-editor IDEA zoom, prevents bundled light-theme table/text rules from overriding dark mode, and keeps the toolbar visibility toggle inside the editor theme scope at full opacity. A leftmost floppy-disk button saves on click and dims only when the buffer is saved; failed saves show red. Its Downloads installer is `markdown-editor-2.0.7-local.8-20261013.Tue.0513-saveicon.zip`; installation and restart are pending. See [source modifications](ToolMods.md#shuzijun-source-build).
+- **Shuzijun Markdown Editor for IntelliJ IDEA** — local source build adds an adaptive toolbar, narrow-pane tooltips, distraction-free and raw-HTML visibility controls, persistent appearance preferences, anchor navigation, IDE theme synchronization, dark-theme content overrides, and the JCEF dependency required by IDEA 2026.2. The `2.0.7-local.9` package derives prose, heading, bold, and code typography from the bundled preview stylesheet, follows the shared font-size preference and preview display normalization, prevents bundled light-theme table/text rules from overriding dark mode, and keeps the toolbar visibility toggle inside the editor theme scope at full opacity. A leftmost floppy-disk button saves on click and dims only when the buffer is saved; failed saves show red. Its Downloads installer is `markdown-editor-2.0.7-local.9-20261013.Tue.0601-preview.zip`; installation and restart are pending. See [source modifications](ToolMods.md#shuzijun-source-build).
 - **IntelliJ IDEA MCP Server plugin** — prevents MCP connections from stealing focus to the Services tool window.
 
 ### Local Build Artifact Rule
@@ -200,7 +200,7 @@ IDEA keybinding overrides (defaults shown in table, actual bindings below):
 
 ### IDEA — Markdown typography and zoom
 
-The [forked Markdown Editor](ToolMods.md#shuzijun-source-build) follows the built-in preview's bundled prose font stack and **Settings → Languages & Frameworks → Markdown → Preview font size**. Source mode and code retain the editor's monospace font. IDEA zoom (`⌘=` / `⌘-`) scales the whole embedded editor, including controls and code; preview-size and UI-scale changes refresh open tabs. Typography and zoom require `2.0.7-local.4` or later; `2.0.7-local.5` uses 1.4 prose line height. Set the built-in JCEF preview's Custom stylesheet text to `body { line-height: 1.4 !important; }` to match it. Preserve any existing custom CSS. The built ZIP must be installed and IDEA restarted.
+The [forked Markdown Editor](ToolMods.md#shuzijun-source-build) derives prose, heading, bold, and rendered-code typography from the built-in preview's bundled stylesheet and follows **Settings → Languages & Frameworks → Markdown → Preview font size**. The shared preference is 14px. Source mode retains the editor's monospace font. Both use JCEF font-size normalization without an additional editor-only browser zoom; preference and UI-setting changes refresh open editor tabs. This requires `2.0.7-local.9` or later. The built ZIP must be installed and IDEA restarted.
 
 Code Puppy uses IDEA's UI label font family and scales the whole webview from the UI label font size. Its maintained JetBrains branch listens for UI-settings changes so open conversations refresh when IDEA zoom or Appearance settings change. Its 13px CSS baseline is a scaling reference, not a zoom exemption. Matching the UI and Markdown preview sizes alone does not match their font families.
 
@@ -657,7 +657,7 @@ On the work laptop, the relationship-shared workspace owns `~/src/relationship-s
 
 ### Markdown Preview
 
-The built-in Markdown preview uses `options/markdown.xml` under `MarkdownSettings`. Font size is 15px.
+The built-in Markdown preview uses `options/markdown.xml` under `MarkdownSettings`. Font size is 14px.
 
 **Rendering engines (2026.2):**
 
