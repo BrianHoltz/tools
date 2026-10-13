@@ -198,7 +198,7 @@ IDEA keybinding overrides (defaults shown in table, actual bindings below):
 
 ### IDEA — Markdown typography and zoom
 
-The [forked Markdown Editor](ToolMods.md#shuzijun-source-build) follows the built-in preview's bundled prose font stack and **Settings → Languages & Frameworks → Markdown → Preview font size**. Source mode and code retain the editor's monospace font. IDEA zoom (`⌘=` / `⌘-`) scales the whole embedded editor, including controls and code; preview-size and UI-scale changes refresh open tabs. This requires `2.0.7-local.4` or later; the built ZIP must be installed and IDEA restarted.
+The [forked Markdown Editor](ToolMods.md#shuzijun-source-build) follows the built-in preview's bundled prose font stack and **Settings → Languages & Frameworks → Markdown → Preview font size**. Source mode and code retain the editor's monospace font. IDEA zoom (`⌘=` / `⌘-`) scales the whole embedded editor, including controls and code; preview-size and UI-scale changes refresh open tabs. Typography and zoom require `2.0.7-local.4` or later; `2.0.7-local.5` uses 1.4 prose line height. Set the built-in JCEF preview's Custom stylesheet text to `body { line-height: 1.4 !important; }` to match it. Preserve any existing custom CSS. The built ZIP must be installed and IDEA restarted.
 
 Code Puppy uses IDEA's UI label font family and scales the whole webview from the UI label font size. Its maintained JetBrains branch listens for UI-settings changes so open conversations refresh when IDEA zoom or Appearance settings change. Its 13px CSS baseline is a scaling reference, not a zoom exemption. Matching the UI and Markdown preview sizes alone does not match their font families.
 
@@ -627,6 +627,8 @@ IDEA keybinding overrides are stored in `~/Library/Application Support/JetBrains
   - Keystroke format: `alt l`
 
 ### IDEA Workspace Roots
+
+On the work laptop, the relationship-shared workspace owns `~/src/relationship-shared` and attaches `~/src/tools` as a separate module/content root and Git mapping. Do not attach all of `~/src`: service and IDE-plugin clones are separate workspaces. Register both module files in this project's `.idea/modules.xml`; exclude generated caches and IDE metadata without excluding another module's root. Reload the project after external root changes and verify Find File locates `GitScheme.md`.
 
 - On the personal Mac and the Mac mini, the Project view should expose these
   bounded content roots:
