@@ -196,21 +196,11 @@ IDEA keybinding overrides (defaults shown in table, actual bindings below):
 - ⚠️ **zoom** `^⌥=` / `^⌥-` (`ZoomInIdeAction` / `ZoomOutIdeAction`) → remapped to `⌘=` / `⌘-`. Displaced `CollapseRegion` / `ExpandRegion` (fold/unfold) — unbound and unneeded.
 - **open file** `⇧⌘O` (`GotoFile`) → remapped to `⌘P`. Displaced `FileChooser.TogglePathBar` from `⌘P` — unneeded.
 
-### IDEA — Code Puppy tool window font size
+### IDEA — Markdown typography and zoom
 
-Code Puppy (JetBrains plugin) scales its webview text from **IDEA's UI font size**. It reads
-`UIUtil.getLabelFont().getSize()` and sets JCEF `CefBrowser.setZoomLevel()` so the app's base
-13px styling ends up matching the UI label font.
+The [forked Markdown Editor](ToolMods.md#shuzijun-source-build) follows the built-in preview's bundled prose font stack and **Settings → Languages & Frameworks → Markdown → Preview font size**. Source mode and code retain the editor's monospace font. IDEA zoom (`⌘=` / `⌘-`) scales the whole embedded editor, including controls and code; preview-size and UI-scale changes refresh open tabs. This requires `2.0.7-local.4` or later; the built ZIP must be installed and IDEA restarted.
 
-What this means in practice:
-
-- If you want the Code Puppy window **one point bigger**, bump the UI font size by 1:
-  Preferences → Appearance & Behavior → Appearance → enable **Use custom font** (if needed) →
-  increase **Size**.
-- If you want Code Puppy to **match Markdown preview / Wibey tool windows**, make the UI font
-  size match your editor font size (Preferences → Editor → Font).
-- There is no per-tool-window font setting; this is global UI font. (If you don’t want the whole
-  IDE bigger, you’re into "open DevTools and inject CSS" territory.)
+Code Puppy uses IDEA's UI label font family and scales the whole webview from the UI label font size. Its maintained JetBrains branch listens for UI-settings changes so open conversations refresh when IDEA zoom or Appearance settings change. Its 13px CSS baseline is a scaling reference, not a zoom exemption. Matching the UI and Markdown preview sizes alone does not match their font families.
 
 ### Keybindings (swapped from defaults in VS Code and Cursor)
 
