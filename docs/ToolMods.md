@@ -218,12 +218,12 @@ TypeDown WYSIWYG markdown editor (tarikkavaz.typedown-markdown-editor) has no se
 
 ### Shuzijun source build
 
-The editable IDEA source checkout is `~/src/idea-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz fork](https://github.com/BrianHoltz/markdown-editor) of the [Apache-licensed upstream plugin](https://github.com/shuzijun/markdown-editor). Keep `origin` pointed at the fork and `upstream` at Shuzijun; the fork makes these local improvements available to other machines without pushing personal changes to the upstream maintainer. Maintained source version `2.0.7-local.7` retains plugin ID `com.shuzijun.markdown-editor` and builds against the installed IDEA 2026.2.3 runtime instead of downloading another IntelliJ distribution.
+The editable IDEA source checkout is `~/src/idea-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz fork](https://github.com/BrianHoltz/markdown-editor) of the [Apache-licensed upstream plugin](https://github.com/shuzijun/markdown-editor). Keep `origin` pointed at the fork and `upstream` at Shuzijun; the fork makes these local improvements available to other machines without pushing personal changes to the upstream maintainer. Maintained source version `2.0.7-local.8` retains plugin ID `com.shuzijun.markdown-editor` and builds against the installed IDEA 2026.2.3 runtime instead of downloading another IntelliJ distribution.
 
 The VS Code improvements map to IDEA as follows:
 
 - Shuzijun already has JCEF browser find through `CefBrowser.find()`, IntelliJ Structure View through `getStructureViewBuilder()`, Vditor outline, one `FileEditor` instance per Markdown file, and locally bundled Vditor translations. The VS Code search overlay, Explorer TreeView, multipanel registry, and locale bundler are unnecessary.
-- `src/main/resources/template/default.html` and `vditor/style.css` supply a single-row adaptive toolbar with a keyboard-accessible `»` overflow tray, viewport-clamped tooltips for narrow panes, a persistent upper-right distraction-free toggle, and a raw-HTML visibility toggle. The visibility toggle lives inside the Vditor root so it inherits light/dark icon colors, with full opacity in both modes. Hidden-toolbar mode also removes rich-editor margin annotations and hides raw HTML markup without changing the Markdown source.
+- `src/main/resources/template/default.html` and `vditor/style.css` supply a single-row adaptive toolbar with a keyboard-accessible `»` overflow tray, viewport-clamped tooltips for narrow panes, a persistent upper-right distraction-free toggle, and a raw-HTML visibility toggle. The visibility toggle lives inside the Vditor root so it inherits light/dark icon colors, with full opacity in both modes. The leftmost floppy-disk button saves on click; its icon is dim when saved, full opacity when unsaved or saving, and red when saving fails. Hidden-toolbar mode also removes rich-editor margin annotations and hides raw HTML markup without changing the Markdown source.
 - Plain clicks use Vditor's link handling; Option-click positions the caret for editing. Same-document fragments resolve duplicate and Unicode heading slugs plus named HTML anchors, including anchors whose raw markup is hidden. Relative Markdown links with fragments open the target IDEA editor and queue navigation until its JCEF page finishes loading.
 - `MarkdownHtmlPanel` persists the two appearance preferences in IntelliJ `PropertiesComponent`, so they apply across Markdown files and IDE restarts.
 - IDE appearance synchronization is source-integrated: theme changes wait for Vditor initialization, replace or create the generated stylesheet safely, and reapply Vditor's light or dark content theme.
@@ -246,9 +246,9 @@ export JAVA_HOME="$HOME/Applications/IntelliJ IDEA 2026.2.3.app/Contents/jbr/Con
   -PlocalIdePath="$HOME/Applications/IntelliJ IDEA 2026.2.3.app" \
   clean buildPlugin
 STAMP=$(date "+%Y%m%d.%a.%H%M")
-OUT="$HOME/Downloads/markdown-editor-2.0.7-local.7-$STAMP-toggle.zip"
-cp -p build/distributions/markdown-editor-2.0.7-local.7.zip "$OUT"
-cmp build/distributions/markdown-editor-2.0.7-local.7.zip "$OUT"
+OUT="$HOME/Downloads/markdown-editor-2.0.7-local.8-$STAMP-saveicon.zip"
+cp -p build/distributions/markdown-editor-2.0.7-local.8.zip "$OUT"
+cmp build/distributions/markdown-editor-2.0.7-local.8.zip "$OUT"
 ```
 
 Install the Downloads copy with **Settings → Plugins → gear → Install Plugin from Disk**, then restart IDEA. The source build replaces the Marketplace plugin because it retains the same plugin ID.
