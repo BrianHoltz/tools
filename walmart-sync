@@ -2,11 +2,9 @@
 # SPDX-FileCopyrightText: 2026 Brian Holtz
 # SPDX-License-Identifier: MIT
 """
-walmart-sync — deterministic mirror audit/sync helper
+walmart-sync — align the portable AI and computer-operation toolchain
 
-Design:
-- Thin orchestrator logic in this file
-- Declarative policy/manifest in walmart-sync.json
+Repository scope and shared-file policies are declared in walmart-sync.json.
 """
 
 import argparse
@@ -137,22 +135,6 @@ def is_managed(path: str, exact, prefixes):
     if path in exact:
         return True
     return any(path.startswith(prefix) for prefix in prefixes)
-
-
-def block_if_managed_changes(cfg, action_label: str):
-    exact, prefixes = walmart_sync_specs(cfg)
-    status = run_git(TOOLS, "status", "--porcelain")
-    dirty = parse_porcelain_paths(status.stdout)
-    managed = [p for p in dirty if is_managed(p, exact, prefixes)]
-    if not managed:
-        return True
-    print(c(RED + BOLD, f"⚠ Commit-first policy: cannot {action_label} with local walmart-sync changes."))
-    print(c(RED, "Commit these files first, then rerun walmart-sync:"))
-    for p in managed:
-        print(f"  - {p}")
-    print()
-    print(c(CYAN, f"Suggested: cd {TOOLS_REPO_LABEL} && git add <files> && git commit"))
-    return False
 
 
 def pull_repo(repo: Path, label: str, cfg=None, check_managed_only=False):
@@ -594,8 +576,6 @@ def parse_args():
 def main():
     cfg = load_cfg()
     args = parse_args()
-    on_work = SHARED.exists()
-
     if args.push:
         sys.exit(0 if do_push(cfg) else 1)
 
