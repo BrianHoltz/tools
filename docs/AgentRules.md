@@ -397,16 +397,20 @@ Maintenance/debug checklist:
 
 ### Portable Skills and Mirrors
 
-The canonical portable skill sources are in `~/src/tools/.wibey/skills/`. Codex discovery adapters are described in [Codex Integration](#codex-integration). Wibey discovers project-level skills from `<workspace>/.wibey/skills/`. The tools repo's tracked `.wibey/` directory exposes portable skills and commands when tools is open as the workspace. Team sources remain in relationship-shared; `~/.wibey/` is an untracked adapter location, not a source for personal Walmart-only skills. Keep that skill tier empty; installed command hardlinks belong there.
+The canonical portable skill sources are in `~/src/tools/.wibey/skills/`. Codex discovery adapters are described in [Codex Integration](#codex-integration). Wibey discovers project-level skills from `<workspace>/.wibey/skills/`. The tools repo's tracked `.wibey/` directory exposes skills and commands when tools is open as the workspace. Team sources remain in `relationship-shared`; `~/.wibey/` is an adapter location, not a source for personal-only skills. Keep that skill tier empty; installed command hardlinks belong there.
 
-Mirror skill discovery metadata together with each skill body. TODO: carry the doc-audit name/description frontmatter into the team source before the next mirror sync.
+Mirror skill discovery metadata together with each skill body. The [sync manifest](../walmart-sync.json) is the source of truth for shared mirrors, personal-only items, AI toolchain repositories, and audit exceptions. Update it when that inventory changes.
 
-The [sync manifest](../walmart-sync.json) is the source of truth for mirrored items, personal-only items, and audit exemptions. Update its `mirror_items` and `personal_only` entries when that inventory changes; do not maintain a second inventory here.
+TODO: carry doc-audit discovery metadata into the team source before the next mirror sync.
 
-Mirrored content must contain no Walmart-proprietary material and must support personal-laptop use. Use [walmart-sync](../walmart-sync) to check or copy the mirror:
+Walmart Sync keeps portable computer-operation machinery aligned across Brian's laptops: AI tools, IDE customizations and extension source, skills, commands, and personal shell dotfiles. Its tracked scope is the full `~/src/tools/` repo plus the repositories listed in `toolchain_repos`; the known external repositories are `~/src/idea-markdown-editor/` and `~/src/vscode-markdown-editor/`. Shell dotfiles (`.bash_profile`, `.bashrc`, `.shellrc.common`, `.zprofile`, `.zshrc`) link to files tracked in `~/src/tools/shellrc/`. Add other maintained machinery to the manifest as it is identified; do not sync volatile credentials or session state.
 
-- On the personal laptop, a bare invocation checks git state, warns about dirty or unpushed changes, then pulls from origin. It is not a read-only audit.
-- On the work laptop, a bare invocation audits consistency with team sources, portability, reference integrity, and personal-only item placement. Use `-v` to include passing items.
-- `--sync --dry-run` previews copies from the team source. `--sync` performs them; review and commit the diff before using `--push`, which runs the portability gate before pushing.
+Run `walmart-sync` on either laptop to stage and commit local changes in each managed repository, pull its upstream with merge semantics, and push the resulting commits. On the Walmart laptop it first pulls `relationship-shared` and applies the configured portable mirrors. Git's clean automatic merges continue; conflicts stop the command with their paths listed. Resolve conflicts locally or with an agent, then rerun the command. The tools repo portability gate checks outgoing additions for configured internal markers.
 
-Portability checks scan for configured internal markers; reference-integrity checks flag work-only paths that cannot resolve on the personal laptop. Passing these checks does not establish that all content is portable or nonproprietary. TODO: remove work-only signing links and path references from portable skill/command bodies at the team source, then re-mirror them; audit exemptions are defined in the manifest.
+Use `--dry-run --sync` to preview shared mirror copies. Audit flags (`--consistency`, `--portability`, `--ref-integrity`, and `--personal-only`) run checks without the full repository sync. `--push` runs the managed repository commit, pull, and push cycle without applying shared mirrors.
+
+Portability checks scan for configured internal markers; reference-integrity checks flag work-only paths that cannot resolve on the personal laptop. Passing checks do not establish that all content is portable or nonproprietary. Mirror items remain subject to the shared-source ownership and overwrite safeguards in the command.
+
+TODO: remove work-only signing links and paths from portable skill and command bodies at the team source, then re-mirror them.
+
+*[doc-audit](https://github.com/BrianHoltz/tools/blob/main/.wibey/skills/doc-audit/SKILL.md): 2026.10.12.Mon*

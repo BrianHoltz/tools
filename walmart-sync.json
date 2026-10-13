@@ -23,6 +23,10 @@
     ".wibey/commands/convo.md",
     ".wibey/commands/say.md"
   ],
+  "toolchain_repos": [
+    { "path": "src/idea-markdown-editor", "label": "~/src/idea-markdown-editor" },
+    { "path": "src/vscode-markdown-editor", "label": "~/src/vscode-markdown-editor" }
+  ],
   "managed_exact": [
     "walmart-sync",
     "walmart-sync.json"

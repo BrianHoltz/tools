@@ -11,6 +11,7 @@ Design:
 
 import argparse
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -372,107 +373,30 @@ def check_personal_only(cfg):
     return all_ok
 
 
-def do_sync(cfg, dry_run=False):
-    if not SHARED.exists():
-        print(c(RED, "ERROR: --sync requires ~/src/relationship-shared"))
-        return False
-    if not block_if_managed_changes(cfg, "sync"):
-        return False
-    print(c(CYAN, f"Pre-sync pull sequence: shared, then {TOOLS_REPO_LABEL}"))
-    if not pull_repo(SHARED, "~/src/relationship-shared", cfg=cfg, check_managed_only=True):
-        return False
-    if not pull_repo(TOOLS, TOOLS_REPO_LABEL):
-        return False
+def report_merge_conflicts(repo: Path, label: str):
+    status = run_git(repo, "status", "--porcelain")
+    conflicts = []
+    for raw in status.stdout.splitlines():
+        if len(raw) >= 3 and ("U" in raw[:2] or raw[:2] in {"AA", "DD"}):
+            conflicts.append(raw[3:])
+    if conflicts:
+        print(c(RED + BOLD, f"⚠ Merge conflicts in {label}."))
+        print(c(RED, "Conflicted paths:"))
+        for path in conflicts:
+            print(f"  - {path}")
+        print(c(CYAN, f"Resolve the merge in {repo}, then rerun walmart-sync."))
+    else:
+        print(c(RED + BOLD, f"⚠ Git could not pull {label}; no merge conflict is recorded."))
+        print(c(CYAN, f"Inspect Git's message above, resolve the issue in {repo}, then rerun walmart-sync."))
 
-    changed = []
-    violations = []
-    days = cfg.get("mirror_violation_lookback_days", 30)
-    for item in cfg["mirror_items"]:
-        label = item["tools_rel"]
-        status, details = classify_mirror_item(item, cfg)
-        if status == "missing_in_shared":
-            print(c(YELLOW, f"  [skip] missing in shared: {item['shared_rel']}"))
-            continue
-        if status == "ok":
-            print(f"  [=] {label}")
-            continue
-        if status == "violation":
-            violations.append(label)
-            print(c(RED + BOLD, f"  [violation] {label} -- refusing to overwrite"))
-            for rel, kind in details:
-                if kind == "violation":
-                    print(c(RED, f"    {rel}: content not found in relationship-shared's last {days}d of history -- hand-edited in tools?"))
-            continue
-        # status == "drift": safe to copy shared -> tools
-        changed.append(label)
-        print(c(YELLOW, f"  [→] {label}") + (" (would copy)" if dry_run else " (copying)"))
-        if dry_run:
-            continue
-        src = SHARED / item["shared_rel"]
-        dst = TOOLS / item["tools_rel"]
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        if item["is_dir"]:
-            if dst.exists():
-                shutil.rmtree(dst)
-            shutil.copytree(src, dst)
-        else:
-            shutil.copy2(src, dst)
 
-    if violations:
-        print()
-        print(c(RED + BOLD, f"⚠ {len(violations)} mirror item(s) have content not traceable to relationship-shared's last {days} days -- sync aborted for those items."))
-        print(c(RED, "Do not blindly overwrite; investigate manually:"))
-        for label in violations:
-            print(f"  - {label}")
-        return False
-
-    if dry_run or not changed:
-        return True
-
-    print()
-    print(c(CYAN, "Rechecking portability on changed items…"))
+def check_push_portability(repo: Path, cfg, label: str):
+    exempt = set(cfg["portability_push_exempt"]) if repo == TOOLS else set()
     compiled = compile_patterns(cfg["internal_patterns"])
-    leak = False
-    for rel in changed:
-        p = TOOLS / rel
-        files = collect_files(p) if p.is_dir() else [p]
-        for f in files:
-            if not f.is_file():
-                continue
-            hits = grep_patterns(f, compiled)
-            if hits:
-                leak = True
-                show = str(f.relative_to(TOOLS))
-                print(c(RED, f"  [leak] {show}"))
-                for ln, line, label in hits[:10]:
-                    print(f"    L{ln} [{label}]: {line[:120]}")
-    if leak:
-        print(c(RED, "Portability check failed after sync; do not commit yet."))
+    diff_r = run_git(repo, "diff", "-U0", "HEAD@{upstream}..HEAD")
+    if diff_r.returncode != 0:
+        print(c(RED, f"Cannot inspect outgoing changes for {label}."))
         return False
-    print(c(GREEN, "Portability clean on synced changes."))
-    return True
-
-
-def do_push(cfg):
-    if not SHARED.exists():
-        print(c(RED, "ERROR: --push requires ~/src/relationship-shared"))
-        return False
-    if not block_if_managed_changes(cfg, "push"):
-        return False
-
-    remote, branch = detect_upstream(TOOLS)
-    ahead_r = run_git(TOOLS, "rev-list", "--count", "HEAD@{upstream}..HEAD")
-    if ahead_r.returncode != 0:
-        print(c(RED, "Cannot determine upstream; set one first."))
-        return False
-    ahead = int(ahead_r.stdout.strip() or "0")
-    if ahead == 0:
-        print(c(YELLOW, "Nothing to push."))
-        return True
-
-    exempt = set(cfg["portability_push_exempt"])
-    compiled = compile_patterns(cfg["internal_patterns"])
-    diff_r = run_git(TOOLS, "diff", "-U0", "HEAD@{upstream}..HEAD")
     leaks = []
     current_file = "(unknown)"
     skip = False
@@ -484,26 +408,152 @@ def do_push(cfg):
         if skip or not line.startswith("+") or line.startswith("+++"):
             continue
         content = line[1:]
-        for rx, label in compiled:
+        for rx, marker in compiled:
             if rx.search(content):
-                leaks.append((current_file, content.rstrip(), label))
+                leaks.append((current_file, content.rstrip(), marker))
                 break
-
     if leaks:
-        print(c(RED + BOLD, "Portability push gate failed; refusing push."))
-        for fp, line, label in leaks[:20]:
-            print(c(RED, f"  [{label}] {fp}"))
+        print(c(RED + BOLD, f"Portability push gate failed for {label}."))
+        for path, line, marker in leaks[:20]:
+            print(c(RED, f"  [{marker}] {path}"))
             print(f"    {line[:120]}")
         return False
-
-    print(c(CYAN, f"Pushing {TOOLS_REPO_LABEL} to {remote}/{branch}…"))
-    r = run_git(TOOLS, "push", remote, branch, capture=False)
-    if r.returncode != 0:
-        print(c(RED + BOLD, "Push failed."))
-        return False
-    print(c(GREEN + BOLD, "Push succeeded."))
     return True
 
+
+def sync_repository(repo: Path, label: str, cfg):
+    if not repo.is_dir() or not (repo / ".git").exists():
+        print(c(RED + BOLD, f"Required toolchain repository is missing or not a Git checkout: {repo}"))
+        return False
+
+    git_dir = run_git(repo, "rev-parse", "--git-dir")
+    if git_dir.returncode != 0:
+        print(c(RED, f"Cannot inspect Git state for {label}."))
+        return False
+    git_path = (repo / git_dir.stdout.strip()).resolve()
+    if any((git_path / marker).exists() for marker in ("MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD", "rebase-merge", "rebase-apply")):
+        report_merge_conflicts(repo, label)
+        return False
+
+    status = run_git(repo, "status", "--porcelain")
+    if status.returncode != 0:
+        print(c(RED, f"Cannot inspect local changes for {label}."))
+        return False
+    dirty = parse_porcelain_paths(status.stdout)
+    if dirty:
+        print(c(CYAN, f"Committing local toolchain changes in {label}…"))
+        add = run_git(repo, "add", "-A")
+        if add.returncode != 0:
+            print(c(RED, f"Could not stage changes in {label}."))
+            return False
+        commit_message = "Sync local toolchain changes"
+        footer = os.environ.get("WALMART_SYNC_COMMIT_FOOTER", "").strip()
+        if footer:
+            commit_message += "\n\n" + footer
+        commit = run_git(repo, "commit", "-m", commit_message, capture=False)
+        if commit.returncode != 0:
+            print(c(RED + BOLD, f"Could not commit local changes in {label}."))
+            return False
+
+    remote, branch = detect_upstream(repo)
+    print(c(CYAN, f"Pulling {label} from {remote}/{branch} (merge)…"))
+    pull = run_git(repo, "pull", "--no-rebase", "--no-edit", remote, branch, capture=False)
+    if pull.returncode != 0:
+        report_merge_conflicts(repo, label)
+        return False
+
+    if not check_push_portability(repo, cfg, label):
+        return False
+    ahead_r = run_git(repo, "rev-list", "--count", "HEAD@{upstream}..HEAD")
+    if ahead_r.returncode != 0:
+        print(c(RED, f"Cannot determine outgoing commits for {label}."))
+        return False
+    ahead = int(ahead_r.stdout.strip() or "0")
+    if ahead == 0:
+        print(c(GREEN, f"{label} is synchronized."))
+        return True
+
+    print(c(CYAN, f"Pushing {label} to {remote}/{branch}…"))
+    push = run_git(repo, "push", remote, branch, capture=False)
+    if push.returncode != 0:
+        print(c(RED + BOLD, f"Push failed for {label}."))
+        return False
+    print(c(GREEN + BOLD, f"Push succeeded for {label}."))
+    return True
+
+
+def sync_toolchain(cfg):
+    repos = [(TOOLS, TOOLS_REPO_LABEL)]
+    for item in cfg.get("toolchain_repos", []):
+        repo = Path.home() / item["path"]
+        repos.append((repo, item.get("label", item["path"])))
+    seen = set()
+    for repo, label in repos:
+        resolved = repo.resolve()
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        if not sync_repository(repo, label, cfg):
+            return False
+    return True
+
+
+def do_sync(cfg, dry_run=False):
+    if SHARED.exists():
+        print(c(CYAN, "Pulling the shared source before applying mirrored tool files…"))
+        if not pull_repo(SHARED, "~/src/relationship-shared", cfg=cfg, check_managed_only=True):
+            return False
+
+        changed = []
+        violations = []
+        days = cfg.get("mirror_violation_lookback_days", 30)
+        for item in cfg["mirror_items"]:
+            label = item["tools_rel"]
+            status, details = classify_mirror_item(item, cfg)
+            if status == "missing_in_shared":
+                print(c(YELLOW, f"  [skip] missing in shared: {item['shared_rel']}"))
+                continue
+            if status == "ok":
+                print(f"  [=] {label}")
+                continue
+            if status == "violation":
+                violations.append(label)
+                print(c(RED + BOLD, f"  [violation] {label} -- refusing to overwrite"))
+                for rel, kind in details:
+                    if kind == "violation":
+                        print(c(RED, f"    {rel}: content not found in relationship-shared's last {days} days of history"))
+                continue
+            changed.append(label)
+            print(c(YELLOW, f"  [→] {label}") + (" (would copy)" if dry_run else " (copying)"))
+            if dry_run:
+                continue
+            src = SHARED / item["shared_rel"]
+            dst = TOOLS / item["tools_rel"]
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            if item["is_dir"]:
+                if dst.exists():
+                    shutil.rmtree(dst)
+                shutil.copytree(src, dst)
+            else:
+                shutil.copy2(src, dst)
+
+        if violations:
+            print(c(RED + BOLD, "Resolve the mirror violations before syncing."))
+            return False
+
+        if not dry_run and changed:
+            print(c(CYAN, "Checking portability of mirrored tool files…"))
+            if not check_portability(cfg):
+                print(c(RED, "Portability check failed after applying mirrored files."))
+                return False
+
+    if dry_run:
+        return True
+    return sync_toolchain(cfg)
+
+
+def do_push(cfg):
+    return sync_toolchain(cfg)
 
 def run_audit(cfg, args):
     run_all = not any([args.consistency, args.portability, args.ref_integrity, args.personal_only])
@@ -528,7 +578,7 @@ def run_audit(cfg, args):
 
 def parse_args():
     p = argparse.ArgumentParser(
-        description="Audit/sync ~/src/tools mirror; push on work laptop, pull on personal"
+        description="Commit, merge, and push the AI toolchain repositories on this laptop"
     )
     p.add_argument("--consistency", action="store_true")
     p.add_argument("--portability", action="store_true")
@@ -549,14 +599,8 @@ def main():
     if args.push:
         sys.exit(0 if do_push(cfg) else 1)
 
-    if args.sync:
+    if args.sync or not any([args.consistency, args.portability, args.ref_integrity, args.personal_only]):
         sys.exit(0 if do_sync(cfg, dry_run=args.dry_run) else 1)
-
-    explicit_audit = any([args.consistency, args.portability, args.ref_integrity, args.personal_only])
-    if not on_work and not explicit_audit:
-        if not block_if_managed_changes(cfg, "pull"):
-            sys.exit(1)
-        sys.exit(0 if pull_repo(TOOLS, TOOLS_REPO_LABEL) else 1)
 
     sys.exit(0 if run_audit(cfg, args) else 1)
 
