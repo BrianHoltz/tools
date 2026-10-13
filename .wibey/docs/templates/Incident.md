@@ -69,7 +69,7 @@ Current sub-steps, blockers, and partial results for the in-progress thread. Mut
 
 ## Draft Next Comms
 
-Pre-composed messages ready to send — Slack replies, Jira comments, emails. Each draft is a `###` sub-heading with target and the message body as plain text. **No blockquote formatting, ever** — the section heading makes the context obvious, and `>` prefix causes pasting problems. **No editorializing or lead-in sentence before the body, ever** — no "reply in-thread to X because Y", no restating who the target is or why, no meta-commentary about what we should have done differently. The `###` heading already carries the target; the body is the message text itself, ready to copy-paste as-is. Include an [incident doc](link) reference in every draft. When a draft is sent, delete it from here entirely and record one Work Log entry with the destination and Slack `ts` or message URL.
+Unsent outbound communications. Each draft uses a `###` target heading followed by a paste-ready body. Follow the complete [Drafting Comms](../../.wibey/skills/doc-audit/SKILL.md#drafting-comms) contract.
 
 ## Pending Decisions
 

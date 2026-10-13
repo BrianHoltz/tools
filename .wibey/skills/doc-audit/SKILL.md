@@ -73,10 +73,11 @@ A `*Testing.md` file is a leaf-node CRQ evidence payload, not a mortal work docu
 
 - no YAML frontmatter;
 - no Work Log, editorial history, task tracking, status narrative, project summary, or navigation section;
-- no links to other documents, including project docs, CRQ docs, SQL files, or testing records; local image references needed to render evidence in the PDF are allowed;
+- no links to other documents, including project docs, CRQ docs, SQL files, or testing records; the required final crq-write provenance link and local image references needed to render evidence in the PDF are allowed;
 - body content is only text destined for the final PDF, actual Red/Green evidence, and visible `(TODO: …)` or `(TBD: …)` markers whose surrounding text says exactly what evidence remains to be captured; the marker’s closing `)` ends the macro;
 - preserve evidence already collected; do not replace it with procedures, operational instructions, or cross-references;
-- use named Red/Green sections near the top when the test record covers pre-change and post-change evidence.
+- use named Red/Green sections near the top when the test record covers pre-change and post-change evidence;
+- end with the universal plain-text provenance signature `Powered by {Model} in {Harness} in {IDE} via [crq-write](https://gecgithub01.walmart.com/CatalogRelationships/relationship-shared/blob/main/.wibey/skills/crq-write/SKILL.md)`, separated from the evidence by a blank line. Keep it unitalicized so the prescribed PDF renderer prints it literally. Resolve model, harness and IDE values using [runtime provenance](https://github.com/BrianHoltz/tools/blob/main/docs/AgentRules.md#communication-signing); Code Puppy and Wibey always include core and active extension/plugin versions, with explicit unknown or CLI n/a when applicable. Never guess.
 
 The Testing.md file is immutable after CRQ submission. Any planning, execution procedure, rationale, cross-reference, or work history belongs in the project or CRQ document instead.
 
@@ -276,25 +277,13 @@ A standing, terse, bullet-heavy draft sized to paste directly as a Jira comment 
 - **Status** — current state in one line (on-track / at-risk / blocked / investigating / resolved, and why)
 - **Next** — the next 1–3 concrete steps
 
-End the draft with a blank line and the universal italicized signing line: `*Powered by {Model} in {Harness} in {IDE} via {skill}*`. Link the named skill when one produced the draft; omit `via` only when no skill applies. Use native italics in the destination, or the same plain-text line where italics are unavailable.
+End the draft with a blank line and the universal italicized provenance line: `*Powered by {Model} in {Harness} in {IDE} via {skill-or-command}*`. Select and link the skill or command using [Drafting Comms](#drafting-comms)' provenance rule. Use native italics in the destination, or the same plain-text line where italics are unavailable.
 
 **Key distinction from Draft Next Comms: this section is overwritten, never deleted.** Draft Next Comms holds one-off outbound messages that vanish once sent. Next Daily Jira Update is a recurring cadence artifact — today's bullets replace yesterday's the moment they're posted (prefix per team convention, e.g. `MM.DD.Dow:`), and the section stays in the doc ready for tomorrow's update. Only delete it once the ticket itself closes or the daily-update cadence stops. The Work Log remains the permanent, cumulative history — this section is a disposable cache of "what would I post right now," derived from Tasks/Active Work/Work Log, never a source of new facts. See [git2jira](../git2jira/SKILL.md) for auto-generating these bullets from git history.
 
 ### Draft Next Comms
 
-Holds **only unsent** outbound communications (Slack replies, email drafts, PR comments). A draft that has been sent **must not appear here in any form** — not as a full message body, not as a compressed stub, not as a SENT status line.
-
-- Each draft is a `###` sub-heading with target and the message body as **plain text — no blockquote, ever.** The `###` heading already makes the context obvious, and a `>` prefix causes pasting problems into Slack/Jira/email.
-- **No editorializing, meta-commentary, or lead-in sentence before the body, ever.** No "reply in-thread to X because Y", no restating who the target is or why we're replying, no apologizing, no explaining what we should have done differently. The `###` heading already carries the target — that is the only metadata this section needs. The body is only ever the message text itself, ready to copy-paste as-is.
-- **Signature:** End every datestamped draft with a blank line and the universal italicized signing line: `*Powered by {Model} in {Harness} in {IDE} via {skill}*`. Link the named skill when one produced the draft; omit `via` only when no skill applies. Preserve the line when posting; use native italics in the destination, or the same plain-text line where italics are unavailable.
-- **No `Status:` line, no "DRAFT"/"READY"/"do not send without approval" annotation above the body.** A draft's mere presence in this section already means unsent; the requirement to get approval before contacting other humans is a standing global agent rule (not a per-draft warning to restate). Any such label is noise — same category as writing "don't `rm -rf $HOME`" next to every `rm` command.
-- **Every evidence sentence in the body must be a live link to a primary source** (a tool URL, query result, or code line — never this doc's own Evidence/Diagnosis section, never another of our own repo artifacts). Apply the eyeball test from [Drafting Comms](#drafting-comms) before finalizing: could a skeptical reader verify the claim in under 10 seconds by clicking the link, with no follow-up question?
-- **Link the reader to the manual when relevant.** A draft that invokes a documented procedure, contract, form, policy, or ownership rule must link the precise canonical documentation, not merely name it or point to an incident record.
-- **Empirical claims must identify the entity and link its evidence whenever a primary tool can expose it.** Link directly to the entity's filtered Editorial, Castar, Atom, OLS, or equivalent record—not a Slack thread, tool homepage, or our own artifact. If a permalink cannot encode the result, include the exact copy-pasteable verification recipe with the tool link.
-- **Linked catalog entity IDs use plain link text only.** Never wrap the ID label in backticks, bold, italics, or other typography: those effects can obscure the hyperlink after a Markdown draft is pasted into Slack. Use `[4490YMOZQTYR](https://editorial.walmart.com/...)`, not `[product \`4490YMOZQTYR\` in Editorial](https://editorial.walmart.com/...)`.
-- **When a draft is sent: delete it from this section entirely.** Add one Work Log entry recording when and to whom it was sent (and the Slack `ts` or message URL if available). That is the complete record.
-- **On audit: any lingering full message body, compressed stub, or status/sent note for a message that has already gone out is a violation.** Remove it immediately — the section must contain only unsent drafts.
-- **Cross-reference with blocked Tasks:** If a draft is blocking a Task (the Task cannot proceed until the external party responds), the blocked task's Notes column must name the draft (`Draft: [draft heading](#draft-next-comms)`) and the draft must name the blocked task (`blocks Task: <task name>`).
+Holds only unsent outbound communication drafts. For formatting, provenance, evidence, approval, and send lifecycle rules, use [Drafting Comms](#drafting-comms). A sent draft is removed from this section and recorded once in Work Log with destination and message URL. Workflow-specific additions belong in the owning workflow, not here.
 
 ### Diagnosis
 
@@ -313,14 +302,16 @@ Ruled-out theories never reach Decisions — their closure path is the Work Log 
 
 **Placement:** Dedicated `## Evidence` section near the bottom, above Work Log.
 
-**Inline citation:** Unicode dagger † (U+2020), no space before: `claim text[†](#e-descriptive-slug)`
+**Inline evidence citations:** Choose a cute decorative Unicode glyph (for example ❀, ✿, ❁, ✧ or ♡) for each unique evidence target in the document. Append its linked glyph to the end of the supported claim, with no intervening space: `claim text[❀](#e-descriptive-slug)`. Never put the glyph at the start of a bullet or claim. Evidence-first prose states the evidence before the proposed action; its citation still follows the evidence claim.
 
-Example: "Latency dropped 40%[†](#e-latency-drop)."
+Append the same plain glyph to the end of the target evidence heading: `### Brief evidence description ❀`. Keep the explicit descriptive anchor stable. Repeated citations to that target reuse its glyph; different targets in the same document must have different glyphs, even across sections or tables. Do not use daggers, numbered markers, or task-status glyphs for evidence citations.
+
+Example: "Latency dropped 40%[❀](#e-latency-drop)." targets `### Latency measurement ❀` with anchor `e-latency-drop`.
 
 **Entry structure** — each entry is a `###` heading:
 
 ```
-### Brief description of what is being evidenced
+### Brief description of what is being evidenced ❀
 
 <a id="e-descriptive-slug"></a>
 
@@ -334,7 +325,7 @@ Omit any field that genuinely doesn't apply; include as many as possible.
 
 **Additional rules:**
 
-- **Many items (&gt;5):** use `[†A1](#a1-slug)`, `[†A2](#a2-slug)`, etc.
+- **Audit citations:** verify one-to-one glyph/target mapping, claim-suffix placement, matching heading-suffix glyphs, and valid stable anchors throughout the document.
 - **Unsourced claims:** label "Inference:" or "Unverified:" until evidenced
 - **Perishable data** (stats, counts, latency, costs, queue depths): add vintage parenthetical:
 
@@ -398,20 +389,26 @@ Entry: `- **HH:MM:** Entry text`
 
 **North star — minimum reader effort to independently verify:** every rule below exists to get the reader from "I read a claim" to "I saw the same data myself" in the fewest possible motions — ideally one click, at worst one click plus one paste-and-run. If a rule and this goal ever seem to conflict, this goal wins. Before finalizing any comms draft, reread every evidence sentence and ask: *could a skeptical reader verify this in under 10 seconds, without asking me a follow-up question?* If not, fix the sentence — don't explain why it can't be fixed.
 
-When drafting Slack messages, emails, or any outbound communication — including the [Draft Next Comms](#draft-next-comms) section of a project doc:
+**When drafting Slack messages, emails, or other outbound communication — including Draft Next Comms:**
 
-- **Inline-link every source you relied on.** If the message claims "we followed X docs" or "the form says Y", the doc/page/tool must be a clickable link right there in the text. This shows due diligence to the recipient and lets the human reviewer verify the agent's claims without hunting for URLs.
+- **Draft Next Comms structure:** Include only unsent drafts. Each is a `###` heading naming the target followed immediately by the paste-ready body as plain text—never a blockquote. Do not add a `Status:` line, `DRAFT`/`READY` label, approval reminder, editorializing, or lead-in sentence.
+- **Inline evidence links:** Every empirical or diagnostic claim in the draft body must link inline to the exact primary record/result/document that supports it. Link each distinct factual clause; no dangling evidence and no internal evidence-glyph/footnote anchors in outbound bodies.
+- **No self-referential evidence:** Never use the same incident document, another agent-authored repo artifact, or `aidocs` as evidence. If the workflow requires an incident link, include it once at the end for context only; it does not support any claim.
+- **Name the owner:** A request or recommendation to another team must identify the specific system/team and link its applicable on-call handle/support route to verified ownership evidence. Do not substitute an umbrella org/platform name for a team.
+- **Provenance:** End every datestamped draft with a blank line and `*Powered by {Model} in {Harness} in {IDE} via {skill-or-command}*`. For every Powered-by signature, including drafts, external communications, and git commit messages, resolve values using [runtime provenance](https://github.com/BrianHoltz/tools/blob/main/docs/AgentRules.md#communication-signing): Code Puppy and Wibey must include both core and active extension/plugin versions, independently of the IDE version; retain explicit unknown or CLI n/a when applicable. Never mention doc-audit. Name [triage](../../commands/triage.md) when it is in play; otherwise name the other skill or command actually used. Link a skill to its `SKILL.md` or a command to its canonical command file. Omit `via` when no skill or command other than doc-audit applies. Workflow-specific provenance rules may change formatting, but cannot override this selection rule. Doc-audit [audit-date markers](#audit-date-format) are separate from Powered-by signatures.
+- **Sent lifecycle:** Do not retain a sent message, stub, or sent-status line in Draft Next Comms. Delete it and add one Work Log entry naming the destination and message URL or Slack `ts`. A recurring daily Jira update is a different artifact: overwrite it for the next cadence rather than deleting its section.
+- **Approval:** A draft is not authorization to send it. Get the user's approval before communicating with other humans.
+- **Task linkage:** When a reply blocks a Task, the task Notes must link the draft and the draft must name the blocked task.
+
 - **Give the reader the manual when it matters.** If a draft invokes a documented procedure, rule, contract, form, or ownership boundary, link the exact canonical documentation that tells the reader how it works or what to do; do not merely name it or link our incident record.
 - **Reference the doc that drives the question.** Frame uncertainty as "the [onboarding guide](url) says X but doesn't cover Y" — not a bare "we're not sure about Y." Citing the source proves the agent read it, surfaces exactly where the gap is, and lets the reviewer click through to confirm.
 - **Link every Walmart tool or platform mentioned by name.** IOP, DX, Kafka Studio, Jira SD, Confluence pages, Kibana, ServiceNow — if it has a URL, link it. Every unlinked tool name is a missed chance for the reviewer to verify.
 - **Never use bare URLs in Slack drafts.** Slack auto-links raw URLs, but they're unreadable in the project doc. Use `[descriptive text](url)` so the doc is reviewable; strip markdown to bare URLs only at send time if needed.
-- **Follow the mechanics in [Draft Next Comms](#draft-next-comms)** — no blockquote formatting, no meta-commentary or lead-in sentence before the body, delete the draft once sent.
+- **Context is not evidence:** A draft may link its owning incident or project for context, but every evidentiary claim must link to its primary source instead.
 - **Link every diagnostic claim to the tool that confirmed it.** "Catalog looks fine" → link to the Editorial URL you checked. "Offer is DELISTED" → link to Castar. "Feed processed 3 times" → link to Ingestion Portal. One click = reader can verify without asking a follow-up question.
 - **Every empirical claim needs evidence when a primary source can expose it.** Name the specific entity and link directly to its filtered tool record or result—not a Slack conversation, a tool landing page, or our incident doc. If no durable permalink exists, give the exact runnable recipe with the tool link.
 - **Present catalog entities using [Catalog Entity Presentation](#catalog-entity-presentation).** That canonical rule defines the first-mention glyph links, styled ID/title, and repeated-mention exception.
 - **Link every recommendation to the tool where the recipient acts on it.** "Seller needs to resubmit" → link to Ingestion Portal showing current feed state. "Check if other variants are affected" → link to Editorial BVShell. One click = recipient can action the recommendation immediately.
-- **Never link into the incident doc itself as evidence.** A Draft Next Comms link must point to a primary source — GHE source lines, an OLS/Grafana query result, Editorial/Castar/Atom, a Jira ticket — never to the incident doc's own Evidence/Diagnosis section. The incident doc records *our interpretation*; linking to it as "proof" lets an agent cite itself instead of the underlying data, and the recipient can't independently verify anything beyond trusting our write-up.
-- **Never link to our own repo artifacts as evidence either — same violation as linking the incident doc.** A filed SQL query in `shared/sql/`, a memo, a project doc, another Draft Comms — these are all *our own work product*, not primary sources, even though we wrote correct SQL or cited a real table. Linking `shared/sql/prod/foo.sql` as "proof the bag is missing" is exactly as self-referential as linking the incident doc's own Diagnosis section. The only valid link for that claim is the live query tool itself (e.g. a Grafana/OLS/AlloyDB console URL) — see the eyeball test below.
 - **THE EYEBALL TEST — every evidence link must pass it, no exceptions:** open the link cold, with zero other context, and look. If what you see does **not immediately and exactly show the data that backs the claim** — same filter, same records, same result — the link fails and must not be used. This rules out three specific failure modes agents keep repeating:
   1. **Landing-page/homepage links.** A link to a tool's default screen (e.g. a SQL editor's blank landing page, a dashboard's home view) shows nothing about the claim. It is not evidence; it's a link to the building, not the room.
   2. **Unfiltered/live-tail links.** A link to a topic browser, log stream, or dashboard showing *whatever is currently flowing* — not the specific records that support the claim — will show different data to the next viewer. If the tool can't preserve the filter/query/time-range in the URL, this pattern doesn't produce valid evidence links.
@@ -617,7 +614,7 @@ Standardized formatting so agents and humans produce visually consistent docs.
 
 ### Footnote Glyphs in Tables
 
-Footnotes hyperlinked from text use daggers as described above. In tables, the footnotes are so nearby/small that it's often better to link to particular footnotes using visual markers rather than hyperlinked daggers. In that case, use these:
+Evidence citations in tables follow the document-wide unique-glyph standard above. Ordinary non-evidence table footnotes may use these nearby visual markers:
 
 **Informational** (neutral, no action needed):
 
@@ -635,7 +632,7 @@ Footnotes hyperlinked from text use daggers as described above. In tables, the f
 
 The glyph *is* the cell content when the cell otherwise has no data; otherwise append it to the value.
 
-Within a given table or list, each glyph type maps to exactly one footnote. Glyphs may be freely reused across different tables/docs.
+Within a given table or list, each ordinary footnote glyph maps to exactly one footnote. Evidence glyphs instead map to exactly one target across the entire document; they may be reassigned only in a different document.
 
 ### Table Cell Vocabulary
 
