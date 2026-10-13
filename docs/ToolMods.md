@@ -218,7 +218,7 @@ TypeDown WYSIWYG markdown editor (tarikkavaz.typedown-markdown-editor) has no se
 
 ### Shuzijun source build
 
-The editable IDEA source checkout is `~/src/idea-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz fork](https://github.com/BrianHoltz/markdown-editor) of the [Apache-licensed upstream plugin](https://github.com/shuzijun/markdown-editor). Keep `origin` pointed at the fork and `upstream` at Shuzijun; the fork makes these local improvements available to other machines without pushing personal changes to the upstream maintainer. Maintained source version `2.0.7-local.9` retains plugin ID `com.shuzijun.markdown-editor` and builds against the installed IDEA 2026.2.3 runtime instead of downloading another IntelliJ distribution.
+The editable IDEA source checkout is `~/src/idea-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz fork](https://github.com/BrianHoltz/markdown-editor) of the [Apache-licensed upstream plugin](https://github.com/shuzijun/markdown-editor). Keep `origin` pointed at the fork and `upstream` at Shuzijun; the fork makes these local improvements available to other machines without pushing personal changes to the upstream maintainer. Maintained source version `2.0.7-local.11` retains plugin ID `com.shuzijun.markdown-editor` and builds against the installed IDEA 2026.2.3 runtime instead of downloading another IntelliJ distribution.
 
 The VS Code improvements map to IDEA as follows:
 
@@ -230,10 +230,10 @@ The VS Code improvements map to IDEA as follows:
 - `META-INF/plugin.xml` declares `com.intellij.modules.jcef` as a required dependency, replacing the installed-JAR compatibility patch.
 - `build.gradle.kts` accepts `-PlocalIdePath=...`, avoiding the slow platform download, and reuses the base `2.0.7` changelog entry for local version metadata.
 - Bundled JavaScript, CSS, locales, icons, and Lute use a startup-specific resource URL prefix, preventing cached assets from another plugin installation from mixing with the active bundle. Browser console warnings and errors are forwarded to `idea.log`.
-- Rich text projects the built-in Markdown preview's bundled prose, heading, bold, and code typography into Vditor selectors. The shared Preview font-size preference is normalized through `JBCefApp.normalizeScaledSize`, matching the preview's sizing path; browser zoom stays at 1 to avoid a second editor-only scale. The preview supplies the 1.6 prose line height, heading size ratios and weights, and relative code sizes. Source mode retains IDEA's editor font. Open tabs refresh on preview-size and UI-settings changes. Tables inherit the rich-text font, occupy the available content width, and wrap cells, including long unbroken URLs. Symmetric 35px rich-editor padding prevents Vditor's centered-column padding from wasting pane width; distraction-free mode uses 12px.
+- Rich text projects the built-in Markdown preview's bundled prose, heading, bold, and code typography into Vditor selectors. The editor uses the raw shared Preview font-size preference and passes IDEA’s current linear UI scale to `JBCefBrowserBase.setZoomLevel`, avoiding confusion with CEF’s logarithmic zoom. The preview supplies the 1.6 prose line height, heading size ratios and weights, and relative code sizes. Source mode retains IDEA's editor font. Open tabs refresh on preview-size and UI-settings changes. Tables inherit the rich-text font, occupy the available content width, and wrap cells, including long unbroken URLs. Symmetric 35px rich-editor padding prevents Vditor's centered-column padding from wasting pane width; distraction-free mode uses 12px.
 - The custom stylesheet explicitly maps rendered text, tables, borders, rules, blockquotes, keyboard tags, and the panel overflow marker to Vditor theme variables. This prevents the bundled light content-theme stylesheet from restoring white table cells and black text after IDEA switches to Darcula or another dark scheme.
 
-The shared Markdown Preview font-size preference is 14px. Typography comes from the bundled preview stylesheet; custom preview CSS is independent of the editor.
+The target shared Markdown Preview font-size preference is 14px; change it through Settings while IDEA is running. Typography comes from the bundled preview stylesheet; custom preview CSS is independent of the editor.
 
 `node --test test/asset-compatibility.test.cjs` checks Lute's Vditor initialization API, cache-isolated template references, typography/table CSS invariants, and theme-variable overrides. A jsdom smoke test verifies startup and computed typography and cell-wrapping styles for synthetic nine-column tables in IR and WYSIWYG modes. It does not measure browser layout geometry or establish interactive feature parity in installed JCEF.
 
@@ -246,9 +246,9 @@ export JAVA_HOME="$HOME/Applications/IntelliJ IDEA 2026.2.3.app/Contents/jbr/Con
   -PlocalIdePath="$HOME/Applications/IntelliJ IDEA 2026.2.3.app" \
   clean buildPlugin
 STAMP=$(date "+%Y%m%d.%a.%H%M")
-OUT="$HOME/Downloads/markdown-editor-2.0.7-local.9-$STAMP-preview.zip"
-cp -p build/distributions/markdown-editor-2.0.7-local.9.zip "$OUT"
-cmp build/distributions/markdown-editor-2.0.7-local.9.zip "$OUT"
+OUT="$HOME/Downloads/markdown-editor-2.0.7-local.11-$STAMP-zoom.zip"
+cp -p build/distributions/markdown-editor-2.0.7-local.11.zip "$OUT"
+cmp build/distributions/markdown-editor-2.0.7-local.11.zip "$OUT"
 ```
 
 Install the Downloads copy with **Settings → Plugins → gear → Install Plugin from Disk**, then restart IDEA. The source build replaces the Marketplace plugin because it retains the same plugin ID.
