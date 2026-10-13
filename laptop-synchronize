@@ -2,9 +2,9 @@
 # SPDX-FileCopyrightText: 2026 Brian Holtz
 # SPDX-License-Identifier: MIT
 """
-walmart-sync — align the portable AI and computer-operation toolchain
+laptop-synchronize — align the portable AI and computer-operation toolchain
 
-Repository scope and shared-file policies are declared in walmart-sync.json.
+Repository scope and shared-file policies are declared in laptop-synchronize.json.
 """
 
 import argparse
@@ -96,7 +96,7 @@ def grep_patterns(path: Path, compiled, skip_url_lines=False):
     return hits
 
 
-def walmart_sync_specs(cfg):
+def laptop_synchronize_specs(cfg):
     exact = set(cfg.get("managed_exact", []))
     prefixes = [p.rstrip("/") + "/" for p in cfg.get("managed_prefixes", [])]
     for item in cfg["mirror_items"]:
@@ -114,7 +114,7 @@ def walmart_sync_specs(cfg):
 
 
 def mirror_only_specs(cfg):
-    """Like walmart_sync_specs, but mirror_items only -- excludes personal_only.
+    """Like laptop_synchronize_specs, but mirror_items only -- excludes personal_only.
 
     Used to gate pushes: personal_only files may be freely pushed from either
     laptop, but mirror_items have a canonical source (relationship-shared) and
@@ -143,12 +143,12 @@ def pull_repo(repo: Path, label: str, cfg=None, check_managed_only=False):
 
     # If checking managed files only (for shared repo), filter to mirror items
     if check_managed_only and cfg:
-        exact, prefixes = walmart_sync_specs(cfg)
+        exact, prefixes = laptop_synchronize_specs(cfg)
         dirty = [p for p in dirty if is_managed(p, exact, prefixes)]
 
     if dirty:
         print(c(RED + BOLD, f"⚠ Commit-first policy: cannot pull {label} with local changes."))
-        print(c(RED, "Commit these files first, then rerun walmart-sync:"))
+        print(c(RED, "Commit these files first, then rerun laptop-synchronize:"))
         for p in dirty:
             print(f"  - {p}")
         print()
@@ -366,10 +366,10 @@ def report_merge_conflicts(repo: Path, label: str):
         print(c(RED, "Conflicted paths:"))
         for path in conflicts:
             print(f"  - {path}")
-        print(c(CYAN, f"Resolve the merge in {repo}, then rerun walmart-sync."))
+        print(c(CYAN, f"Resolve the merge in {repo}, then rerun laptop-synchronize."))
     else:
         print(c(RED + BOLD, f"⚠ Git could not pull {label}; no merge conflict is recorded."))
-        print(c(CYAN, f"Inspect Git's message above, resolve the issue in {repo}, then rerun walmart-sync."))
+        print(c(CYAN, f"Inspect Git's message above, resolve the issue in {repo}, then rerun laptop-synchronize."))
 
 
 def check_push_portability(repo: Path, cfg, label: str):
@@ -429,7 +429,7 @@ def sync_repository(repo: Path, label: str, cfg):
             print(c(RED, f"Could not stage changes in {label}."))
             return False
         commit_message = "Sync local toolchain changes"
-        footer = os.environ.get("WALMART_SYNC_COMMIT_FOOTER", "").strip()
+        footer = os.environ.get("LAPTOP_SYNCHRONIZE_COMMIT_FOOTER", "").strip()
         if footer:
             commit_message += "\n\n" + footer
         commit = run_git(repo, "commit", "-m", commit_message, capture=False)

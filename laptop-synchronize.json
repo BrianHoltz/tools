@@ -28,12 +28,12 @@
     { "path": "src/vscode-markdown-editor", "label": "~/src/vscode-markdown-editor" }
   ],
   "managed_exact": [
-    "walmart-sync",
-    "walmart-sync.json"
+    "laptop-synchronize",
+    "laptop-synchronize.json"
   ],
   "managed_prefixes": [],
   "portability_push_exempt": [
-    "walmart-sync",
+    "laptop-synchronize",
     "docs/AgentRules.md"
   ],
   "ref_integrity_exempt": [

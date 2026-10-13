@@ -44,7 +44,7 @@ The public tools repo lives at `~/src/tools/`; `~/bin → ~/src/tools` is retain
 ~/src/tools/          public repo (BrianHoltz/tools)
   fhold               executable scripts live at repo top level
   safewrite
-  walmart-sync
+  laptop-synchronize
   docs/
   .wibey/
   shellrc/
@@ -53,11 +53,11 @@ The public tools repo lives at `~/src/tools/`; `~/bin → ~/src/tools` is retain
 ~/bin -> ~/src/tools
 ```
 
-### Walmart Sync
+### Laptop Synchronize
 
-[Walmart Sync](../walmart-sync) keeps the portable computer-operation toolchain aligned between Brian's laptops. Its repositories are `~/src/tools/`, `~/src/idea-markdown-editor/`, and `~/src/vscode-markdown-editor/`, with the latter two listed in [its manifest](../walmart-sync.json). The tools repo includes the canonical shell configuration linked from `.bash_profile`, `.bashrc`, `.shellrc.common`, `.zprofile`, and `.zshrc`, plus maintained AI skills, commands, IDE customizations, and extension patches.
+[Laptop Synchronize](../laptop-synchronize) keeps the portable computer-operation toolchain aligned between Brian's laptops. Its repositories are `~/src/tools/`, `~/src/idea-markdown-editor/`, and `~/src/vscode-markdown-editor/`, with the latter two listed in [its manifest](../laptop-synchronize.json). The tools repo includes the canonical shell configuration linked from `.bash_profile`, `.bashrc`, `.shellrc.common`, `.zprofile`, and `.zshrc`, plus maintained AI skills, commands, IDE customizations, and extension patches.
 
-A bare `walmart-sync` stages and commits local changes in each managed repo, pulls upstream with merge semantics, and pushes. On the Walmart laptop it first updates the configured mirrors from `relationship-shared`. Clean Git merges proceed automatically; unresolved conflicts stop with their paths listed for resolution.
+A bare `laptop-synchronize` stages and commits local changes in each managed repo, pulls upstream with merge semantics, and pushes. On the Walmart laptop it first updates the configured mirrors from `relationship-shared`. Clean Git merges proceed automatically; unresolved conflicts stop with their paths listed for resolution.
 
 
 Layout:
@@ -212,4 +212,4 @@ For agent access to Google Docs content, prefer a real OAuth flow first and use 
 
 **Backup:** Tarball at `~/tmp/gdrive.20260715.tar` (6.7G, 5,257 files) — retain until 2026-07-30.
 
-*[doc-audit](https://github.com/BrianHoltz/tools/blob/main/.wibey/skills/doc-audit/SKILL.md): 2026.10.12.Mon*
+*[doc-audit](https://github.com/BrianHoltz/tools/blob/main/.wibey/skills/doc-audit/SKILL.md): 2026.10.13.Tue*
