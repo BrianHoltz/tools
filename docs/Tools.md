@@ -630,30 +630,18 @@ IDEA keybinding overrides are stored in `~/Library/Application Support/JetBrains
 
 ### IDEA Workspace Roots
 
-On the work laptop, the relationship-shared workspace owns `~/src/relationship-shared` and attaches `~/src/tools` as a separate module/content root and Git mapping. Do not attach all of `~/src`: service and IDE-plugin clones are separate workspaces. Register both module files in this project's `.idea/modules.xml`; exclude generated caches and IDE metadata without excluding another module's root. Reload the project after external root changes and verify Find File locates `GitScheme.md`.
+The `relationship-shared` IDEA project has exactly two content roots: `~/src/relationship-shared` (the project root) and `~/src/tools` (a separate module). Keep both module files listed in `relationship-shared/.idea/modules.xml`, with independent Git mappings for these two repositories. Never attach `~/src` or map its sibling repositories into this project; each clone is its own workspace. Exclude generated output and IDE metadata inside each module, never either module root.
 
-- On the personal Mac and the Mac mini, the Project view should expose these
-  bounded content roots:
+A stray `.iml` file does not create a content root unless `modules.xml` registers it. When troubleshooting an unexpected root, inspect `modules.xml` and each registered module's content URL; do not infer roots from filenames alone. IDEA's project tint is separate from content roots: inspect the `ProjectColorInfo` override in `.idea/workspace.xml` or reset Project Color in the UI rather than changing module roots to fix a tint. Keep workspace edits narrow because that file also stores IDE-local session and layout state.
 
-  ```text
-  ~/Documents
-  ~/lpscc
-  ~/My Drive
-  ~/src
-  ```
+For a different, multi-root personal workspace, its intended roots are separate from this project and must not be copied into `relationship-shared`'s IDEA configuration:
 
-  This corresponds to the personal laptop layout shown as `Documents`,
-  `lpscc`, `My Drive [GDrive]`, and `src`. Attach the real directories in IDEA
-  rather than only opening `~/src/tools`; the tools checkout is nested under
-  `~/src` but should also have its own VCS mapping when it is being edited.
-- Preferred LPSCC root: `~/lpscc` (the symlink to the shared-drive root).
-- In Project view and attached directories, use `~/lpscc` rather than `~/My Drive/Libertarian/LPSCC`.
-- For the tools repo, attach the **real repo path** `~/src/tools` as both an IDEA content root and a VCS root. Do **not** rely on the `~/bin` symlink for IDE root configuration.
-- If a module file exists on disk but the root does not appear in IDEA, check `~/IdeaProjects/Personal/.idea/modules.xml` first. A stray `*.iml` file is inert until `modules.xml` actually lists it.
-- If the folder appears in Project view but git status does not surface in the Commit tool window, check `~/IdeaProjects/Personal/.idea/vcs.xml` for a matching `<mapping ... vcs="Git" />` entry.
-- For the tools repo specifically, the desired pair is a module pointing at `file://$USER_HOME$/src/tools` and a VCS mapping for `$USER_HOME$/src/tools`.
-- If the wrong root shows up, remove the direct `My Drive/.../LPSCC` entry and reattach the symlinked root so the workspace stays stable across Drive remounts.
-- Do not let agents rewrite unrelated module/root config while doing this cleanup; even removing one stale root can have side effects on IDEA layout state and Copilot's local session/history mapping after restart.
+- `~/Documents`
+- `~/lpscc` (the stable symlink to the shared-drive root)
+- `~/My Drive`
+- `~/src`
+
+Use `~/lpscc` rather than `~/My Drive/Libertarian/LPSCC`. For the tools repo, use the real `~/src/tools` path, not the `~/bin` symlink. In any multi-root workspace, attach tools as its own root/module with its own Git mapping; do not attach the parent `~/src` just to reach tools.
 
 ### Markdown Preview
 
@@ -784,4 +772,4 @@ Files that implement auto-regen (keep in sync):
 - `~/.claude/hooks/session-end-usage.py` (active hook)
 - `~/.wibey/skills/usage-dashboard/scripts/session-end-usage.py` (skill source)
 
-*[doc-audit](https://github.com/BrianHoltz/tools/blob/main/.wibey/skills/doc-audit/SKILL.md): 2026.10.11.Sun*
+*[doc-audit](https://github.com/BrianHoltz/tools/blob/main/.wibey/skills/doc-audit/SKILL.md): 2026.10.13.Tue*
