@@ -24,6 +24,14 @@ if [ ! -f "$WRAPPER_PROPS" ]; then
   echo "ERROR: $WRAPPER_PROPS not found — is this a Gradle-wrapped repo?" >&2
   exit 1
 fi
+WRAPPER_REL="gradle/wrapper/gradle-wrapper.properties"
+
+# Keep the public wrapper configuration in the index while allowing the
+# Walmart-only URL to remain in this checkout. This prevents repository-wide
+# sync commands from publishing an internal hostname.
+if git -C "$REPO" rev-parse --show-toplevel >/dev/null 2>&1; then
+  git -C "$REPO" update-index --no-skip-worktree -- "$WRAPPER_REL"
+fi
 
 CURRENT_URL=$(grep -m1 '^distributionUrl=' "$WRAPPER_PROPS" | cut -d= -f2-)
 GRADLE_VERSION=$(echo "$CURRENT_URL" | grep -oE 'gradle-[0-9]+\.[0-9]+(\.[0-9]+)?-bin' | sed -E 's/gradle-(.*)-bin/\1/')
@@ -35,6 +43,9 @@ echo "== Detected Gradle version: $GRADLE_VERSION =="
 
 echo "== Overwriting $WRAPPER_PROPS (local, uncommitted) =="
 sed "s/GRADLE_VERSION/$GRADLE_VERSION/g" "$OVERLAY_DIR/gradle-wrapper.properties.template" > "$WRAPPER_PROPS"
+if git -C "$REPO" rev-parse --show-toplevel >/dev/null 2>&1; then
+  git -C "$REPO" update-index --skip-worktree -- "$WRAPPER_REL"
+fi
 
 echo "== Installing Maven/plugin-portal mirror init script =="
 mkdir -p "$HOME/.gradle/init.d"
