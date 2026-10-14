@@ -604,6 +604,7 @@ Line-height, table padding, list spacing, and focus bug patches. Full procedure:
 - **Code Puppy JetBrains 0.28.1 rendering compatibility:** callback-adapter and HTTP navigation-fallback fixes are maintained in the fork; see [ToolMods.md](ToolMods.md#code-puppy-maintained-source-builds).
 - **Patch audit 2026.10.09 (personal Mac, 2026.2.3):** restored the missing JCEF remote-mode override (`idea.vmoptions`), Shuzijun 2.0.7 JCEF dependency + 13px font, MCP Server Services-panel suppression, sensitive-file dialog suppression, and built-in Markdown preview light/dark stylesheet. The active `VSCode OSX` keymap is supplied by the installed `keymap-vscode` plugin; no stale custom keymap XML was recreated.
 - *command-approval constipation*
+- **JetBrains AI Yolo mode:** choose **Allow All** at the bottom of the chat window to grant maximum permissions.
 - *Parallel agents now supported (as of 2026.06)*
 - *Cannot paste file/line reference!?*
 - *Pending Changes panel sometimes fails to show agent-written files (new untracked files, or edits via MCP/Write tool). Check* `git status` *to catch anything the panel missed.*
