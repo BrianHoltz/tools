@@ -341,6 +341,8 @@ When Zscaler/corporate proxy blocks network-heavy binary downloads (pnpm install
 
 **Key principle:** phantom-agent grows and shrinks with each episode. Its git history tracks the evolution of what *must* run offline, vs. what merely *can* run offline. Never bundle unrelated work into a job function; each should be a single, focused download or install step.
 
+**Watch for pre-existing dotfiles that hardcode on-VPN endpoints** (e.g. `~/.gradle/gradle.properties` systemProp proxy settings, intentionally configured for builds while on VPN). A job that needs the same tool off-VPN must move such a file aside and restore it unconditionally afterward — never edit or delete it permanently; the on-VPN config is still needed once reconnected. Capture the command's exit status with `|| status=$?` rather than letting it run bare, since the script's `set -e` would otherwise abort before the restore step runs.
+
 **Example job:**
 ```bash
 job:vscode-markdown-install() {
