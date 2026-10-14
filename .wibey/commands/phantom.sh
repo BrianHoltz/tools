@@ -1,12 +1,11 @@
 #!/bin/bash
-# Disconnect VPN, run this script, reconnect VPN.
+# phantom: Ghost work registry for off-VPN tasks
 #
-# Agent-managed registry: add off-VPN work commands here.
-# This is the standard place for any task that requires disconnected network access
-# (npm/pnpm installs, gradle downloads, etc. blocked by Zscaler on VPN).
+# Before disconnecting VPN: phantom
+# Reconnect VPN when done.
 #
-# Usage: disconnect-vpn-do-work.sh [job...]
-# If no job specified, runs all.
+# Agent-managed registry of work that must run while disconnected
+# (pnpm installs, gradle downloads, etc. blocked by Zscaler on VPN).
 
 set -e
 
@@ -29,20 +28,11 @@ job:idea-markdown-gradle() {
 }
 
 # ============================================================================
-# Entry point
+# Execute all registered phantom jobs
 # ============================================================================
-if [ $# -eq 0 ]; then
-    # Run all jobs
-    for func in $(compgen -A function | grep '^job:'); do
-        $func
-        echo ""
-    done
-else
-    # Run specified jobs
-    for job in "$@"; do
-        "job:$job"
-        echo ""
-    done
-fi
+for func in $(compgen -A function | grep '^job:'); do
+    $func
+    echo ""
+done
 
-echo "✓ Off-VPN work complete. Safe to reconnect VPN."
+echo "✓ Phantom work complete. Safe to reconnect VPN."
