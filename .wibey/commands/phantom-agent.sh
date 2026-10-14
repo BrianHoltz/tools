@@ -20,6 +20,22 @@ job:vscode-markdown-install() {
 }
 
 # ============================================================================
+# VSCode Markdown Editor: add @vscode/vsce devDependency (one-time)
+# Not in the existing lockfile, so pnpm must fetch new tarballs from
+# registry.npmjs.org. On VPN this gets ECONNRESET / 403 MediaTypeBlocked
+# from Zscaler content filtering on several packages (commander, marked,
+# @azure/msal-*, etc.) — same binary-block pattern as gradle/jetbrains.
+# A failed attempt leaves pnpm-lock.yaml modified with no package.json
+# change; if this job fails, run `git checkout -- pnpm-lock.yaml` in that
+# repo to restore a clean state before retrying.
+# ============================================================================
+job:vscode-markdown-add-vsce() {
+    echo "→ VSCode Markdown: add @vscode/vsce devDependency"
+    cd /Users/b0h0166/src/vscode-markdown-editor
+    pnpm add -D -w @vscode/vsce
+}
+
+# ============================================================================
 # IDEA Markdown Editor: Gradle wrapper download
 # ~/.gradle/gradle.properties deliberately hardcodes the on-VPN corporate
 # proxy (proxy-intlho.wal-mart.com) for use when actually building on VPN.
