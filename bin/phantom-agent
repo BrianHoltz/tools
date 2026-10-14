@@ -1,11 +1,12 @@
 #!/bin/bash
-# phantom: Ghost work registry for off-VPN tasks
+# phantom-agent: Bare-minimum off-VPN task registry
 #
-# Before disconnecting VPN: phantom
+# Runs only the BARE MINIMUM commands agents need executed while VPN is disconnected.
+# Completely rewritten for each blocking episode as new network constraints emerge.
+# Git history tracks the evolution of what must run offline.
+#
+# Before disconnecting VPN: phantom-agent
 # Reconnect VPN when done.
-#
-# Agent-managed registry of work that must run while disconnected
-# (pnpm installs, gradle downloads, etc. blocked by Zscaler on VPN).
 
 set -e
 

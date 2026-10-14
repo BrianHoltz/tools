@@ -1,11 +1,11 @@
 #!/bin/bash
-# agent-phantom: Bare-minimum off-VPN task registry
+# phantom-agent: Bare-minimum off-VPN task registry
 #
 # Runs only the BARE MINIMUM commands agents need executed while VPN is disconnected.
 # Completely rewritten for each blocking episode as new network constraints emerge.
 # Git history tracks the evolution of what must run offline.
 #
-# Before disconnecting VPN: agent-phantom
+# Before disconnecting VPN: phantom-agent
 # Reconnect VPN when done.
 
 set -e
