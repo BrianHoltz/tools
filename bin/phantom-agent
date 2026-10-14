@@ -50,11 +50,17 @@ job:idea-markdown-gradle() {
 # Zscaler SSLO inspection (SSL_Decryption_Authority_SSLO_*.wal-mart.com) hangs
 # with 0 bytes received on this binary via both corporate proxies on VPN.
 # Confirmed network-wide, not proxy-specific or IDE-config-specific.
+#
+# Use the EXACT URL IntelliJ's own error dialog reports, not a simplified
+# "stable" pluginId-only URL — that 404s for this plugin (confirmed off-VPN).
+# The full URL (with updateId/family/uuid/build params) is confirmed to reach
+# a real TLS handshake and start a real download; only Zscaler's on-VPN
+# content inspection blocks it, so off-VPN it should complete.
 # ============================================================================
 job:jetbrains-air-plugin-download() {
     echo "→ JetBrains Marketplace: Air plugin zip"
     curl -fL --max-time 60 -o ~/Downloads/air-plugin.zip \
-        "https://plugins.jetbrains.com/plugin/download?pluginId=33314&rel=true"
+        "https://downloads.marketplace.jetbrains.com/files/33314/1189348/air-plugin-262.8665.490.zip?updateId=1189348&pluginId=33314&family=INTELLIJ&uuid=1408232d48feb78-be60-4c4f-8226-aa686ac14508&updatedFrom=code=IU&build=262.10968.63"
     echo "Saved to ~/Downloads/air-plugin.zip — install via Settings > Plugins > ⚙ > Install Plugin from Disk"
 }
 
