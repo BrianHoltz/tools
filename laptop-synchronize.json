@@ -21,7 +21,6 @@
     ".wibey/commands/avoid-numbering.md",
     ".wibey/commands/commitz.md",
     ".wibey/commands/convo.md",
-    ".wibey/commands/peer-review.md",
     ".wibey/commands/say.md"
   ],
   "toolchain_repos": [
