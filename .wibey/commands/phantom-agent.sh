@@ -36,15 +36,28 @@ job:vscode-markdown-add-vsce() {
 }
 
 # ============================================================================
-# IDEA Markdown Editor: Gradle wrapper download
+# IDEA Markdown Editor: Gradle wrapper + full dependency resolution
 # ~/.gradle/gradle.properties deliberately hardcodes the on-VPN corporate
 # proxy (proxy-intlho.wal-mart.com) for use when actually building on VPN.
 # That host doesn't resolve off-VPN, but services.gradle.org resolves fine
 # directly off-VPN — so the wrapper bootstrap only needs the proxy config
 # gone for this one invocation. Move it aside, download, always restore.
+#
+# Beyond the wrapper itself: `./gradlew help` forces full settings.gradle.kts
+# pluginManagement + build.gradle.kts plugins{} resolution (foojay-resolver,
+# org.jetbrains.intellij.platform, de.undercouch.download, changelog, and
+# their transitive deps from mavenCentral()). Both plugins.gradle.org and
+# mavenCentral() are Zscaler-blocked on VPN (403 MediaTypeBlocked, confirmed
+# on foojay-resolver-1.0.0.jar) — this repo's walmartMavenCentralRepository
+# gradle.properties entry exists but isn't wired into any build file, so
+# there is no working mirror for either repository today. `--version` alone
+# does NOT trigger this (it skips project/settings evaluation entirely),
+# which is why the first phantom-agent episode missed it — `help` forces
+# the same evaluation `buildPlugin` needs, caching everything in
+# ~/.gradle/caches so the real on-VPN build hits cache instead of network.
 # ============================================================================
 job:idea-markdown-gradle() {
-    echo "→ IDEA Markdown: gradle wrapper download"
+    echo "→ IDEA Markdown: gradle wrapper + dependency resolution"
     local props=~/.gradle/gradle.properties
     local backup=~/.gradle/gradle.properties.phantom-backup
     local restored=0
@@ -53,7 +66,7 @@ job:idea-markdown-gradle() {
         restored=1
     fi
     local status=0
-    (cd /Users/b0h0166/src/idea-markdown-editor && ./gradlew --version) || status=$?
+    (cd /Users/b0h0166/src/idea-markdown-editor && ./gradlew help) || status=$?
     if [ "$restored" = 1 ]; then
         mv "$backup" "$props"
         echo "(restored ~/.gradle/gradle.properties)"
