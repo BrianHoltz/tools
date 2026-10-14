@@ -34,6 +34,7 @@ This file is the global layer; a repo's AGENTS.md supplies project/team context,
   - [PR Diff Source of Truth](#pr-diff-source-of-truth)
   - [Git Merge Strategy](#git-merge-strategy)
   - [Team Tool Discovery](#team-tool-discovery)
+  - [Agent-Phantom Pattern: Off-VPN Work Registry](#agent-phantom-pattern-off-vpn-work-registry)
 - [Portable Agent Tooling](#portable-agent-tooling)
   - [Codex Integration](#codex-integration)
   - [Custom Commands](#custom-commands)
@@ -324,6 +325,32 @@ Merge commits are honest: they record that the integration happened at that poin
 - Team commands: `~/src/relationship-shared/.wibey/commands/<name>.md`
 
 Read the command/skill file before executing it, exactly as you would for a workspace-local command.
+
+### Agent-Phantom Pattern: Off-VPN Work Registry
+
+When Zscaler/corporate proxy blocks network-heavy package manager downloads (pnpm install, gradle downloads, etc.), use the **agent-phantom** pattern:
+
+**The registry:** `~/.wibey/commands/agent-phantom.sh` — bare-minimum off-VPN task registry. Agents add `job:name()` functions here when network constraints block their work.
+
+**Workflow:**
+1. When blocked by VPN on a package manager install/download, identify the BARE MINIMUM command needed (e.g., `pnpm install`, not the full build).
+2. Add a new `job:` function to `agent-phantom.sh` with that single command.
+3. Commit the registry update to `~/src/tools/`.
+4. Tell the user: disconnect VPN, run `agent-phantom`, reconnect VPN, and the work will continue.
+5. After reconnection, the build/compilation can proceed on VPN.
+
+**Key principle:** agent-phantom grows and shrinks with each episode. Its git history tracks the evolution of what *must* run offline, vs. what merely *can* run offline. Never bundle unrelated work into a job function; each should be a single, focused download or install step.
+
+**Example job:**
+```bash
+job:vscode-markdown-install() {
+    echo "→ VSCode Markdown: pnpm install"
+    cd /Users/b0h0166/src/vscode-markdown-editor
+    pnpm install
+}
+```
+
+Use when: Network calls fail with 403/timeout on package managers. Do not use for: general connectivity issues, authentication, or work that doesn't require external downloads.
 
 ## Portable Agent Tooling
 
