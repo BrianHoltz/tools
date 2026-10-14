@@ -78,5 +78,17 @@ else
 fi
 echo ""
 
+echo "--- Known gotcha: ~/.gradle/gradle.properties hardcoded proxy ---"
+if [ -f ~/.gradle/gradle.properties ] && grep -q "systemProp.https.proxyHost" ~/.gradle/gradle.properties 2>/dev/null; then
+    echo "⚠ ~/.gradle/gradle.properties hardcodes an on-VPN-only proxy host."
+    echo "  Gradle wrapper bootstrap reads this even for --version, so off-VPN"
+    echo "  downloads fail with UnknownHostException unless phantom-agent's"
+    echo "  idea-markdown-gradle job (which moves the file aside and restores"
+    echo "  it) is used instead of running ./gradlew directly."
+else
+    echo "(no hardcoded proxy found in ~/.gradle/gradle.properties)"
+fi
+echo ""
+
 echo "=== End phantom-doctor report ==="
 echo "Paste this output back to your agent when VPN is reconnected."
