@@ -29,6 +29,19 @@ job:idea-markdown-gradle() {
 }
 
 # ============================================================================
+# JetBrains Marketplace: Air plugin download
+# Zscaler SSLO inspection (SSL_Decryption_Authority_SSLO_*.wal-mart.com) hangs
+# with 0 bytes received on this binary via both corporate proxies on VPN.
+# Confirmed network-wide, not proxy-specific or IDE-config-specific.
+# ============================================================================
+job:jetbrains-air-plugin-download() {
+    echo "→ JetBrains Marketplace: Air plugin zip"
+    curl -fL --max-time 60 -o ~/Downloads/air-plugin.zip \
+        "https://plugins.jetbrains.com/plugin/download?pluginId=33314&rel=true"
+    echo "Saved to ~/Downloads/air-plugin.zip — install via Settings > Plugins > ⚙ > Install Plugin from Disk"
+}
+
+# ============================================================================
 # Execute all registered phantom jobs
 # ============================================================================
 for func in $(compgen -A function | grep '^job:'); do

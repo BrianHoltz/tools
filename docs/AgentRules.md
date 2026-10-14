@@ -326,20 +326,20 @@ Merge commits are honest: they record that the integration happened at that poin
 
 Read the command/skill file before executing it, exactly as you would for a workspace-local command.
 
-### Agent-Phantom Pattern: Off-VPN Work Registry
+### Phantom-Agent Pattern: Off-VPN Work Registry
 
-When Zscaler/corporate proxy blocks network-heavy package manager downloads (pnpm install, gradle downloads, etc.), use the **agent-phantom** pattern:
+When Zscaler/corporate proxy blocks network-heavy binary downloads (pnpm install, gradle downloads, IDE plugin marketplace installs, etc.), use the **phantom-agent** pattern. Confirmed root cause in one episode: Walmart's SSL-inspection appliance (`SSL_Decryption_Authority_SSLO_*.wal-mart.com`) completes the TLS handshake but then hangs with 0 bytes received on specific binaries — reproducible via `curl` through either configured corporate proxy, so it is a content-inspection block, not a misconfigured proxy or a dead host.
 
-**The registry:** `~/.wibey/commands/agent-phantom.sh` — bare-minimum off-VPN task registry. Agents add `job:name()` functions here when network constraints block their work.
+**The registry:** `~/.wibey/commands/phantom-agent.sh` — bare-minimum off-VPN task registry. Agents add `job:name()` functions here when network constraints block their work.
 
 **Workflow:**
 1. When blocked by VPN on a package manager install/download, identify the BARE MINIMUM command needed (e.g., `pnpm install`, not the full build).
-2. Add a new `job:` function to `agent-phantom.sh` with that single command.
+2. Add a new `job:` function to `phantom-agent.sh` with that single command.
 3. Commit the registry update to `~/src/tools/`.
-4. Tell the user: disconnect VPN, run `agent-phantom`, reconnect VPN, and the work will continue.
+4. Tell the user: disconnect VPN, run `phantom-agent`, reconnect VPN, and the work will continue.
 5. After reconnection, the build/compilation can proceed on VPN.
 
-**Key principle:** agent-phantom grows and shrinks with each episode. Its git history tracks the evolution of what *must* run offline, vs. what merely *can* run offline. Never bundle unrelated work into a job function; each should be a single, focused download or install step.
+**Key principle:** phantom-agent grows and shrinks with each episode. Its git history tracks the evolution of what *must* run offline, vs. what merely *can* run offline. Never bundle unrelated work into a job function; each should be a single, focused download or install step.
 
 **Example job:**
 ```bash
@@ -351,6 +351,12 @@ job:vscode-markdown-install() {
 ```
 
 Use when: Network calls fail with 403/timeout on package managers. Do not use for: general connectivity issues, authentication, or work that doesn't require external downloads.
+
+### Phantom-Doctor: Off-VPN Network Diagnostics
+
+`~/.wibey/commands/phantom-doctor.sh` is a general-purpose network/proxy diagnostic script the user runs manually while VPN is disconnected (an agent cannot run it then, since agent connectivity itself depends on the host network). It checks connectivity, DNS resolution, proxy env vars, and known-problem hosts, then prints a plain-text report.
+
+Agents extend this script's checks when new network failure modes are diagnosed (e.g. a new host that needs DNS verification), but do not rely on it being run automatically — it is a human-invoked tool for the disconnected state where the agent itself cannot operate.
 
 ## Portable Agent Tooling
 
