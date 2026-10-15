@@ -31,7 +31,8 @@ Make and execute a detailed systematic plan for the following request.
   3. **Seed** new docs: populate `## Summary` with the task description, add a
      timestamped `## Work Log` entry, add blank `## Active Work` and
      `## Open Questions` sections.
-  4. **Open in VS Code:** `code <filepath>`. Update as you execute — plan phases in
-     Active Work, blockers in Open Questions.
+  4. **Open in the default editor:** `open <filepath>` (respects the current macOS
+     default app for Markdown, not a hardcoded editor). Update as you execute —
+     plan phases in Active Work, blockers in Open Questions.
 - **Plan.** Break the work into numbered phases with clear deliverables.
 - **Execute.** Use the deep knowledge and skills in this repo and any linked shared/ repo. If you are Wibey, leverage your DX/MCP powers and run the /safe-browse command if you might need a browser. For work with independent or parallel workstreams, you may spawn subagents — all state flows back to the anchor doc; subagents do not maintain their own docs. Think critically and question your assumptions.
