@@ -91,22 +91,20 @@ job:idea-markdown-gradle() {
 }
 
 # ============================================================================
-# JetBrains Marketplace: Air plugin download
-# Zscaler SSLO inspection (SSL_Decryption_Authority_SSLO_*.wal-mart.com) hangs
-# with 0 bytes received on this binary via both corporate proxies on VPN.
-# Confirmed network-wide, not proxy-specific or IDE-config-specific.
-#
-# Use the EXACT URL IntelliJ's own error dialog reports, not a simplified
-# "stable" pluginId-only URL — that 404s for this plugin (confirmed off-VPN).
-# The full URL (with updateId/family/uuid/build params) is confirmed to reach
-# a real TLS handshake and start a real download; only Zscaler's on-VPN
-# content inspection blocks it, so off-VPN it should complete.
+# git push ~/src/tools (GitHub) — SSH protocol blocked on VPN
+# SSH to github.com (both port 22 directly and GitHub's port-443 SSH fallback)
+# times out during banner exchange on VPN: `ssh -T git@github.com` and
+# `ssh -T git@github.com -p 22` both hang then fail with "Connection timed
+# out during banner exchange" — Zscaler SSLO blocks the SSH protocol itself,
+# while plain HTTPS GETs to github.com succeed fine through the same proxy
+# (confirmed via curl -I https://github.com -> 200 OK). This is a protocol-
+# level block, not a dead host or bad credentials — git's remote is SSH
+# (git@github.com:BrianHoltz/tools.git) so `git push` hangs until it's
+# retried off-VPN, where the existing SSH key auth works normally.
 # ============================================================================
-job:jetbrains-air-plugin-download() {
-    echo "→ JetBrains Marketplace: Air plugin zip"
-    curl -fL --max-time 60 -o ~/Downloads/air-plugin.zip \
-        "https://downloads.marketplace.jetbrains.com/files/33314/1189348/air-plugin-262.8665.490.zip?updateId=1189348&pluginId=33314&family=INTELLIJ&uuid=1408232d48feb78-be60-4c4f-8226-aa686ac14508&updatedFrom=code=IU&build=262.10968.63"
-    echo "Saved to ~/Downloads/air-plugin.zip — install via Settings > Plugins > ⚙ > Install Plugin from Disk"
+job:tools-repo-push() {
+    echo "→ ~/src/tools: git push origin main"
+    cd /Users/b0h0166/src/tools && git push
 }
 
 # ============================================================================
