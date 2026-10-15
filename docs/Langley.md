@@ -38,6 +38,62 @@
   - Attached context — linked repositories, issues or pull requests, files or selected code, and the originating request.
 - **Organization and actions** — search, filters, grouping and sorting, pinned/favorite/archive state, and direct resume/open/fork/archive/delete actions.
 
+### Conversation table mockups
+
+Design sketches using the supplied **Past Conversations** screenshot, observed 2026.10.15. These are proposed Langley layouts, not JetBrains Air capabilities. The screenshot shows four cards with a title, repository, model label, YOLO badge, creation timestamp, and relative modification time. It does not identify the host application or expose lifecycle state, harness, IDE, branch, cost, or working-tree changes.
+
+#### Sample data and card-layout tradeoffs
+
+All four cards repeat `relationship-shared`, `auto-elite`, and `YOLO`. The visible titles and timestamps below preserve the screenshot's truncation; omitted title text is unknown. Creation dates have no displayed year or timezone. Relative modification labels describe the captured view, not live elapsed time.
+
+Cards provide clear click targets but spend three lines per conversation on largely repeated metadata. Long titles truncate even with only four entries, and timestamps do not align into columns for comparison. A table should prioritize distinguishing information without turning unavailable telemetry into invented status.
+
+#### Compact list: find and resume
+
+Repository, model, and permission mode move into a shared scope strip when identical across the visible results:
+
+> **Repository:** relationship-shared · **Model:** auto-elite · **Permissions:** YOLO
+>
+> Search conversations… · Status: All · Sort: Modified, newest first
+
+| Conversation | Modified at capture | Created as displayed |
+| --- | --- | --- |
+| phantom-agent | 3m ago | Oct 15, 4:38 PM |
+| enable copilot in IDEA | 1d ago | Oct 14, 4:06 PM |
+| Wysiwyg editor: what does form... | 2d ago | Oct 13, 4:49 PM |
+| code-puppy extension not start... | 2d ago | Oct 13, 8:08 PM |
+
+Keep conversation titles flexible-width and allow wrapping or full-title disclosure. If repository, model, or permission values vary, expose their columns rather than implying that the scope strip applies to every row. Search should include the full stored title, even when its display is truncated.
+
+#### Operations view: monitor concurrent work
+
+Use the same conversations to sketch the proposed monitoring columns. **Not reported** means the screenshot contains no value; it does not mean idle, completed, zero cost, or a clean working tree.
+
+| Status | Conversation | Started | Idle | Cost | Uncommitted files | Model |
+| --- | --- | --- | --- | --- | --- | --- |
+| Not reported | phantom-agent | Oct 15, 4:38 PM | Not reported | Not reported | Not reported | auto-elite |
+| Not reported | enable copilot in IDEA | Oct 14, 4:06 PM | Not reported | Not reported | Not reported | auto-elite |
+| Not reported | Wysiwyg editor: what does form... | Oct 13, 4:49 PM | Not reported | Not reported | Not reported | auto-elite |
+| Not reported | code-puppy extension not start... | Oct 13, 8:08 PM | Not reported | Not reported | Not reported | auto-elite |
+
+Here **Started** provisionally maps to the card's **Created** field; a runtime adapter must distinguish conversation creation from execution start. **Idle** requires a defined last-activity event and cannot be derived reliably from the screenshot's **Modified** label. Keep Modified separately selectable. Repository, branch, harness, and IDE are optional identity columns; only repository is known in this sample. YOLO is a permission-mode label, not execution status.
+
+#### Progressive disclosure: inspect without leaving the list
+
+Expanding **phantom-agent** reveals only the selected conversation's detail:
+
+- **Context:** repository `relationship-shared`; branch, harness, IDE, anchor file, and current file not reported.
+- **Changes:** uncommitted file count and diff lines not reported.
+- **More detail:** latest prompt and timestamp; latest output and timestamp. Neither is visible in the sample.
+- **Actions:** Open/resume and archive; offer fork only when supported by the runtime. Delete requires explicit confirmation. Do not imply that opening a historical conversation restarts execution.
+
+#### Interaction and layout rules
+
+- Default the history view to Modified descending; offer attention-first sorting for live monitoring when reliable status events exist. Pending approval, waiting for input, failure, unread output, and an unsent draft need distinct text labels rather than a single ambiguous attention dot.
+- Keep title and status visible while optional columns are hidden or reordered. Use accessible row-expansion buttons, keyboard navigation, visible focus, and text alternatives for state icons; never rely on badge color alone.
+- At sidebar widths, use the compact list or stacked rows with secondary detail on expansion rather than squeezing the operations table into unreadable columns. The wide operations view belongs in a main panel.
+- Prefer a clear unknown value over fabricated telemetry. Cost needs currency and scope; change counts need a defined workspace; activity and status need adapter timestamps. Show exact timestamps on disclosure once the source supplies year and timezone.
+
 ## Categorization Framework
 
 
