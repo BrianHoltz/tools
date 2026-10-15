@@ -15,27 +15,41 @@
 
 ## Agent Conversation List
 
-- **Conversation identity and intent** — title, concise task summary or initial request, and most recent activity summary; distinguish the session from its individual chats.
-- **Project and execution context** — repository or project, workspace path, branch or worktree, local/cloud/remote environment, and associated IDE.
-- **Agent configuration** — harness or provider, agent, model, and interaction mode (chat or terminal), including per-chat differences.
-- **Lifecycle and attention** — queued/running/waiting/completed/failed state; pending approval or user input, unread activity, unsent draft, and errors.
-- **Activity and results** — start and last-update times, last completed turn, changed-file and diff statistics, commit/branch state, and linked pull request.
-- **Conversation relationships** — parent/fork, related parallel sessions, peer chats, delegated agents, and whether workspaces are shared or isolated.
-- **Attached context** — linked repositories, issues or pull requests, files or selected code, and the originating request.
+- Status: queued/running/waiting/completed/failed state; pending approval or user input, unread activity, unsent draft, and errors
+- Title
+- Started
+- Idle
+- Cost
+- uncommitted files
+- model
+- expanded
+  - anchor file
+  - current file
+  - git diff lines
+- expanded more
+  - latest prompt with time
+  - latest output with time
+- obvious
+  - repo, branch
+  - harness
+  - IDE
+- out of scope
+  - Conversation relationships** — parent/fork, related parallel sessions, peer chats, delegated agents, and whether workspaces are shared or isolated.
+  - Attached context — linked repositories, issues or pull requests, files or selected code, and the originating request.
 - **Organization and actions** — search, filters, grouping and sorting, pinned/favorite/archive state, and direct resume/open/fork/archive/delete actions.
-- **Documented native-list details** — [Copilot's Agents window](https://code.visualstudio.com/docs/agents/run/agents-window) groups sessions by workspace and shows working status and change statistics; its [session UI](https://code.visualstudio.com/docs/agents/run/sessions/manage-sessions) supports chat titles, per-chat agent/model selection, progress, and unread indicators. [JetBrains Air's session picker](https://www.jetbrains.com/help/air-ides/air-start-a-new-session.html) searches recent sessions, groups them by recency (for example, “Last 7 days”), shows session time, and marks forked sessions; its documentation does not establish which other metadata appears in each row.
 
 ## Categorization Framework
 
-| Category | What it answers for the user | Cross-agent? |
-|---|---|---|
-| 1. Cross-agent session indexes | "Show me every AI conversation I've had, across all my tools, in one searchable place" | Yes, by design |
-| 2. Agent-work/project management | "Show me the list/board of tasks my async cloud agents are running or finished" | Mostly single-vendor; one cross-vendor exception |
-| 3. Native IDE history | "Show me my past chats in this one IDE" (baseline/contrast) | No — single product |
-| 4. Cross-workspace/session managers | "Let me save/restore/switch terminal or editor sessions that happen to be running an agent CLI" | Agent-agnostic by construction |
-| 5. Desktop agent clients | "Give me an app to launch and watch several agent sessions running in parallel" | Varies (2–6 CLIs supported) |
-| 6. Terminal multiplexers as agent-control surfaces | "Run a fleet of agent CLI instances from one terminal, each isolated" | Yes, multi-CLI |
-| 7. Agent-control surfaces (observability) | "Trace/monitor/debug agent runs regardless of framework or vendor" | Yes, framework-agnostic |
+
+| Category                                           | What it answers for the user                                                                    | Cross-agent?                                     |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| 1. Cross-agent session indexes                     | "Show me every AI conversation I've had, across all my tools, in one searchable place"          | Yes, by design                                   |
+| 2. Agent-work/project management                   | "Show me the list/board of tasks my async cloud agents are running or finished"                 | Mostly single-vendor; one cross-vendor exception |
+| 3. Native IDE history                              | "Show me my past chats in this one IDE" (baseline/contrast)                                     | No — single product                             |
+| 4. Cross-workspace/session managers                | "Let me save/restore/switch terminal or editor sessions that happen to be running an agent CLI" | Agent-agnostic by construction                   |
+| 5. Desktop agent clients                           | "Give me an app to launch and watch several agent sessions running in parallel"                 | Varies (2–6 CLIs supported)                     |
+| 6. Terminal multiplexers as agent-control surfaces | "Run a fleet of agent CLI instances from one terminal, each isolated"                           | Yes, multi-CLI                                   |
+| 7. Agent-control surfaces (observability)          | "Trace/monitor/debug agent runs regardless of framework or vendor"                              | Yes, framework-agnostic                          |
 
 ---
 
