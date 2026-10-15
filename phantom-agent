@@ -36,40 +36,56 @@ job:vscode-markdown-add-vsce() {
 }
 
 # ============================================================================
-# IDEA Markdown Editor: Gradle wrapper + full dependency resolution
-# ~/.gradle/gradle.properties deliberately hardcodes the on-VPN corporate
-# proxy (proxy-intlho.wal-mart.com) for use when actually building on VPN.
-# That host doesn't resolve off-VPN, but services.gradle.org resolves fine
-# directly off-VPN — so the wrapper bootstrap only needs the proxy config
-# gone for this one invocation. Move it aside, download, always restore.
+# IDEA Markdown Editor: full plugin build (gradlew buildPlugin)
+# ~/.gradle/gradle.properties mixes two kinds of settings:
+#   (a) on-VPN-only network config: corporate proxy host/port/nonProxyHosts
+#       and a custom truststore (walmart_cacerts) built for MITM'd traffic
+#       through that proxy — proxy-intlho.wal-mart.com doesn't resolve
+#       off-VPN, and the custom truststore likely lacks public root CAs
+#       (confirmed: the JDK *default* cacerts handles public HTTPS fine
+#       off-VPN once the whole file was removed in an earlier episode).
+#   (b) settings needed regardless of VPN state: org.gradle.java.home
+#       (Gradle 9.6.1 requires JVM 17+ just to launch — removing this
+#       wholesale broke the build with "Gradle requires JVM 17 or later...
+#       configured to use JVM 8" once the file was fully moved aside) and
+#       org.jetbrains.intellij.platform.versionOverride=2.11.0 (consumed by
+#       settings.gradle.kts resolutionStrategy — omitting it off-VPN resolves
+#       platform 2.18.1 from build.gradle.kts instead, a cache miss against
+#       what the on-VPN build actually wants).
+# Fix: strip only the proxy/truststore lines, keep everything else, restore
+# unconditionally by overwriting (not swapping) so the file's inode survives.
 #
-# Beyond the wrapper itself: `./gradlew help` forces full settings.gradle.kts
-# pluginManagement + build.gradle.kts plugins{} resolution (foojay-resolver,
-# org.jetbrains.intellij.platform, de.undercouch.download, changelog, and
-# their transitive deps from mavenCentral()). Both plugins.gradle.org and
-# mavenCentral() are Zscaler-blocked on VPN (403 MediaTypeBlocked, confirmed
-# on foojay-resolver-1.0.0.jar) — this repo's walmartMavenCentralRepository
-# gradle.properties entry exists but isn't wired into any build file, so
-# there is no working mirror for either repository today. `--version` alone
-# does NOT trigger this (it skips project/settings evaluation entirely),
-# which is why the first phantom-agent episode missed it — `help` forces
-# the same evaluation `buildPlugin` needs, caching everything in
-# ~/.gradle/caches so the real on-VPN build hits cache instead of network.
+# `buildPlugin` (not `help` or `--version`) forces full resolution of the
+# buildscript classpath (foojay-resolver, org.jetbrains.intellij.platform,
+# de.undercouch.download, changelog + transitives from mavenCentral()) AND
+# the IntelliJ Platform SDK download + compile/test configurations. Both
+# plugins.gradle.org and mavenCentral() are Zscaler-blocked on VPN (403
+# MediaTypeBlocked, confirmed on foojay-resolver-1.0.0.jar); `help` only
+# covers the buildscript classpath and would leave the SDK download as the
+# next surprise. Off-VPN has full internet, so build the real artifact
+# outright instead of just priming the cache.
 # ============================================================================
 job:idea-markdown-gradle() {
-    echo "→ IDEA Markdown: gradle wrapper + dependency resolution"
+    echo "→ IDEA Markdown: gradle full plugin build"
     local props=~/.gradle/gradle.properties
     local backup=~/.gradle/gradle.properties.phantom-backup
     local restored=0
     if [ -f "$props" ]; then
-        mv "$props" "$backup"
+        cp "$props" "$backup"
         restored=1
+        grep -vE '^systemProp\.(https?\.proxy(Host|Port)|https?\.nonProxyHosts|javax\.net\.ssl\.trustStore(Password)?)=' \
+            "$backup" > "$props"
     fi
     local status=0
-    (cd /Users/b0h0166/src/idea-markdown-editor && ./gradlew help) || status=$?
+    (cd /Users/b0h0166/src/idea-markdown-editor && ./gradlew buildPlugin) || status=$?
     if [ "$restored" = 1 ]; then
-        mv "$backup" "$props"
+        cat "$backup" > "$props"
+        rm -f "$backup"
         echo "(restored ~/.gradle/gradle.properties)"
+    fi
+    if [ "$status" = 0 ]; then
+        echo "Build artifacts:"
+        ls -l /Users/b0h0166/src/idea-markdown-editor/build/distributions/*.zip 2>/dev/null
     fi
     return "$status"
 }
@@ -95,10 +111,20 @@ job:jetbrains-air-plugin-download() {
 
 # ============================================================================
 # Execute all registered phantom jobs
+# `set -e` would otherwise abort the whole script at the first job's nonzero
+# return, silently skipping every job listed after it — confirmed in a real
+# run where the gradle job's failure left the Air plugin job never attempted.
+# Capture each job's status and keep going so one failure doesn't starve the
+# rest of the off-VPN window.
 # ============================================================================
+failures=0
 for func in $(compgen -A function | grep '^job:'); do
-    $func
+    $func || { echo "✗ $func FAILED"; failures=$((failures + 1)); }
     echo ""
 done
 
-echo "✓ Phantom work complete. Safe to reconnect VPN."
+if [ "$failures" -gt 0 ]; then
+    echo "⚠ $failures job(s) failed — see output above. Reconnect VPN and report back."
+else
+    echo "✓ Phantom work complete. Safe to reconnect VPN."
+fi
