@@ -1,6 +1,6 @@
 # AI Agent Session & Project Management — Comparative UX Research (Langley Comps)
 
-2026.09.29 — Scope: UX patterns and tools for managing one user's current/recent AI-agent conversations, sessions, and multi-agent/multi-session projects, with emphasis on **cross-agent** solutions over single-vendor native history. The comparative survey uses product pages, documentation, and GitHub READMEs collected on 2026.09.29; the JetBrains Air assessment uses documentation and local inspection collected on 2026.10.14. Unverifiable claims are marked explicitly. Product capabilities and support status are dated observations, not guarantees about later releases.
+2026.09.29 — Scope: UX patterns and tools for managing one user's current/recent AI-agent conversations, sessions, and multi-agent/multi-session projects, with emphasis on **cross-agent** solutions over single-vendor native history. The comparative survey uses product pages, documentation, and GitHub READMEs collected on 2026.09.29; the conversation-list comparison and JetBrains Air assessment use documentation and local inspection collected on 2026.10.14. Unverifiable claims are marked explicitly. Product capabilities and support status are dated observations, not guarantees about later releases.
 
 ## Key Takeaways
 
@@ -12,6 +12,18 @@
 - **Mobile/remote steering** ("start on desktop, approve from phone") is an emerging pattern: Happy, Factory.ai's Droid, and GitHub Copilot's mobile app all ship this today.
 - **Cloud-async dashboards remain single-vendor**: OpenAI Codex Cloud, Google Jules, Cursor Background Agents, and Devin each have their own task list/dashboard, but none orchestrate a competitor's agent — the one clear cross-vendor dashboard is GitHub's Copilot "Agents" surface, which can invoke Claude and Codex alongside Copilot itself.
 - **Terminal multiplexers (tmux/Zellij) are being repurposed** as the substrate for agent orchestration rather than replaced — Claude Squad and Tmux Orchestrator both wrap tmux rather than reinventing pane/session management.
+
+## Agent Conversation List
+
+- **Conversation identity and intent** — title, concise task summary or initial request, and most recent activity summary; distinguish the session from its individual chats.
+- **Project and execution context** — repository or project, workspace path, branch or worktree, local/cloud/remote environment, and associated IDE.
+- **Agent configuration** — harness or provider, agent, model, and interaction mode (chat or terminal), including per-chat differences.
+- **Lifecycle and attention** — queued/running/waiting/completed/failed state; pending approval or user input, unread activity, unsent draft, and errors.
+- **Activity and results** — start and last-update times, last completed turn, changed-file and diff statistics, commit/branch state, and linked pull request.
+- **Conversation relationships** — parent/fork, related parallel sessions, peer chats, delegated agents, and whether workspaces are shared or isolated.
+- **Attached context** — linked repositories, issues or pull requests, files or selected code, and the originating request.
+- **Organization and actions** — search, filters, grouping and sorting, pinned/favorite/archive state, and direct resume/open/fork/archive/delete actions.
+- **Documented native-list details** — [Copilot's Agents window](https://code.visualstudio.com/docs/agents/run/agents-window) groups sessions by workspace and shows working status and change statistics; its [session UI](https://code.visualstudio.com/docs/agents/run/sessions/manage-sessions) supports chat titles, per-chat agent/model selection, progress, and unread indicators. [JetBrains Air's session picker](https://www.jetbrains.com/help/air-ides/air-start-a-new-session.html) searches recent sessions, groups them by recency (for example, “Last 7 days”), shows session time, and marks forked sessions; its documentation does not establish which other metadata appears in each row.
 
 ## Categorization Framework
 
@@ -166,6 +178,7 @@ These are Langley design recommendations inferred from Air's host/runtime bounda
 
 - [JetBrains Air overview](https://www.jetbrains.com/help/air-ides/air-overview.html)
 - [JetBrains Air agent management and custom ACP registration](https://www.jetbrains.com/help/air-ides/air-manage-agents.html)
+- [JetBrains Air session management](https://www.jetbrains.com/help/air-ides/air-start-a-new-session.html)
 - [JetBrains Air authorization](https://www.jetbrains.com/help/air-ides/air-configure-authorization.html)
 - [SpecStory (GitHub)](https://github.com/specstoryai/getspecstory)
 - [ThreadLens](https://github.com/hanityx/threadlens)
@@ -181,6 +194,8 @@ These are Langley design recommendations inferred from Air's host/runtime bounda
 - [JetBrains YouTrack LLM-26656](https://youtrack.jetbrains.com/projects/LLM/issues/LLM-26656)
 - [VS Code Copilot Chat sessions](https://code.visualstudio.com/docs/copilot/chat/chat-sessions)
 - [VS Code Agents session history](https://code.visualstudio.com/docs/agents/run/sessions/session-history)
+- [VS Code Agents window](https://code.visualstudio.com/docs/agents/run/agents-window)
+- [VS Code manage agent sessions](https://code.visualstudio.com/docs/agents/run/sessions/manage-sessions)
 - [Cascade docs (redirected under Devin Desktop)](https://docs.devin.ai/desktop/cascade/cascade)
 - [Zed Agent Panel](https://zed.dev/docs/ai/agent-panel)
 - [Zed parallel agents](https://zed.dev/docs/ai/parallel-agents)
@@ -204,3 +219,5 @@ These are Langley design recommendations inferred from Air's host/runtime bounda
 - [LangSmith observability](https://www.langchain.com/langsmith/observability)
 - [Langfuse](https://langfuse.com/)
 - [AgentOps](https://www.agentops.ai/)
+
+*[doc-audit](https://github.com/BrianHoltz/tools/blob/main/.wibey/skills/doc-audit/SKILL.md): 2026.10.14.Wed*
