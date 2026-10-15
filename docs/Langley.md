@@ -1,9 +1,10 @@
 # AI Agent Session & Project Management — Comparative UX Research (Langley Comps)
 
-2026.09.29 — Scope: UX patterns and tools for managing one user's current/recent AI-agent conversations, sessions, and multi-agent/multi-session projects, with emphasis on **cross-agent** solutions over single-vendor native history. All entries below were verified by fetching the live product page, docs, or GitHub README on 2026.09.29 unless flagged otherwise; unverifiable claims are marked explicitly rather than omitted silently.
+2026.09.29 — Scope: UX patterns and tools for managing one user's current/recent AI-agent conversations, sessions, and multi-agent/multi-session projects, with emphasis on **cross-agent** solutions over single-vendor native history. The comparative survey uses product pages, documentation, and GitHub READMEs collected on 2026.09.29; the JetBrains Air assessment uses documentation and local inspection collected on 2026.10.14. Unverifiable claims are marked explicitly. Product capabilities and support status are dated observations, not guarantees about later releases.
 
 ## Key Takeaways
 
+- **[JetBrains Air](#jetbrains-air) is a candidate active agent host, not just another chat-history sidebar.** Its custom Agent Client Protocol (ACP) integration separates the IDE frontend from the agent runtime. It is a potential JetBrains-side solution and architectural inspiration for Langley, but does not establish a shared control plane across IDE vendors or repositories.
 - **Git-worktree-per-task isolation** is the dominant UX pattern for running parallel coding agents: Conductor, Crystal/Nimbalyst, Vibe Kanban, and Claude Squad all use it independently.
 - **This category churns fast.** Of ~20 tools surveyed, three have been deprecated/sunset or gone stale within the last 12 months: Crystal (deprecated Feb 2026, successor Nimbalyst), Vibe Kanban (company BloopAI shut down Apr 2026; product survives only as community OSS), and the tmux-resurrect/tmux-continuum plugin pair (no commits since Aug 2024).
 - **Vendor consolidation is visible in real time**: Windsurf's Cascade docs now redirect to Cognition/Devin Desktop documentation, reflecting the Windsurf↔Cognition merger — a single-vendor "native history" feature got absorbed into a different vendor's product overnight.
@@ -88,6 +89,39 @@
 
 ## 5. Desktop Agent Clients (parallel-session launchers)
 
+### JetBrains Air
+
+[Air in JetBrains IDEs](https://www.jetbrains.com/help/air-ides/air-overview.html) is an in-development agent host. The [agent-management documentation](https://www.jetbrains.com/help/air-ides/air-manage-agents.html) describes custom ACP agents, sessions, and presets; the [authorization guide](https://www.jetbrains.com/help/air-ides/air-configure-authorization.html) distinguishes agent-owned login from JetBrains AI and configured providers. Assessment date: 2026.10.14.
+
+**Fit for Langley:** an active, cross-harness host within a JetBrains frontend. Selecting a different model inside one proprietary runtime is not the same as hosting independent agent runtimes; ACP offers the latter boundary. This makes Air relevant to the desired multi-harness, multi-repository, multi-IDE agent driver, even if it does not satisfy the entire requirement.
+
+#### Verified capabilities
+
+- **External runtime registration:** custom agents are configured in `~/.jetbrains/acp.json` with an absolute executable path and ACP startup arguments. Existing IDE plugins do not automatically become Air agents.
+- **Separate tool integration:** configuration includes `use_idea_mcp` and `use_custom_mcp`. ACP connects the host to the agent; Model Context Protocol (MCP) connects the agent to tools. These are separate interfaces, not interchangeable compatibility claims.
+- **Independent authentication:** custom ACP agents do not require JetBrains AI to be enabled. That does not imply every provider, cloud execution mode, or telemetry setting is approved by an employer.
+- **Local availability:** Air plugin 262.8665.490 was installed in IntelliJ IDEA 2026.2.3 during inspection. Installation and coexistence with other agent plugins are weaker evidence than a successful agent session.
+
+#### Boundaries and evaluation gaps
+
+- **Multi-harness is conditional:** each runtime needs working ACP support. An installed plugin, an MCP server, or an advertised ACP flag alone does not demonstrate successful initialization, permissions, streaming, cancellation, and file operations through Air.
+- **Multi-repository scope is unverified:** the inspected evidence does not establish a global queue spanning repositories, dependency-aware cross-repository tasks, or workspace/worktree isolation and recovery guarantees. Parallel sessions alone would not prove these properties.
+- **Multi-IDE is not a shared control plane:** availability in JetBrains IDEs does not establish shared state with VS Code, Cursor, terminal clients, or mobile clients. Discovery and attachment to sessions started outside Air were not demonstrated.
+- **Persistence and portability are unverified:** survival after closing the IDE, restart recovery, cross-device steering, transcript export, and migration between different harnesses require explicit tests. ACP support alone does not guarantee any of them.
+- **End-to-end evaluation is incomplete:** the inspection did not establish a production-ready workflow with the intended enterprise agent runtimes. This public comparison deliberately excludes private enterprise compatibility records.
+
+#### Design inspiration
+
+These are Langley design recommendations inferred from Air's host/runtime boundary, not claims that Air implements them:
+
+- **Keep the driver independent of the editor:** use a durable session registry and runtime adapters, with thin IDE/CLI/web frontends. Treat Air as a possible frontend or comparator rather than assuming one IDE must own all state.
+- **Use ACP where it fits:** preserve structured session updates and permission requests rather than depending entirely on terminal-output parsing. Retain adapters for runtimes without ACP; do not imply a universal cross-harness transcript format.
+- **Model repository and host separately:** record repository/worktree, harness, frontend, parent task, lifecycle state, and approval ownership independently. A session should remain identifiable when its editor window changes.
+- **Make blocked work visible:** aggregate permission requests and errors across sessions while keeping authorization scoped to the specific runtime, repository, and action. A global dashboard must not become blanket approval.
+- **Separate interoperability from governance:** agent registration, tool access, authentication, data handling, and organizational approval are distinct checks.
+
+**Assessment:** shortlist Air as a possible JetBrains-side solution and a useful protocol-oriented UX reference. It is not established as the complete Langley replacement. A buy-versus-build comparison needs the same concrete scenarios for Air and other candidates: independent runtimes across repositories, attention/approval aggregation, collision isolation, IDE-independent persistence, and attachment from multiple frontends.
+
 **Conductor** — https://www.conductor.build. Mac app running parallel Claude Code, Codex, and Cursor agents, each in its own isolated git-worktree workspace (auto branch/terminal/diff/PR), with a UI to monitor, review, and merge multiple agents at once. Free app (bring your own subscription); separate /pricing and /enterprise pages imply paid tiers. Active, changelog at v0.89.1.
 
 **Crystal** — https://github.com/stravu/crystal. **Deprecated as of February 2026** — README states this plainly and redirects to its successor, Nimbalyst. Was: Electron app running multiple Claude Code/Codex sessions in parallel git worktrees with diff review and rebase/squash tooling.
@@ -130,6 +164,9 @@
 
 ## Sources
 
+- [JetBrains Air overview](https://www.jetbrains.com/help/air-ides/air-overview.html)
+- [JetBrains Air agent management and custom ACP registration](https://www.jetbrains.com/help/air-ides/air-manage-agents.html)
+- [JetBrains Air authorization](https://www.jetbrains.com/help/air-ides/air-configure-authorization.html)
 - [SpecStory (GitHub)](https://github.com/specstoryai/getspecstory)
 - [ThreadLens](https://github.com/hanityx/threadlens)
 - [Happier](https://github.com/happier-dev/happier)
