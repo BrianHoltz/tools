@@ -161,6 +161,35 @@ Queuing holds a follow-up for execution after the active task; steering delivers
 
 Voice typing is a strongly weighted selection criterion for Brian. His reported preference is Claude Code's live word-by-word transcription over Copilot and Codex's recording followed by delayed transcription. Transcription accuracy is not scored separately without comparative evidence. Harness ratings are excluded from the existing IDE score; TODO: reconcile legacy harness rows and weights before using the aggregate score to choose an IDE.
 
+## Git
+
+### SSH push hangs on VPN → push over HTTPS instead
+
+`~/.ssh/config` routes `github.com` through `ssh.github.com:443` specifically so SSH works when a network blocks port 22 — but Walmart's VPN (Zscaler SSLO) can still break it: the TCP connect to `ssh.github.com:443` succeeds, then the connection hangs dead at the SSH banner exchange and times out (confirmed reproducible with `ssh -v -T git@github.com`, and with the sandbox disabled, so it isn't a harness artifact). Plain HTTPS `curl` requests to `github.com` succeed over the same network at the same time — the inspection device tolerates real TLS/HTTP but not raw SSH bytes on port 443.
+
+**Fix: push to the explicit HTTPS URL instead of the configured SSH remote**, using the OAuth token `gh` already has cached in the macOS keychain (`gh auth status` → `github.com ... Logged in ... Token: gho_...`; `git credential fill` with `protocol=https` / `host=github.com` returns it via `credential.helper = osxkeychain`, no extra setup needed):
+
+```sh
+git push https://github.com/<owner>/<repo>.git <branch>
+```
+
+This does **not** update the local `refs/remotes/origin/<branch>` tracking ref (the push went to a literal URL, not the `origin` remote), so `git status` will still show "ahead" afterward even though the push succeeded. Fix the tracking ref directly instead of re-fetching over the still-broken SSH remote:
+
+```sh
+git update-ref refs/remotes/origin/<branch> <pushed-sha>
+```
+
+If the remote has commits you don't have locally (non-fast-forward rejection), fetch over HTTPS first, merge (this repo uses merge, not rebase — see AgentRules.md § Git Merge Strategy), then push and update the tracking ref as above:
+
+```sh
+git fetch https://github.com/<owner>/<repo>.git <branch>
+git merge FETCH_HEAD --no-edit
+git push https://github.com/<owner>/<repo>.git <branch>
+git update-ref refs/remotes/origin/<branch> <pushed-sha>
+```
+
+Leave the remote itself on SSH (`git remote -v`) — this is a one-off per-push workaround, not a permanent protocol switch; SSH keeps working fine off-VPN and on networks where the block doesn't apply.
+
 ## Markdown Viewers/ Editors
 
 - VSCode md preview hangs for big files, but zaaack handles them
