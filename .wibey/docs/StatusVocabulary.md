@@ -12,6 +12,7 @@
 | 📣   | INVOKED       | Our team notified; our incident doc opened                             | —                    | Triage Initial Assessment  | Acknowledged       | Assigned           | Response   |
 | ➡️ | ROUTED        | Investigation handed off; incident still live                          | Won't Do (reassigned) | —                         | —                 | —                 | —         |
 |      | **Working**   |                                                                        |                       |                            |                    |                    |            |
+| ▶️ | STARTED | Work is in progress; generic task state (synonyms: IN_PROGRESS, RUNNING), not a specific incident phase | In Progress | — | — | In Progress | — |
 | 🔬 | INVESTIGATING | Actively working root cause. synonym: ENGAGED                          | In Progress           | Investigate                | Investigating      | In Progress        | Response   |
 | 🎯   | DIAGNOSED     | Root cause confirmed; fix not yet deployed                             | In Progress           | —                         | Identified         | In Progress        | Response   |
 | 🛠️ | FIXING        | Fix underway — PR open, CRQ in flight                                 | In Progress           | Investigate                | —                 | In Progress        | Mitigation |
