@@ -40,59 +40,61 @@
 
 ### Conversation table mockups
 
-Design sketches using the supplied **Past Conversations** screenshot, observed 2026.10.15. These are proposed Langley layouts, not JetBrains Air capabilities. The screenshot shows four cards with a title, repository, model label, YOLO badge, creation timestamp, and relative modification time. It does not identify the host application or expose lifecycle state, harness, IDE, branch, cost, or working-tree changes.
+**One conversation, one tight row.** No cards, timestamp sentences, or repeated badges. Titles come from the supplied screenshot; their completed endings and all other values below are illustrative mock data, not observed telemetry or Air capabilities.
 
-#### Sample data and card-layout tradeoffs
+#### Default: dense list
 
-All four cards repeat `relationship-shared`, `auto-elite`, and `YOLO`. The visible titles and timestamps below preserve the screenshot's truncation; omitted title text is unknown. Creation dates have no displayed year or timezone. Relative modification labels describe the captured view, not live elapsed time.
+**Conversations**　⌕ Search…　　All ▾　　Idle ↑　　＋
 
-Cards provide clear click targets but spend three lines per conversation on largely repeated metadata. Long titles truncate even with only four entries, and timestamps do not align into columns for comparison. A table should prioritize distinguishing information without turning unavailable telemetry into invented status.
+| | Conversation | Started | Idle | $ | Δ | Model |
+| :---: | :--- | ---: | ---: | ---: | ---: | :--- |
+| ◉ | phantom-agent | 22m | 3s | .18 | 2 | elite |
+| ◇ | enable copilot in IDEA | 1d | 8m | .42 | 1 | elite |
+| ✓ | Wysiwyg editor: what does formatting mean? | 2d | 1d | 1.26 | · | elite |
+| ! | code-puppy extension not starting | 2d | 2d | .63 | 3 | elite |
 
-#### Compact list: find and resume
+**◉** running · **◇** needs you · **✓** done · **!** failed · **◷** queued. An unread dot sits beside the title; a tiny pencil marks an unsent draft. Those are independent of lifecycle state. In the UI, glyphs are fixed-size icons, not variable-width emoji.
 
-Repository, model, and permission mode move into a shared scope strip when identical across the visible results:
+**Started** = age since conversation creation; **Idle** = time since agent/user activity. Use one rounded-down unit (`3s`, `8m`, `3h`, `2d`); exact timestamps live on hover/focus. **$** = conversation spend in USD; omit the repeated currency symbol and leading zero. **Δ** = uncommitted files; `·` = none. `elite` is the display alias for `auto-elite`.
 
-> **Repository:** relationship-shared · **Model:** auto-elite · **Permissions:** YOLO
+Repository `relationship-shared`, branch `main`, harness Code Puppy, IDE IDEA, and permission mode YOLO live in a quiet scope line above the table—not four copies in every row. Mixed values become optional columns; shared values stay in the scope line.
+
+#### Expanded: one extra line, not a detail form
+
+Select **phantom-agent**, then expand with **→** or its disclosure control:
+
+| | Conversation | Started | Idle | $ | Δ | Model |
+| :---: | :--- | ---: | ---: | ---: | ---: | :--- |
+| ◉ | ▾ phantom-agent | 22m | 3s | .18 | 2 | elite |
+
+　↳ anchor `phantom-agent` → current `phantom-doctor`　 **+38 −6**　　[More ▾]
+
+**More** adds the latest exchange inline, clipped to one line per message:
+
+> **You · 3m**　Add a minimal off-VPN install job; preserve proxy settings.
 >
-> Search conversations… · Status: All · Sort: Modified, newest first
+> **Agent · 3s**　Restore trap added. Checking the failure path…
 
-| Conversation | Modified at capture | Created as displayed |
-| --- | --- | --- |
-| phantom-agent | 3m ago | Oct 15, 4:38 PM |
-| enable copilot in IDEA | 1d ago | Oct 14, 4:06 PM |
-| Wysiwyg editor: what does form... | 2d ago | Oct 13, 4:49 PM |
-| code-puppy extension not start... | 2d ago | Oct 13, 8:08 PM |
+Files open on click; the change summary opens the diff. Keep the rest of the list visible. Expansion does not resume execution.
 
-Keep conversation titles flexible-width and allow wrapping or full-title disclosure. If repository, model, or permission values vary, expose their columns rather than implying that the scope strip applies to every row. Search should include the full stored title, even when its display is truncated.
+#### Sidebar: keep the signal, drop the columns
 
-#### Operations view: monitor concurrent work
+At narrow widths, retain the same row rhythm with status, title, and one right-aligned idle value. No miniature spreadsheet and no three-line cards.
 
-Use the same conversations to sketch the proposed monitoring columns. **Not reported** means the screenshot contains no value; it does not mean idle, completed, zero cost, or a clean working tree.
+| | Conversation | Idle |
+| :---: | :--- | ---: |
+| ◉ | phantom-agent | 3s |
+| ◇ | enable copilot in IDEA | 8m |
+| ✓ | Wysiwyg editor: what does… | 1d |
+| ! | code-puppy extension not… | 2d |
 
-| Status | Conversation | Started | Idle | Cost | Uncommitted files | Model |
-| --- | --- | --- | --- | --- | --- | --- |
-| Not reported | phantom-agent | Oct 15, 4:38 PM | Not reported | Not reported | Not reported | auto-elite |
-| Not reported | enable copilot in IDEA | Oct 14, 4:06 PM | Not reported | Not reported | Not reported | auto-elite |
-| Not reported | Wysiwyg editor: what does form... | Oct 13, 4:49 PM | Not reported | Not reported | Not reported | auto-elite |
-| Not reported | code-puppy extension not start... | Oct 13, 8:08 PM | Not reported | Not reported | Not reported | auto-elite |
+#### Visual and interaction contract
 
-Here **Started** provisionally maps to the card's **Created** field; a runtime adapter must distinguish conversation creation from execution start. **Idle** requires a defined last-activity event and cannot be derived reliably from the screenshot's **Modified** label. Keep Modified separately selectable. Repository, branch, harness, and IDE are optional identity columns; only repository is known in this sample. YOLO is a permission-mode label, not execution status.
-
-#### Progressive disclosure: inspect without leaving the list
-
-Expanding **phantom-agent** reveals only the selected conversation's detail:
-
-- **Context:** repository `relationship-shared`; branch, harness, IDE, anchor file, and current file not reported.
-- **Changes:** uncommitted file count and diff lines not reported.
-- **More detail:** latest prompt and timestamp; latest output and timestamp. Neither is visible in the sample.
-- **Actions:** Open/resume and archive; offer fork only when supported by the runtime. Delete requires explicit confirmation. Do not imply that opening a historical conversation restarts execution.
-
-#### Interaction and layout rules
-
-- Default the history view to Modified descending; offer attention-first sorting for live monitoring when reliable status events exist. Pending approval, waiting for input, failure, unread output, and an unsent draft need distinct text labels rather than a single ambiguous attention dot.
-- Keep title and status visible while optional columns are hidden or reordered. Use accessible row-expansion buttons, keyboard navigation, visible focus, and text alternatives for state icons; never rely on badge color alone.
-- At sidebar widths, use the compact list or stacked rows with secondary detail on expansion rather than squeezing the operations table into unreadable columns. The wide operations view belongs in a main panel.
-- Prefer a clear unknown value over fabricated telemetry. Cost needs currency and scope; change counts need a defined workspace; activity and status need adapter timestamps. Show exact timestamps on disclosure once the source supplies year and timezone.
+- **Density:** 28px desktop rows, 12px text, 16px glyph column; tabular numerals and right-aligned metrics. Title absorbs remaining width. Start with approximate widths of 52/40/44/24/56px for Started/Idle/$/Δ/Model; headers remain readable. No vertical gridlines, pill badges, or per-row action chrome.
+- **Hierarchy:** title high contrast; metrics quieter but still accessible. Very faint horizontal separators, a subtle selected-row tint and focus edge. Amber diamond for attention, green running ring, muted check, red error mark; shape and accessible names carry meaning without color.
+- **Triage:** default Idle ascending; an Attention filter isolates approvals, questions, and failures. Clicking a header sorts; a second click reverses. Hover/focus reveals resume, archive, and overflow actions without shifting columns.
+- **Keyboard:** ↑/↓ select, → expands, ← collapses, Enter opens the conversation, / focuses search, Esc clears it. Provide named buttons, announced sort/expansion state, and visible focus. Full truncated titles appear on hover and keyboard focus.
+- **Touch:** use 44px rows and visible overflow controls for coarse pointers. Compact must not mean impossible to hit.
 
 ## Categorization Framework
 
