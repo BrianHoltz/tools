@@ -26,7 +26,6 @@
   - anchor file
   - current file
   - git diff lines
-- expanded more
   - latest prompt with time
   - latest output with time
 - obvious
@@ -34,28 +33,35 @@
   - harness
   - IDE
 - out of scope
-  - Conversation relationships** — parent/fork, related parallel sessions, peer chats, delegated agents, and whether workspaces are shared or isolated.
+  - Conversation relationships — parent/fork, related parallel sessions, peer chats, delegated agents, and whether workspaces are shared or isolated.
   - Attached context — linked repositories, issues or pull requests, files or selected code, and the originating request.
-- **Organization and actions** — search, filters, grouping and sorting, pinned/favorite/archive state, and direct resume/open/fork/archive/delete actions.
+- Organization and actions — search, filters, grouping and sorting, pinned/favorite/archive state, and direct resume/open/fork/archive/delete actions.
 
 ### Conversation table mockups
 
-- One conversation per row; no cards or repeated badges.
+- One summary row per conversation; expansion inline; no cards or repeated badges.
 - Screenshot-derived titles; completed endings and metrics are illustrative, not telemetry or Air capabilities.
 
-#### Default: dense list
+#### Dense list
 
-**Conversations**　⌕ Search…　All ▾　◴ ↑　＋
+Conversations　⌕ Search…　All ▾　◴ ↑　＋
 
 | | | | | | | |
 | :---: | :--- | ---: | ---: | ---: | ---: | :--- |
-| ▶️ | phantom-agent | ✦22m | ◴0m | $.18 | Δ2 | elite |
+| ▶️ | ▾ phantom-agent | ✦22m | ◴0m | $.18 | Δ2 | elite |
+| | ↳ anchor: phantom-agent | | | | | |
+| | current: phantom-doctor | | | | +38 −6 lines | |
+| | user: Add a minimal off-VPN in… | 3m | | | | |
+| | agent: Restore trap added. Chec… | 0m | | | | |
 | ❓ | enable copilot in IDEA | ✦1d | ◴8m | $.42 | Δ1 | elite |
 | ✅ | Wysiwyg editor: what doe… | ✦2d | ◴1d | $1.26 | Δ0 | elite |
 | ☠️ | code-puppy extension not… | ✦2d | ◴2d | $.63 | Δ3 | elite |
 
 - Headers hidden; accessible column names and hover/focus labels retained.
 - Titles: ≤25 grapheme clusters; truncate to 24 + `…`. Full title on hover/focus and in accessible names.
+- → or disclosure: expand directly to files, diff, and latest exchange; no intermediate state.
+- Message previews: ≤25 grapheme clusters including `…`, excluding role/time; full text on hover/focus.
+- Click file: open. Click changes: diff. Expansion never resumes execution.
 - ✦: age since creation. ◴: age since last agent/user activity, not execution state.
 - Ages: round down to one unit; minimum `0m`, never seconds. Exact timestamps on hover/focus.
 - Spend: `$.18`, `$1.26`, `$0`; unknown `$?`.
@@ -68,25 +74,6 @@
 - [Status Vocabulary](../.wibey/docs/StatusVocabulary.md#status-definitions): canonical glyphs, names, meanings.
 - Fixed-width status slot; accessible names and shapes, not color alone.
 - ✦/◴: metrics only. Unread dot and draft pencil: independent indicators beside title.
-
-#### Expanded: one extra line, not a detail form
-
-- → or disclosure: expand selected conversation.
-
-| | | | | | | |
-| :---: | :--- | ---: | ---: | ---: | ---: | :--- |
-| ▶️ | ▾ phantom-agent | ✦22m | ◴0m | $.18 | Δ2+3-1 | elite |
-
-　↳ anchor `phantom-agent` → current `phantom-doctor`　 **+38 −6 lines**　[More ▾]
-
-- More: latest exchange, one clipped line per message.
-
-> **You · 3m**　Add a minimal off-VPN install job; preserve proxy settings.
->
-> **Agent · 0m**　Restore trap added. Checking the failure path…
-
-- Click file: open. Click changes: diff.
-- Expansion preserves list visibility; never resumes execution.
 
 #### Sidebar: keep the signal, drop the columns
 
