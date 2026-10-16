@@ -48,7 +48,7 @@
 
 | | | | | | | |
 | :---: | :--- | ---: | ---: | ---: | ---: | :--- |
-| ◉ | phantom-agent | b:22m | m:3s | $.18 | Δ2 | elite |
+| ◉ | phantom-agent | b:22m | m:0m | $.18 | Δ2 | elite |
 | ◇ | enable copilot in IDEA | b:1d | m:8m | $.42 | Δ1 | elite |
 | ✓ | Wysiwyg editor: what doe… | b:2d | m:1d | $1.26 | Δ0 | elite |
 | ! | code-puppy extension not… | b:2d | m:2d | $.63 | Δ3 | elite |
@@ -57,7 +57,7 @@ No visible column labels. Each compact token carries its own meaning; accessible
 
 Titles contain at most **25 displayed characters, including the single Unicode ellipsis `…`** when truncated: retain the first 24 grapheme clusters, then append `…`. Never split a composed character or emoji. Full titles appear on hover and keyboard focus, and remain the accessible names.
 
-**b:** = age since conversation began; **m:** = time since the last agent/user activity. Use one rounded-down unit (`m:3s`, `m:8m`, `b:3h`, `b:2d`); exact timestamps live on hover/focus. Spend retains its currency symbol but omits a leading zero below one dollar (`$.18`, `$1.26`, `$0`); unknown spend is `$?`, not zero. **Δ3** = three uncommitted files; **Δ0** = none. An optional breakdown **Δ2+3-1** means two modified, three added, and one deleted file; these categories are disjoint, not line counts. Exact paths and counts live in the expanded view. `elite` is the display alias for `auto-elite`.
+**b:** = age since conversation began; **m:** = time since the last agent/user activity. Use one rounded-down unit, with minutes as the minimum resolution: ages below one minute display `0m`, never seconds (`m:0m`, `m:8m`, `b:3h`, `b:2d`); exact timestamps live on hover/focus. Spend retains its currency symbol but omits a leading zero below one dollar (`$.18`, `$1.26`, `$0`); unknown spend is `$?`, not zero. **Δ3** = three uncommitted files; **Δ0** = none. An optional breakdown **Δ2+3-1** means two modified, three added, and one deleted file; these categories are disjoint, not line counts. Exact paths and counts live in the expanded view. `elite` is the display alias for `auto-elite`.
 
 Repository `relationship-shared`, branch `main`, harness Code Puppy, IDE IDEA, and permission mode YOLO live in a quiet scope line above the table—not four copies in every row. Mixed values become optional columns; shared values stay in the scope line.
 
@@ -67,7 +67,7 @@ Select **phantom-agent**, then expand with **→** or its disclosure control:
 
 | | | | | | | |
 | :---: | :--- | ---: | ---: | ---: | ---: | :--- |
-| ◉ | ▾ phantom-agent | b:22m | m:3s | $.18 | Δ2+3-1 | elite |
+| ◉ | ▾ phantom-agent | b:22m | m:0m | $.18 | Δ2+3-1 | elite |
 
 　↳ anchor `phantom-agent` → current `phantom-doctor`　 **+38 −6 lines**　[More ▾]
 
@@ -75,7 +75,7 @@ Select **phantom-agent**, then expand with **→** or its disclosure control:
 
 > **You · 3m**　Add a minimal off-VPN install job; preserve proxy settings.
 >
-> **Agent · 3s**　Restore trap added. Checking the failure path…
+> **Agent · 0m**　Restore trap added. Checking the failure path…
 
 Files open on click; the change summary opens the diff. Keep the rest of the list visible. Expansion does not resume execution.
 
@@ -85,7 +85,7 @@ At narrow widths, retain status, the same 25-character title limit, and one righ
 
 | | | |
 | :---: | :--- | ---: |
-| ◉ | phantom-agent | m:3s |
+| ◉ | phantom-agent | m:0m |
 | ◇ | enable copilot in IDEA | m:8m |
 | ✓ | Wysiwyg editor: what doe… | m:1d |
 | ! | code-puppy extension not… | m:2d |
