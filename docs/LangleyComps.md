@@ -1,7 +1,5 @@
 # Langley Comps
 
-[Langley](Langley.md) contains the conversation-list specification and implementation proposal.
-
 2026.09.29 — Scope: UX patterns and tools for managing one user's current/recent AI-agent conversations, sessions, and multi-agent/multi-session projects, with emphasis on **cross-agent** solutions over single-vendor native history. The comparative survey uses product pages, documentation, and GitHub READMEs collected on 2026.09.29; the conversation-list comparison and JetBrains Air assessment use documentation and local inspection collected on 2026.10.14. Unverifiable claims are marked explicitly. Product capabilities and support status are dated observations, not guarantees about later releases.
 
 ## Key Takeaways
