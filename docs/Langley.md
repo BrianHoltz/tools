@@ -21,7 +21,7 @@
 - Idle
 - Cost
 - uncommitted files
-- Model power/expense: $–$$$
+- Model power/expense: \$–\$\$\$
 - expanded
   - git diff lines
   - latest prompt with time
@@ -46,12 +46,12 @@ Conversations　⌕ Search…　All ▾　◴ ↑　＋
 
 | | | | | | |
 | :---: | :--- | ---: | ---: | ---: | ---: |
-| ▶️ | ▾ phantom-agent | ✦22m | ◴0m | $$$.18 | Δ2 |
+| ▶️ | ▾ phantom-agent | ✦22m | ◴0m | \$\$\$.18 | Δ2 |
 | | 👤 Add a minimal off-VPN in… | | ◴3m | | |
 | | 🤖 Restore trap added. Chec… | | ◴0m | | |
-| ❓ | enable copilot in IDEA | ✦1d | ◴8m | $$.42 | Δ1 |
-| ✅ | Wysiwyg editor: what doe… | ✦2d | ◴1d | $1.26 | Δ0 |
-| ☠️ | code-puppy extension not… | ✦2d | ◴2d | $$$.63 | Δ3 |
+| ❓ | enable copilot in IDEA | ✦1d | ◴8m | \$\$.42 | Δ1 |
+| ✅ | Wysiwyg editor: what doe… | ✦2d | ◴1d | \$1.26 | Δ0 |
+| ☠️ | code-puppy extension not… | ✦2d | ◴2d | \$\$\$.63 | Δ3 |
 
 - Headers hidden; accessible column names and hover/focus labels retained.
 - Titles: ≤25 grapheme clusters; truncate to 24 + `…`. Full title on hover/focus and in accessible names.
@@ -60,7 +60,7 @@ Conversations　⌕ Search…　All ▾　◴ ↑　＋
 - Click changes: diff. Expansion never resumes execution.
 - ✦: age since creation. ◴: age since last agent/user activity, not execution state.
 - Ages: round down to one unit; minimum `0m`, never seconds. Exact timestamps on hover/focus.
-- Spend: `$.18`, `$1.26`, `$0`; unknown `$?`. Prefix count: $ low, $$ medium, $$$ high model power/expense.
+- Spend: `$.18`, `$1.26`, `$0`; unknown `$?`. Prefix count: \$ low, \$\$ medium, \$\$\$ high model power/expense.
 - Files: `Δ3` total; `Δ0` none; `Δ2+3-1` = modified/added/deleted, disjoint counts—not lines.
 - Shared repo/branch/harness/IDE/permissions: scope line; mixed values: optional columns.
 
