@@ -6,7 +6,7 @@ This file is the global layer; a repo's AGENTS.md supplies project/team context,
 
 ## Contents
 
-- [The Seven Commandments](#the-seven-commandments)
+- [The Eight Commandments](#the-eight-commandments)
 - [Truth-Seeking Commandments](#truth-seeking-commandments)
 - [Tools Repository](#tools-repository)
   - [Personal and Team Sources](#personal-and-team-sources)
@@ -42,7 +42,7 @@ This file is the global layer; a repo's AGENTS.md supplies project/team context,
 
 *[doc-audit](https://github.com/BrianHoltz/tools/blob/main/.wibey/skills/doc-audit/SKILL.md): 2026.10.09.Fri*
 
-## The Seven Commandments
+## The Eight Commandments
 
 1. **Don't Ramble**: From sections to words, cut or condense until meaning changes.
 2. **Don't Repeat**: This is so important that I'm self-consciously repeating it. Cut everything that performs helpfulness without delivering it, or completeness without informing. If the information exists elsewhere, then omit it or link it, don't repeat it.
@@ -51,6 +51,11 @@ This file is the global layer; a repo's AGENTS.md supplies project/team context,
 5. **Don't Spam**: Ask permission before communicating with other humans through Slack, Jira, email, or GitHub comments/approvals. Use normal caution for other git or Confluence operations. Do not repeat agent rules in docs. Agent-authored external communications, ready-to-send drafts, and commits follow [Communication Signing](#communication-signing).
 6. **Don't Count**: Never label things sequentially with numbers or letters. It's opaque and brittle and lazy. Use names. Exceptions may be granted for long or immutable sequences.
 7. **Don't Narrate**: Except in designated sections such as work logs, documents should not narrate their history or exhibit consciousness of previous versions. Omit apologetic or performative text. Documents are timeless; all that matters is whether the text helps the reader.
+8. **Don't Bloviate**: I value clarity and directness over filibuster and performative detail. Conduct your turns accordingly, but also end each with a terse summary. Each bullet must be <25 words. Only **Did** is mandatory; omit the other bullets unless they add useful information.
+   * **Did**: what you did. Give an opens-in-this-IDE link to the basename of the anchor doc (if any), either in this bullet (if you modified it) or the next (if you didn't).
+   * **Didn't**: anything I might think you did but you didn't. Omit anything you obviously didn't/wouldn't do.
+   * **My Next**: what if anything you think I should want you to do next.
+   * **Your Next**: what if anything you think I should do next.
 
 ## Truth-Seeking Commandments
 
@@ -105,7 +110,8 @@ To update the above files, edit the canonical files under `~/src/tools/` and com
 
 The repos serve different scopes:
 
-|                           | `~/src/tools/`                              | `relationship-shared/`       |
+
+|                           | `~/src/tools/`                               | `relationship-shared/`       |
 | ------------------------- | -------------------------------------------- | ---------------------------- |
 | Git host                  | GitHub (personal, public)                    | Walmart GHE (team, internal) |
 | Available on              | both laptops                                 | work laptop only             |
@@ -333,6 +339,7 @@ When Zscaler/corporate proxy blocks network-heavy binary downloads (pnpm install
 **The registry:** `~/.wibey/commands/phantom-agent.sh` — bare-minimum off-VPN task registry. Agents add `job:name()` functions here when network constraints block their work.
 
 **Workflow:**
+
 1. When blocked by VPN on a package manager install/download, identify the BARE MINIMUM command needed (e.g., `pnpm install`, not the full build).
 2. Add a new `job:` function to `phantom-agent.sh` with that single command.
 3. Commit the registry update to `~/src/tools/`.
@@ -344,6 +351,7 @@ When Zscaler/corporate proxy blocks network-heavy binary downloads (pnpm install
 **Watch for pre-existing dotfiles that hardcode on-VPN endpoints** (e.g. `~/.gradle/gradle.properties` systemProp proxy settings, intentionally configured for builds while on VPN). A job that needs the same tool off-VPN must move such a file aside and restore it unconditionally afterward — never edit or delete it permanently; the on-VPN config is still needed once reconnected. Capture the command's exit status with `|| status=$?` rather than letting it run bare, since the script's `set -e` would otherwise abort before the restore step runs.
 
 **Example job:**
+
 ```bash
 job:vscode-markdown-install() {
     echo "→ VSCode Markdown: pnpm install"
