@@ -44,22 +44,41 @@
 
 #### Default: dense list
 
-**Conversations**　⌕ Search…　All ▾　m ↑　＋
+**Conversations**　⌕ Search…　All ▾　◴ ↑　＋
 
 | | | | | | | |
 | :---: | :--- | ---: | ---: | ---: | ---: | :--- |
-| ◉ | phantom-agent | b:22m | m:0m | $.18 | Δ2 | elite |
-| ◇ | enable copilot in IDEA | b:1d | m:8m | $.42 | Δ1 | elite |
-| ✓ | Wysiwyg editor: what doe… | b:2d | m:1d | $1.26 | Δ0 | elite |
-| ! | code-puppy extension not… | b:2d | m:2d | $.63 | Δ3 | elite |
+| ◉ | phantom-agent | ✦22m | ◴0m | $.18 | Δ2 | elite |
+| ❓ | enable copilot in IDEA | ✦1d | ◴8m | $.42 | Δ1 | elite |
+| ✅ | Wysiwyg editor: what doe… | ✦2d | ◴1d | $1.26 | Δ0 | elite |
+| ! | code-puppy extension not… | ✦2d | ◴2d | $.63 | Δ3 | elite |
 
-No visible column labels. Each compact token carries its own meaning; accessible column names remain available to assistive technology. **◉** running · **◇** needs you · **✓** done · **!** failed · **◷** queued. An unread dot sits beside the title; a tiny pencil marks an unsent draft. Those are independent of lifecycle state. In the UI, glyphs are fixed-size icons, not variable-width emoji.
+No visible column labels. Accessible column names and hover/focus labels explain the compact tokens. Status uses the vocabulary below. An unread dot sits beside the title; a tiny pencil marks an unsent draft. These are independent of lifecycle state. Render all status symbols in a fixed-width icon slot; platform emoji width must not shift the metrics.
 
 Titles contain at most **25 displayed characters, including the single Unicode ellipsis `…`** when truncated: retain the first 24 grapheme clusters, then append `…`. Never split a composed character or emoji. Full titles appear on hover and keyboard focus, and remain the accessible names.
 
-**b:** = age since conversation began; **m:** = time since the last agent/user activity. Use one rounded-down unit, with minutes as the minimum resolution: ages below one minute display `0m`, never seconds (`m:0m`, `m:8m`, `b:3h`, `b:2d`); exact timestamps live on hover/focus. Spend retains its currency symbol but omits a leading zero below one dollar (`$.18`, `$1.26`, `$0`); unknown spend is `$?`, not zero. **Δ3** = three uncommitted files; **Δ0** = none. An optional breakdown **Δ2+3-1** means two modified, three added, and one deleted file; these categories are disjoint, not line counts. Exact paths and counts live in the expanded view. `elite` is the display alias for `auto-elite`.
+**✦** = born: age since conversation creation. **◴** = idle: time since the last agent/user activity, not a paused execution state. These are metric prefixes, not lifecycle statuses. Use one rounded-down unit, with minutes as the minimum resolution: ages below one minute display `0m`, never seconds (`◴0m`, `◴8m`, `✦3h`, `✦2d`); exact timestamps live on hover/focus. Spend retains its currency symbol but omits a leading zero below one dollar (`$.18`, `$1.26`, `$0`); unknown spend is `$?`, not zero. **Δ3** = three uncommitted files; **Δ0** = none. An optional breakdown **Δ2+3-1** means two modified, three added, and one deleted file; these categories are disjoint, not line counts. Exact paths and counts live in the expanded view. `elite` is the display alias for `auto-elite`.
 
 Repository `relationship-shared`, branch `main`, harness Code Puppy, IDE IDEA, and permission mode YOLO live in a quiet scope line above the table—not four copies in every row. Mixed values become optional columns; shared values stay in the scope line.
+
+#### Status glyphs
+
+Reuse [Status Vocabulary](../.wibey/docs/StatusVocabulary.md#status-definitions) where its meaning fits; do not infer investigative or deployment phases from generic agent execution.
+
+| Glyph | Conversation status | Meaning / vocabulary reuse |
+| :---: | :--- | :--- |
+| *(blank)* | Queued / unstarted | Not executing yet; preserve the vocabulary’s blank unstarted status. |
+| ◉ | Running | Agent is executing; conversation-specific, not necessarily INVESTIGATING or FIXING. |
+| 🛑 | Action needed | BLOCKED: approval, authentication, or another external action is required. |
+| ❓ | Answer needed | BLOCKED: a question or decision requires the user. |
+| ⏰ | Awaiting | A committed, expected event is pending; not generic inactivity. |
+| 👀 | Under review | Awaiting another person’s feedback. |
+| ⏸️ | Paused | Intentionally suspended; never use merely because idle time is increasing. |
+| ! | Failed | Conversation-specific execution error; not FIX_FAILED, which means a deployed fix failed. |
+| ❌ | Canceled | Explicitly canceled, not failed. |
+| ✅ | Done | RESOLVED / DONE: the requested work is complete, not merely a finished response. |
+
+Use accessible status names and shape as well as color. Creation and idle glyphs stay in their metric columns, never in the status slot. Unread and draft indicators remain independent.
 
 #### Expanded: one extra line, not a detail form
 
@@ -67,7 +86,7 @@ Select **phantom-agent**, then expand with **→** or its disclosure control:
 
 | | | | | | | |
 | :---: | :--- | ---: | ---: | ---: | ---: | :--- |
-| ◉ | ▾ phantom-agent | b:22m | m:0m | $.18 | Δ2+3-1 | elite |
+| ◉ | ▾ phantom-agent | ✦22m | ◴0m | $.18 | Δ2+3-1 | elite |
 
 　↳ anchor `phantom-agent` → current `phantom-doctor`　 **+38 −6 lines**　[More ▾]
 
@@ -85,16 +104,16 @@ At narrow widths, retain status, the same 25-character title limit, and one righ
 
 | | | |
 | :---: | :--- | ---: |
-| ◉ | phantom-agent | m:0m |
-| ◇ | enable copilot in IDEA | m:8m |
-| ✓ | Wysiwyg editor: what doe… | m:1d |
-| ! | code-puppy extension not… | m:2d |
+| ◉ | phantom-agent | ◴0m |
+| ❓ | enable copilot in IDEA | ◴8m |
+| ✅ | Wysiwyg editor: what doe… | ◴1d |
+| ! | code-puppy extension not… | ◴2d |
 
 #### Visual and interaction contract
 
 - **Density:** 24px desktop rows, 12px text, 14px glyph column, and 4px inter-column gaps; tabular numerals and right-aligned metrics. Title is capped at 25 characters and absorbs remaining width up to that limit. Metrics size to their content; no visible header row, vertical gridlines, pill badges, or per-row action chrome. Blank header cells above are a Markdown rendering accommodation, not UI labels.
-- **Hierarchy:** title high contrast; metrics quieter but still accessible. Very faint horizontal separators, a subtle selected-row tint and focus edge. Amber diamond for attention, green running ring, muted check, red error mark; shape and accessible names carry meaning without color.
-- **Triage:** default activity age ascending (`m ↑`); an Attention filter isolates approvals, questions, and failures. A named Sort control selects the metric and direction without requiring visible column headers. Hover/focus reveals resume, archive, and overflow actions without shifting columns.
+- **Hierarchy:** title high contrast; metrics quieter but still accessible. Very faint horizontal separators, a subtle selected-row tint and focus edge. Amber action/question glyphs, green running ring, muted completion check, red error mark; shape and accessible names carry meaning without color.
+- **Triage:** default activity age ascending (`◴ ↑`); an Attention filter isolates approvals, questions, and failures. A named Sort control selects the metric and direction without requiring visible column headers. Hover/focus reveals resume, archive, and overflow actions without shifting columns.
 - **Keyboard:** ↑/↓ select, → expands, ← collapses, Enter opens the conversation, / focuses search, Esc clears it. Provide named buttons, announced sort/expansion state, and visible focus. Full truncated titles appear on hover and keyboard focus.
 - **Touch:** use 44px rows and visible overflow controls for coarse pointers. Compact must not mean impossible to hit.
 
