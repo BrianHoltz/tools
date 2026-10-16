@@ -1,17 +1,6 @@
-# AI Agent Session & Project Management — Comparative UX Research (Langley Comps)
+# Langley
 
-2026.09.29 — Scope: UX patterns and tools for managing one user's current/recent AI-agent conversations, sessions, and multi-agent/multi-session projects, with emphasis on **cross-agent** solutions over single-vendor native history. The comparative survey uses product pages, documentation, and GitHub READMEs collected on 2026.09.29; the conversation-list comparison and JetBrains Air assessment use documentation and local inspection collected on 2026.10.14. Unverifiable claims are marked explicitly. Product capabilities and support status are dated observations, not guarantees about later releases.
-
-## Key Takeaways
-
-- **[JetBrains Air](#jetbrains-air) is a candidate active agent host, not just another chat-history sidebar.** Its custom Agent Client Protocol (ACP) integration separates the IDE frontend from the agent runtime. It is a potential JetBrains-side solution and architectural inspiration for Langley, but does not establish a shared control plane across IDE vendors or repositories.
-- **Git-worktree-per-task isolation** is the dominant UX pattern for running parallel coding agents: Conductor, Crystal/Nimbalyst, Vibe Kanban, and Claude Squad all use it independently.
-- **This category churns fast.** Of ~20 tools surveyed, three have been deprecated/sunset or gone stale within the last 12 months: Crystal (deprecated Feb 2026, successor Nimbalyst), Vibe Kanban (company BloopAI shut down Apr 2026; product survives only as community OSS), and the tmux-resurrect/tmux-continuum plugin pair (no commits since Aug 2024).
-- **Vendor consolidation is visible in real time**: Windsurf's Cascade docs now redirect to Cognition/Devin Desktop documentation, reflecting the Windsurf↔Cognition merger — a single-vendor "native history" feature got absorbed into a different vendor's product overnight.
-- **Cross-agent tools split into two families**: (1) passive history/index layers that sit beside your existing tools and capture transcripts (SpecStory, ThreadLens, Happier), and (2) active session hosts that actually launch/control multiple agent CLIs in isolated workspaces (Conductor, Claude Squad, Vibe Kanban).
-- **Mobile/remote steering** ("start on desktop, approve from phone") is an emerging pattern: Happy, Factory.ai's Droid, and GitHub Copilot's mobile app all ship this today.
-- **Cloud-async dashboards remain single-vendor**: OpenAI Codex Cloud, Google Jules, Cursor Background Agents, and Devin each have their own task list/dashboard, but none orchestrate a competitor's agent — the one clear cross-vendor dashboard is GitHub's Copilot "Agents" surface, which can invoke Claude and Codex alongside Copilot itself.
-- **Terminal multiplexers (tmux/Zellij) are being repurposed** as the substrate for agent orchestration rather than replaced — Claude Squad and Tmux Orchestrator both wrap tmux rather than reinventing pane/session management.
+[Comparative research](LangleyComps.md) surveys alternative products and UX patterns.
 
 ## Agent Conversation List
 
@@ -23,7 +12,6 @@
 - uncommitted files
 - Model power/expense: \$–\$\$\$
 - expanded
-  - git diff lines
   - latest prompt with time
   - latest output with time
 - obvious
@@ -44,14 +32,15 @@
 
 Conversations　⌕ Search…　All ▾　◴ ↑　＋
 
-| | | | | | |
-| :---: | :--- | ---: | ---: | ---: | ---: |
-| ▶️ | ▾ phantom-agent | ✦22m | ◴0m | \$\$\$.18 | Δ2 |
-| | 👤 Add a minimal off-VPN in… | | ◴3m | | |
-| | 🤖 Restore trap added. Chec… | | ◴0m | | |
-| ❓ | enable copilot in IDEA | ✦1d | ◴8m | \$\$.42 | Δ1 |
-| ✅ | Wysiwyg editor: what doe… | ✦2d | ◴1d | \$1.26 | Δ0 |
-| ☠️ | code-puppy extension not… | ✦2d | ◴2d | \$\$\$.63 | Δ3 |
+
+|      |                               |       |      |           |     |
+| :--: | :---------------------------- | ----: | ---: | --------: | --: |
+| ▶️ | ▾ phantom-agent              | ✦22m | ◴0m | \$\$\$.18 | Δ2 |
+|      | 👤 Add a minimal off-VPN in… |       | ◴3m |           |     |
+|      | 🤖 Restore trap added. Chec… |       | ◴0m |           |     |
+|  ❓  | enable copilot in IDEA        |  ✦1d | ◴8m |   \$\$.42 | Δ1 |
+|  ✅  | Wysiwyg editor: what doe…    |  ✦2d | ◴1d |    \$1.26 | Δ0 |
+| ☠️ | code-puppy extension not…    |  ✦2d | ◴2d | \$\$\$.63 | Δ3 |
 
 - Headers hidden; accessible column names and hover/focus labels retained.
 - Titles: ≤25 grapheme clusters; truncate to 24 + `…`. Full title on hover/focus and in accessible names.
@@ -64,200 +53,277 @@ Conversations　⌕ Search…　All ▾　◴ ↑　＋
 - Files: `Δ3` total; `Δ0` none; `Δ2+3-1` = modified/added/deleted, disjoint counts—not lines.
 - Shared repo/branch/harness/IDE/permissions: scope line; mixed values: optional columns.
 
-## Categorization Framework
+## Recommendation
 
+Build the first usable version **inside the Wibey JetBrains plugin**, as an optional dense renderer for the existing history surface. Keep the existing renderer and navigation available. Separate **history appearance** from **conversation placement**: choosing a table should not also commit the user to editor tabs or a split pane.
 
-| Category                                           | What it answers for the user                                                                    | Cross-agent?                                     |
-| -------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| 1. Cross-agent session indexes                     | "Show me every AI conversation I've had, across all my tools, in one searchable place"          | Yes, by design                                   |
-| 2. Agent-work/project management                   | "Show me the list/board of tasks my async cloud agents are running or finished"                 | Mostly single-vendor; one cross-vendor exception |
-| 3. Native IDE history                              | "Show me my past chats in this one IDE" (baseline/contrast)                                     | No — single product                             |
-| 4. Cross-workspace/session managers                | "Let me save/restore/switch terminal or editor sessions that happen to be running an agent CLI" | Agent-agnostic by construction                   |
-| 5. Desktop agent clients                           | "Give me an app to launch and watch several agent sessions running in parallel"                 | Varies (2–6 CLIs supported)                     |
-| 6. Terminal multiplexers as agent-control surfaces | "Run a fleet of agent CLI instances from one terminal, each isolated"                           | Yes, multi-CLI                                   |
-| 7. Agent-control surfaces (observability)          | "Trace/monitor/debug agent runs regardless of framework or vendor"                              | Yes, framework-agnostic                          |
+Recommended progression: minimal dense prototype with existing navigation → collapsible list above the current conversation → optional conversation editor tabs. Change shared runtime/core only for demonstrated missing data or ownership contracts, not to render a JetBrains table. Defer a CLI UI until it has an independent user need.
 
----
+The cheap part is drawing rows. The expensive parts are knowing what an agent is actually waiting for, attributing shared working-tree changes, and safely displaying the same live conversation in several places.
 
-## 1. Cross-Agent Session Indexes
+## Contents
 
-**SpecStory** — https://github.com/specstoryai/getspecstory (specstory.com blocked automated fetch with HTTP 403; verified via GitHub instead). Saves AI coding conversations to local `.specstory/history/` Markdown, with optional sync to SpecStory Cloud for cross-device search/sharing. A "Lore" feature mines saved history into reusable agent skills. IDE extensions cover Cursor and VS Code/GitHub Copilot Chat; a CLI wrapper additionally covers Claude Code, Codex CLI, Cursor CLI, Droid CLI, Gemini CLI, DeepSeek TUI, Antigravity CLI, Qwen Code, Pi, Grok Build, and OpenCode. CLI/Lore are Apache-2.0 OSS; IDE extensions are free closed-source; Cloud tier requires signup with no published price found.
+- [Agent Conversation List](#agent-conversation-list)
+- [Investigation checkpoint](#investigation-checkpoint)
+- [Implementation baseline](#implementation-baseline)
+- [History appearance and compatibility](#history-appearance-and-compatibility)
+- [Conversation placement options](#conversation-placement-options)
+- [Architecture and core boundary](#architecture-and-core-boundary)
+- [Feature feasibility](#feature-feasibility)
+- [Delivery phases](#delivery-phases)
+- [Validation and acceptance](#validation-and-acceptance)
+- [Choices for proceeding](#choices-for-proceeding)
 
-**ThreadLens** — https://github.com/hanityx/threadlens. Local-first, no-cloud/no-account tool to search, review, back up, and safely clean up AI coding session transcripts from one place. Explicitly supports Codex, Claude, Gemini, and Copilot with cross-provider keyword search and dry-run-before-delete cleanup; ships as TUI, Electron desktop, and web variants. MIT/free, actively maintained (v0.3.1, CI passing, public roadmap).
+*[doc-audit](https://github.com/BrianHoltz/tools/blob/main/.wibey/skills/doc-audit/SKILL.md): 2026.10.16.Fri*
 
-**Happier** — https://github.com/happier-dev/happier. Multi-device "control room" that doubles as a cross-agent session/history layer: one agent can spawn subagents on a different engine, and the underlying agent can be switched mid-session with context carried over. Supports Claude Code, Codex, OpenCode, Gemini CLI, Cursor, GitHub Copilot, Grok, Antigravity, Qwen Code, Kimi, and any ACP-speaking agent. MIT/free, self-hostable, optional hosted relay at cloud.happier.dev.
 
-*Unverified, noted only:* a self-hosted "recensa" transcript viewer (Claude-Code-only, out of cross-agent scope) and a "Claude-Code-History-VSCode" extension surfaced via GitHub's chat-history topic — neither independently confirmed live.
+## Investigation checkpoint
 
----
+2026.10.16.Fri — documentation/design work only; no plugin implementation.
 
-## 2. Agent-Work / Project Management (async cloud-agent dashboards)
+- **Completed:** comparative material separated into [Langley Comps](LangleyComps.md); conversation-list specification preserved here. JetBrains upstream and CLI session/history entry points inspected.
+- **Working recommendation:** JetBrains-first optional dense history renderer, reusing existing actions and whatever status signals are already available. Fixed columns and existing ordering are sufficient for the first prototype.
+- **Prototype exclusions:** custom sorting, resizable columns, excerpt expansion, richer status classification, dollar accounting, and attributed file counts are not prerequisites.
+- **Next investigation:** confirm the target release/UI toolkit; compare minimal history replacement with integrated splitter and editor-tab lifecycle costs.
+- **Parallel-agent scope:** independently evaluate placement and integration choices. Private source citations and verified data gaps are in the internal companion, `docs/LangleyImplementation.md`, in the team repository. Do not assume the developer checkout, installed plugin, and upstream main match.
+- **Open choices:** preferred prototype placement; whether conversations outside the IDE need live attachment at launch; whether editor tabs are essential or a later option. No decision is required to finish this proposal.
 
-**OpenAI Codex Cloud** — https://learn.chatgpt.com/docs/cloud (chatgpt.com/codex and openai.com/codex returned 403 to automated fetch; docs mirror confirmed the behavior instead). Each cloud task runs in its own isolated workspace that keeps going while your machine is asleep/offline; reviewed via web, mobile, desktop app, or CLI ("list recent cloud chats and check their status"). Docs describe per-task review (diff/results/PR), not a single side-by-side multi-task board. Single-vendor (OpenAI models only); access via ChatGPT Plus/Pro/Business/Enterprise/Edu/Go plans.
+## Implementation baseline
 
-**GitHub Copilot coding agent — Agents dashboard** — https://docs.github.com/en/copilot/concepts/agents/cloud-agent/agent-management. Two surfaces: a repo-scoped "Agents" tab listing active/past sessions with real-time logs, and a centralized page at github.com/copilot/agents. **This is the one clearly cross-vendor dashboard found**: it can invoke Anthropic Claude and OpenAI Codex as agents alongside Copilot itself, plus partner-built "agent apps." Requires a Copilot plan with coding-agent entitlement (consumes premium requests/credits).
+**Assessment date: 2026.10.16.Fri.** This is a design proposal, not an implemented feature or a runtime-tested compatibility claim. Source-level implementation evidence belongs in the internal companion, `LangleyImplementation.md`, under the team repository's docs directory; private code excerpts and internal repository links are deliberately excluded here.
 
-**Google Jules** — https://jules.google/. Browser dashboard: pick repo/branch, get a plan, review a diff, receive a PR; can also trigger from a GitHub issue label. Single-vendor (Gemini only). Tiers double as the parallel-task cap: free (15 tasks/day, 3 concurrent), Jules in Pro (100/day, 15 concurrent, Gemini 3 Pro), Jules in Ultra (300/day, 60 concurrent).
+Treat the installed plugin, a developer's local branch, upstream main, and in-flight UI replacements as different baselines. Before implementation, select the target release and UI toolkit with the maintainers. A speculative toolkit migration is not a reason to build two production renderers from scratch: keep the list model toolkit-neutral and implement against the accepted release path.
 
-**Cursor Background/Cloud Agents** — https://cursor.com/docs/cloud-agent. Dashboard at cursor.com/dashboard/cloud-agents lists runs with environment/version history; supports running many agents in parallel independent of local machine state. Single-vendor UI (Cursor's own agent runtime). Requires a paid Cursor plan; billed at model API rates plus a user-set spend limit.
+Distinguish these concepts throughout the design:
 
-**Devin (Cognition)** — app.devin.ai/sessions. **Not verified** — the URL requires auth and returned only a bare page title to an unauthenticated fetch. Search results describe a per-session status/timestamp/PR-link list, but this is unconfirmed and should not be cited as fact without a logged-in check.
+- **Conversation:** durable transcript identity, potentially reopened across processes.
+- **Runtime session:** the process-local owner of execution, stream, pending requests, and cancellation.
+- **View:** a sidebar, split-pane region, or editor tab showing a conversation.
+- **Workspace:** repository/worktree context; multiple conversations can share it.
 
-**Factory.ai (Droid)** — https://factory.com/product/cli (factory.ai redirects to factory.com). Sessions/computers/skills sync across TUI, desktop, web, IDE, and Slack — start a task in a terminal, finish it on your phone; sessions can be forked, favorited, and resumed. The fetched page does not confirm a single visual multi-session board and appears single-vendor (Factory's own Droid agent).
+Historical discovery is not attachment to a running process. Opening a transcript is not sending a prompt. An idle session is not proof that its task succeeded.
 
-**Vibe Kanban** — https://github.com/BloopAI/vibe-kanban. **Status flag: sunsetting.** README now leads with "Vibe Kanban is sunsetting," per BloopAI's April 2026 shutdown announcement (company cited an unsustainable business model). The paid $30/user/month cloud tier is discontinued with refunds; only the free, self-hosted OSS version (Apache-2.0) has a confirmed future. When self-hosted, it remains genuinely cross-vendor: kanban board plus per-task git-worktree workspaces for Claude Code, Codex, Gemini CLI, GitHub Copilot, Amp, Cursor, OpenCode, Droid, CCR, and Qwen Code.
+## History appearance and compatibility
 
----
+**Preserve the existing history UI initially.** Add a persisted `History view: Existing / Dense` preference and an immediately reachable switch in the history toolbar. Keep the existing History action, settings, shortcuts, storage, resume checks, rename/export/delete behavior, and any current compact picker. Scope the first rollout to opt-in users.
 
-## 3. Native IDE History (baseline/contrast, single-product)
+Use one conversation read model and one action layer for both views; do not copy the old history implementation into a competing storage/navigation subsystem. Existing-only presentation features may stay in the existing renderer, but destructive actions, identity resolution, permission handling, and resume gates must remain shared.
 
-**Cursor** — https://cursor.com/docs/agent/overview. Docs describe a searchable-transcript model (Cmd/Ctrl+K searches past agent transcripts via a local index) rather than a named "history sidebar"; a third-party guide separately describes a History icon that lists/renames/deletes past Composer sessions, but that specific UI was not confirmed on cursor.com.
+The dense view combines open, running, idle, closed, and historical conversations into one deduplicated list. Do not implement it as only a replacement for the historical half of a running/past split. Otherwise a conversation can disappear when it stops streaming but remains open. Preserve a row through that transition and through provisional-to-durable ID assignment.
 
-**JetBrains AI Assistant / Junie** — https://plugins.jetbrains.com/plugin/26104-junie-the-ai-coding-agent-by-jetbrains. 2026.1 changelog (per search; full text didn't render on direct fetch) added "Move Project History to AI Chat"/"Move Project History to CLI" migration tools and an "Import History from Previous IDE Versions" consolidator. A JetBrains YouTrack bug ([LLM-26656](https://youtrack.jetbrains.com/projects/LLM/issues/LLM-26656)) confirms 2026.1 users briefly lost AI-answer content from chat history (since fixed).
+An alternative is replacing the old renderer outright. That reduces long-term maintenance but broadens regression and adoption risk. Prefer retirement only after action parity, accessibility, large-history performance, and navigation behavior are demonstrated. Do not promise permanent support for every renderer/layout combination.
 
-**VS Code + GitHub Copilot Chat** — https://code.visualstudio.com/docs/copilot/chat/chat-sessions (companion: /docs/agents/run/sessions/session-history). Ships a Sessions List "central hub": in the Agents window it's a cross-workspace sidebar grouped by workspace/timeframe; in Chat view it's workspace-scoped, grouped by time period. Sessions can be archived, auto-cleaned, or exported as JSON — and it can surface external sessions from Copilot CLI, the GitHub Copilot mobile app, Claude Code, and Codex, making it partially cross-agent despite being a "native" IDE feature.
+## Conversation placement options
 
-**Windsurf / Codeium Cascade** — https://docs.devin.ai/desktop/cascade/cascade (this URL is a 307 redirect from the original docs.windsurf.com/windsurf/cascade/cascade). Cascade is now documented as one of two local agents inside Cognition's "Devin Desktop," not a standalone Windsurf product page — a direct artifact of the Windsurf/Cognition merger. Supports @-mentioning past conversations for summarized/checkpoint retrieval and multi-conversation switching via dropdown; a long-reported ~20-conversation storage cap (oldest evicted) isn't addressed in current docs.
+These are independent of the Existing/Dense renderer switch. All placements use the same rows, selection identity, previews, and commands.
 
-**Zed Agent Panel** — https://zed.dev/docs/ai/agent-panel and https://zed.dev/docs/ai/parallel-agents. "Thread History holds all your threads across all projects, sorted chronologically," restorable any time via the Threads Sidebar (⌘⌥J) or Thread History toggle (⌘G); archiving doesn't delete, and worktree-linked threads save/restore git state on archive/restore.
+### History replaces chat — smallest change
 
----
+The sidebar alternates between history and the selected conversation. Explicitly opening a row switches to chat; Back returns to the same query, scroll position, expansion, and selection. This preserves the familiar model and needs little layout work.
 
-## 4. Cross-Workspace/Session Managers (agent-agnostic hosts)
+**Strengths:** lowest integration risk; narrow sidebar remains usable; fastest delivery. **Costs:** no persistent overview while reading or steering a conversation; repeated history/chat navigation.
 
-**tmux** — https://github.com/tmux/tmux. Base multiplexer; no built-in persistence across reboots (needs the plugins below). Active: 49,575 stars, pushed 2026.09.29.
+**Interaction:** arrows change selection; Right/disclosure expands; Enter or clicking the title opens. Clicking status reveals the reason, and clicking Δ opens a diff. None of those actions sends a prompt or approves anything. Opening an already running conversation attaches its existing view rather than creating another execution owner.
 
-**tmux-resurrect** / **tmux-continuum** — https://github.com/tmux-plugins/tmux-resurrect (13,078★) and https://github.com/tmux-plugins/tmux-continuum (4,083★). Save/restore full tmux environment (panes, windows, cwds, running programs) across restarts, with auto-save/auto-restore layered on top. **Stale**: both last pushed 2024.08 — functionally stable but over two years without a commit.
+**Difficulty:** small layout change, medium total delivery once the shared list model and accessibility are included. Recommended first release and permanent compact fallback.
 
-**Zellij session-manager** — https://zellij.dev/news/session-manager-protobuffs/ and https://zellij.dev/documentation/session-manager-alias.html. Built-in plugin (since Zellij 0.38.0, bound to Ctrl-o+w) that resurrects exited sessions with full layout/commands, renames, kills, shows metadata, and controls web-sharing. Very active: 35,595★, pushed 2026.09.29.
+### Sidebar list with conversation editor tabs — strongest overview
 
-**Warp terminal** — https://docs.warp.dev/agents/using-agents and .../blocks-as-context/. Agent conversations are multi-turn and tied to terminal sessions with a dedicated history/management UI; multiple conversations can run concurrently across windows/tabs/panes. Blocks (terminal output + agent context) are shareable as structured artifacts via Warp Drive. One open bug ([#5088](https://github.com/warpdotdev/Warp/issues/5088)) confirms an agent-block-attach UI defect as of this check.
+Keep history in the sidebar and open conversations in the central editor area. A preview tab follows selection; an explicit Open or pin action makes it durable. Support several conversation tabs and editor splits only after single-tab ownership works correctly.
 
-**Wave Terminal** — https://docs.waveterm.dev/releasenotes, https://github.com/wavetermdev/waveterm. Open-source AI-integrated terminal; v0.14 added "Durable Sessions" for SSH (survive disconnects/restarts). Workspaces > Tabs > Blocks model; `wsh` commands share variables/files across sessions; Wave AI is BYOK across Claude/OpenAI/Gemini plus local Ollama/LM Studio. Active: 22,390★, pushed 2026.09.29, latest tag v0.14.5 (2026.04.16).
+**Strengths:** history stays visible; wide conversation area; native tab/split workflow; several conversations can be compared. **Costs:** editor lifecycle, focus, restoration, toolbar/action routing, memory, and close semantics become product features rather than cosmetic details.
 
-**iTerm2 session restoration** — https://iterm2.com/documentation-restoration.html. Two mechanisms: automatic Session Restoration (long-lived pane servers reconnect after crash/upgrade) and manual Window Arrangements (save/restore layout+profile+cwd, not running state).
+Use a JetBrains file-editor integration with a stable virtual conversation identity and an explicit editor provider; verify APIs against the supported IDE build. Do not model a live conversation as a generated Markdown file. Opening two editors must not start two sessions. A Swing component cannot occupy two parents: either move its sole live view or construct separate views over the same session state. A read-only second view is a reasonable intermediate scope, but must be visibly read-only.
 
----
+Closing an editor detaches the view, not silently stops work or deletes history. Stopping execution remains a separate action. Project close, runtime disconnect, deleted worktree, and reopened editor require explicit unavailable/reconnect states. Never auto-send after restoration.
 
-## 5. Desktop Agent Clients (parallel-session launchers)
+**Difficulty:** large; a single read-only editor preview is medium. Best destination if simultaneous overview and multiple conversations outweigh editor space consumed by chat.
 
-### JetBrains Air
+### Collapsible history above chat — recommended second phase
 
-[Air in JetBrains IDEs](https://www.jetbrains.com/help/air-ides/air-overview.html) is an in-development agent host. The [agent-management documentation](https://www.jetbrains.com/help/air-ides/air-manage-agents.html) describes custom ACP agents, sessions, and presets; the [authorization guide](https://www.jetbrains.com/help/air-ides/air-configure-authorization.html) distinguishes agent-owned login from JetBrains AI and configured providers. Assessment date: 2026.10.14.
+Place the dense list above the current conversation in the existing tool window, separated by a draggable horizontal divider. Collapse leaves a compact header with the current scope and attention count. Expansion restores the user's previous proportion; support a keyboard-operated resize/collapse action and persist proportions per project/layout.
 
-**Fit for Langley:** an active, cross-harness host within a JetBrains frontend. Selecting a different model inside one proprietary runtime is not the same as hosting independent agent runtimes; ACP offers the latter boundary. This makes Air relevant to the desired multi-harness, multi-repository, multi-IDE agent driver, even if it does not satisfy the entire requirement.
+**Strengths:** matches the requested integrated-pane vision; list and current chat stay visible without occupying code-editor tabs; reuses the existing conversation host. **Costs:** vertical competition in a short sidebar; nested scrolling, focus, composer visibility, and minimum heights need deliberate handling.
 
-#### Verified capabilities
+Keep the list outside the transcript's scroll container. Give it independent scrolling and bounded expanded-preview heights. Preserve the composer and enough transcript height to remain useful; when space is insufficient, offer collapsed or history-only mode rather than tiny unreadable regions. Selecting a row changes only list selection; explicitly opening it changes the lower conversation. Keep the active conversation highlighted separately from keyboard selection.
 
-- **External runtime registration:** custom agents are configured in `~/.jetbrains/acp.json` with an absolute executable path and ACP startup arguments. Existing IDE plugins do not automatically become Air agents.
-- **Separate tool integration:** configuration includes `use_idea_mcp` and `use_custom_mcp`. ACP connects the host to the agent; Model Context Protocol (MCP) connects the agent to tools. These are separate interfaces, not interchangeable compatibility claims.
-- **Independent authentication:** custom ACP agents do not require JetBrains AI to be enabled. That does not imply every provider, cloud execution mode, or telemetry setting is approved by an employer.
-- **Local availability:** Air plugin 262.8665.490 was installed in IntelliJ IDEA 2026.2.3 during inspection. Installation and coexistence with other agent plugins are weaker evidence than a successful agent session.
+**Difficulty:** medium if the session/view boundary is respected; medium-large if the existing outer panel assumes exclusive history/chat cards everywhere. Recommended practical default after the dense renderer proves useful.
 
-#### Boundaries and evaluation gaps
+### Dedicated history tool window — modular alternative
 
-- **Multi-harness is conditional:** each runtime needs working ACP support. An installed plugin, an MCP server, or an advertised ACP flag alone does not demonstrate successful initialization, permissions, streaming, cancellation, and file operations through Air.
-- **Multi-repository scope is unverified:** the inspected evidence does not establish a global queue spanning repositories, dependency-aware cross-repository tasks, or workspace/worktree isolation and recovery guarantees. Parallel sessions alone would not prove these properties.
-- **Multi-IDE is not a shared control plane:** availability in JetBrains IDEs does not establish shared state with VS Code, Cursor, terminal clients, or mobile clients. Discovery and attachment to sessions started outside Air were not demonstrated.
-- **Persistence and portability are unverified:** survival after closing the IDE, restart recovery, cross-device steering, transcript export, and migration between different harnesses require explicit tests. ACP support alone does not guarantee any of them.
-- **End-to-end evaluation is incomplete:** the inspection did not establish a production-ready workflow with the intended enterprise agent runtimes. This public comparison deliberately excludes private enterprise compatibility records.
+Register a separate Conversations tool window while retaining the existing Wibey chat tool window. JetBrains docking can place them side-by-side, stacked, or on different edges. Row Open targets the existing chat host; it can target editor tabs later.
 
-#### Design inspiration
+**Strengths:** both surfaces stay visible without custom splitter code; native docking; small impact on the existing chat container. **Costs:** another tool-window entry, discoverability, focus across windows, limited space when both dock on the same edge, and synchronization between two lifecycles.
 
-These are Langley design recommendations inferred from Air's host/runtime boundary, not claims that Air implements them:
-
-- **Keep the driver independent of the editor:** use a durable session registry and runtime adapters, with thin IDE/CLI/web frontends. Treat Air as a possible frontend or comparator rather than assuming one IDE must own all state.
-- **Use ACP where it fits:** preserve structured session updates and permission requests rather than depending entirely on terminal-output parsing. Retain adapters for runtimes without ACP; do not imply a universal cross-harness transcript format.
-- **Model repository and host separately:** record repository/worktree, harness, frontend, parent task, lifecycle state, and approval ownership independently. A session should remain identifiable when its editor window changes.
-- **Make blocked work visible:** aggregate permission requests and errors across sessions while keeping authorization scoped to the specific runtime, repository, and action. A global dashboard must not become blanket approval.
-- **Separate interoperability from governance:** agent registration, tool access, authentication, data handling, and organizational approval are distinct checks.
-
-**Assessment:** shortlist Air as a possible JetBrains-side solution and a useful protocol-oriented UX reference. It is not established as the complete Langley replacement. A buy-versus-build comparison needs the same concrete scenarios for Air and other candidates: independent runtimes across repositories, attention/approval aggregation, collision isolation, IDE-independent persistence, and attachment from multiple frontends.
-
-**Conductor** — https://www.conductor.build. Mac app running parallel Claude Code, Codex, and Cursor agents, each in its own isolated git-worktree workspace (auto branch/terminal/diff/PR), with a UI to monitor, review, and merge multiple agents at once. Free app (bring your own subscription); separate /pricing and /enterprise pages imply paid tiers. Active, changelog at v0.89.1.
-
-**Crystal** — https://github.com/stravu/crystal. **Deprecated as of February 2026** — README states this plainly and redirects to its successor, Nimbalyst. Was: Electron app running multiple Claude Code/Codex sessions in parallel git worktrees with diff review and rebase/squash tooling.
-
-**Nimbalyst** — https://nimbalyst.com/crystal/. Crystal's official successor — "a full visual workspace for building with Claude Code and Codex" — adds a session kanban board, visual editors (markdown/mockups/diagrams/data models), inline reviewable diffs, and a companion iOS app. Supports Claude Code and Codex only. Free for individuals (OSS, no feature limits); paid "Nimbalyst Teams" tier for shared workspaces.
-
-**Happy** — https://github.com/slopus/happy (happy.engineering's own page returned only a bare title on fetch; GitHub confirmed the product). Mobile/web/desktop remote-control client for Claude Code and Codex CLI sessions running on your own machine: start, steer, approve, and hand off control between phone/desktop instantly, end-to-end encrypted, no added cloud compute cost. Free, MIT/OSS, no telemetry; last tagged release v1.4.0 (2025.09) but repo shows continued activity (1,500+ commits, 44 contributors).
-
-**Vibe Kanban** — see § 2 above; also fits here as a desktop-adjacent client, with the same sunsetting caveat.
-
-**Claude Squad** — see § 6 below (fits both desktop-client and terminal-multiplexer framing).
-
----
-
-## 6. Terminal Multiplexers as Agent-Control Surfaces
-
-**Tmux Orchestrator** — https://github.com/Jedward23/Tmux-Orchestrator. Three-tier Orchestrator→Project Manager→Engineer hierarchy of Claude instances across tmux windows, with self-scheduled check-ins (`schedule_with_note.sh`) and inter-agent messaging (`send-claude-message.sh`). MIT/free. **Stale**: 1,809★ but last pushed 2025.07 — over a year without a commit upstream, though active forks/derivatives exist (mdwoicke, absmartly, primeline-ai, Dicklesworthstone/claude_code_agent_farm), suggesting the pattern lives on downstream rather than in the original repo.
-
-**Claude Squad** — https://github.com/smtg-ai/claude-squad. TUI managing Claude Code, Codex, Gemini, OpenCode, and Amp (plus Aider via `-p`) as isolated tmux-backed sessions, each in its own git worktree, with background/auto-accept execution (`-y`/`--autoyes`). AGPL-3.0/free. Actively maintained: 8,551★, last pushed 2026.08.20, latest release v1.0.20 (2026.08.20), 54 open issues.
-
----
-
-## 7. Agent-Control Surfaces (observability/orchestration, not coding-specific)
-
-**LangSmith** — https://www.langchain.com/langsmith/observability. Real-time dashboards for cost, latency (P50/P99), error rate, LLM-as-judge/code evals, tool/trajectory monitoring, plus an "Insights" auto-clustering layer over traces. Framework-agnostic (OpenAI/Anthropic/Vercel AI SDK/LlamaIndex/custom, native OpenTelemetry) despite the LangChain branding. Free dev tier; paid plans scale with trace volume; cloud, BYOC, or fully self-hosted.
-
-**Langfuse** — https://langfuse.com/. Unified tracing, a sessions view, prompt management, evals, datasets, dashboards; OpenTelemetry-native with 100+ integrations (LangChain, CrewAI, Pydantic AI, Google ADK, various model providers). Cloud (US/EU/JP/HIPAA regions) or fully free self-hosted (MIT, Docker/K8s/Terraform, no feature gates). Cloud pricing: free Hobby tier (50k observations/month), usage-based paid tiers, enterprise self-hosted adds SLA/SSO.
-
-**AgentOps** — https://www.agentops.ai/. Session replay ("Time Travel Debugging") for full agent runs — LLM calls, tool use, multi-agent interactions — plus cost/token tracking and audit trail. Explicitly agnostic ("Agent Agnostic SDK," 400+ LLM/framework integrations: CrewAI, Autogen, OpenAI Agents SDK, LangChain). Pricing: Basic free (5,000 events/month), Pro from $40/month (unlimited events/retention), Enterprise custom (SSO, on-prem, SOC-2/HIPAA/NIST AI RMF).
-
----
-
-## Verification Gaps (do not cite these as confirmed)
-
-- **Devin's session dashboard** (app.devin.ai/sessions) — auth-walled, unconfirmed by fetch.
-- **specstory.com** and **vibekanban.com/blog/shutdown** — blocked automated fetch (403); substituted GitHub/search corroboration.
-- **Cursor's "History" sidebar icon** — claimed by a third-party guide, not confirmed on official cursor.com docs.
-- **chatgpt.com/codex, openai.com/codex/** — blocked automated fetch (403); substituted the OpenAI docs mirror.
-- **JetBrains Junie 2026.1 changelog** — full text didn't render on direct fetch; summarized from search snippets plus a corroborating YouTrack ticket.
-
-## Sources
-
-- [JetBrains Air overview](https://www.jetbrains.com/help/air-ides/air-overview.html)
-- [JetBrains Air agent management and custom ACP registration](https://www.jetbrains.com/help/air-ides/air-manage-agents.html)
-- [JetBrains Air session management](https://www.jetbrains.com/help/air-ides/air-start-a-new-session.html)
-- [JetBrains Air authorization](https://www.jetbrains.com/help/air-ides/air-configure-authorization.html)
-- [SpecStory (GitHub)](https://github.com/specstoryai/getspecstory)
-- [ThreadLens](https://github.com/hanityx/threadlens)
-- [Happier](https://github.com/happier-dev/happier)
-- [OpenAI Codex Cloud docs](https://learn.chatgpt.com/docs/cloud)
-- [GitHub Copilot coding agent management](https://docs.github.com/en/copilot/concepts/agents/cloud-agent/agent-management)
-- [Google Jules](https://jules.google/)
-- [Cursor Cloud Agent docs](https://cursor.com/docs/cloud-agent)
-- [Factory.ai CLI](https://factory.com/product/cli)
-- [Vibe Kanban](https://github.com/BloopAI/vibe-kanban)
-- [Cursor Agent overview](https://cursor.com/docs/agent/overview)
-- [Junie plugin page](https://plugins.jetbrains.com/plugin/26104-junie-the-ai-coding-agent-by-jetbrains)
-- [JetBrains YouTrack LLM-26656](https://youtrack.jetbrains.com/projects/LLM/issues/LLM-26656)
-- [VS Code Copilot Chat sessions](https://code.visualstudio.com/docs/copilot/chat/chat-sessions)
-- [VS Code Agents session history](https://code.visualstudio.com/docs/agents/run/sessions/session-history)
-- [VS Code Agents window](https://code.visualstudio.com/docs/agents/run/agents-window)
-- [VS Code manage agent sessions](https://code.visualstudio.com/docs/agents/run/sessions/manage-sessions)
-- [Cascade docs (redirected under Devin Desktop)](https://docs.devin.ai/desktop/cascade/cascade)
-- [Zed Agent Panel](https://zed.dev/docs/ai/agent-panel)
-- [Zed parallel agents](https://zed.dev/docs/ai/parallel-agents)
-- [tmux](https://github.com/tmux/tmux)
-- [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect)
-- [tmux-continuum](https://github.com/tmux-plugins/tmux-continuum)
-- [Zellij session-manager announcement](https://zellij.dev/news/session-manager-protobuffs/)
-- [Zellij session-manager docs](https://zellij.dev/documentation/session-manager-alias.html)
-- [Warp using agents](https://docs.warp.dev/agents/using-agents)
-- [Warp blocks-as-context](https://docs.warp.dev/agents/local-agents/agent-context/blocks-as-context/)
-- [Warp issue #5088](https://github.com/warpdotdev/Warp/issues/5088)
-- [Wave Terminal release notes](https://docs.waveterm.dev/releasenotes)
-- [Wave Terminal (GitHub)](https://github.com/wavetermdev/waveterm)
-- [iTerm2 session restoration](https://iterm2.com/documentation-restoration.html)
-- [Conductor](https://www.conductor.build)
-- [Crystal](https://github.com/stravu/crystal)
-- [Nimbalyst](https://nimbalyst.com/crystal/)
-- [Happy (GitHub)](https://github.com/slopus/happy)
-- [Tmux Orchestrator](https://github.com/Jedward23/Tmux-Orchestrator)
-- [Claude Squad](https://github.com/smtg-ai/claude-squad/blob/main/README.md)
-- [LangSmith observability](https://www.langchain.com/langsmith/observability)
-- [Langfuse](https://langfuse.com/)
-- [AgentOps](https://www.agentops.ai/)
-
-*[doc-audit](https://github.com/BrianHoltz/tools/blob/main/.wibey/skills/doc-audit/SKILL.md): 2026.10.14.Wed*
+**Difficulty:** medium. Useful if changing the current chat container is too invasive. Less coherent than the integrated split and less powerful than editor tabs; prototype it only if it resolves a concrete integration constraint.
+
+### Shared interaction contract
+
+- Expansion previews content only; it does not open, activate, resume execution, acquire a runtime, or trigger model usage.
+- Open activates or restores a conversation; Send starts another turn. Keep any existing resume-cost warning until its semantics are explicitly reviewed.
+- Maintain one execution owner per conversation; multiple views subscribe to it. A title click must not cancel a different running session.
+- Permission decisions stay in the target session's existing approval UI. Status navigation is not a global approve button.
+- Persist renderer, placement, sort/filter, and divider state separately. Avoid a settings matrix that exposes unfinished combinations.
+
+## Architecture and core boundary
+
+### JetBrains-first implementation
+
+Introduce small, proposed components rather than adding table logic to a large chat coordinator:
+
+- **ConversationListRepository:** reads existing summaries, lazily loads preview data, and merges local live sessions with persisted rows. Existing transcript/storage readers remain authoritative.
+- **ConversationRow:** immutable identity, title, timestamps with provenance, status/reason, preview references, workspace context, optional spend, and optional file summary. Missing is distinct from zero.
+- **ConversationListController:** selection, filtering, sort, paging, expansions, and action dispatch. Existing session-opening and destructive-action services remain responsible for their operations.
+- **ConversationStatusReducer:** consumes session events to derive a display state without inspecting rendered widget text.
+- **DenseHistoryView:** native list/table presentation; no transcript parsing, Git scans, or runtime calls inside cell renderers.
+- **ConversationHost:** placement adapter for existing chat, integrated split, or editor. This is a narrow navigation boundary, not a new orchestration framework.
+
+Use a native JetBrains table/list compatible with the chosen UI toolkit. For Swing, prototype a `JBTable` summary model plus nonselectable preview rows keyed to their parent conversation. That preserves column alignment and avoids a full nested chat renderer per row. Verify variable-height rows, sorting, screen-reader navigation, and selection before committing to this technique; a custom painted virtual list buys compactness at a substantial accessibility cost.
+
+Update snapshots on the UI thread; perform storage/Git work on background dispatchers with cancellation. Refresh by events and a lightweight visible-age timer, coalescing streamed output rather than rebuilding every row per token. Lazy-load previews, memoize against transcript versions, and keep list scroll/selection stable as timestamps change. Do not silently reorder a row out from under a click; apply live sorting at a stable interaction boundary.
+
+### What belongs in shared runtime/core
+
+“Core” can mean a shared client library, the executable runtime/transport, or a central service. Confirm the actual owner before proposing a change; those are not interchangeable repositories.
+
+**No core change needed for:** dense rendering, grapheme truncation, relative ages from known timestamps, search over supplied summaries, UI preferences, divider placement, or editor hosting. All are frontend responsibilities.
+
+**Possible narrow shared contract:** versioned conversation summaries and lifecycle events carrying durable ID, source namespace, runtime owner, workspace, last user/agent activity, current wait reason, terminal outcome, and optional usage provenance. Add only fields a tested feature actually needs; old producers must remain readable with unsupported values shown as unknown.
+
+**Core becomes justified when:** independently running CLI/IDE processes need trustworthy live discovery, attachment, request routing, heartbeats/owner leases, crash detection, or concurrent metadata writes. File watching can detect transcript changes, but cannot prove a permission request is pending or that another process owns a resumable live stream.
+
+A shared file sidecar without cross-process concurrency control is not a session registry. If several clients write metadata, define ownership or compare-and-swap, schema negotiation, redaction, and rebuild behavior. Keep the index derived/rebuildable; do not introduce a second transcript source of truth.
+
+### CLI-first and shared-service alternatives
+
+**CLI-only table:** appropriate for terminal users, not a shortcut to a JetBrains history mode. It still needs conversation discovery, real status, previews, terminal width handling, and explicit resume semantics; editor tabs and IDE diffs do not transfer. A terminal embedded in the plugin would be a different UX with weaker native integration.
+
+**Shared data contract, native UIs:** the best later expansion. Reuse semantics/schema and conformance fixtures, not Kotlin/Swing widgets in a TypeScript terminal application. Port a minimal read-only CLI list after the JetBrains model settles; add watch/attach only if supported by a real owner protocol.
+
+**Daemon/control plane first:** strongest route to cross-IDE live sessions, but largest cost and security/lifecycle scope. It introduces installation, updates, process survival, IPC authorization, recovery, and multi-client writer arbitration. Not required to prove the desired history UX; defer unless live cross-process steering is a launch requirement.
+
+## Feature feasibility
+
+Effort labels describe incremental implementation risk, not commitments. Several simple cells can conceal difficult data ownership requirements.
+
+### Title and dense rows — small
+
+Reuse persisted/derived titles; never rename stored conversations just to fit a cell. Truncate display to 25 grapheme clusters, including ellipsis, using a Unicode implementation tested for combining marks, flags, and joined emoji. Ordinary string length is insufficient. Provide full title on hover, keyboard focus, and accessible name. Fit columns responsively; drop optional context columns before forcing horizontal scrolling.
+
+### Started and idle ages — small presentation, medium semantics
+
+Use recorded creation time; if only a fallback timestamp exists, show unknown rather than a fabricated start. Idle is elapsed time since actual user/agent activity, including meaningful streaming output, not merely the last save, file modification, or last completed turn. Record activity in the live session and persist suitable summary timestamps. A rename, pin, export, or index rebuild must not reset idle.
+
+Round down to the largest defined unit, minimum `0m`; specify minutes/hours/days and exact hover timestamps. Clamp future timestamps to `0m` with diagnostic provenance. Creation and idle values are not lifecycle statuses.
+
+### Status vocabulary — medium locally, large cross-process
+
+Implement evidence-backed states, with an explanation available on focus/click:
+
+- ▶️: executing a turn or tool; not merely an open tab.
+- 🛑: explicit permission/action requirement; ❓: explicit user question.
+- ⏰: a known timed wait or expected external event; not any slow tool call.
+- 👀: explicitly awaiting review; not inferred from a final answer.
+- ⏸️: explicitly paused work; an ordinary idle conversation is not automatically paused.
+- ⚠️: recoverable fault; ☠️: recorded fatal failure; ❌: explicit cancellation.
+- ✅: explicit completed task outcome or user mark; a completed model turn alone does not prove task completion.
+
+Keep execution, attention, outcome, and open/closed state separate internally, even if one dominant glyph is rendered. Prefer actionable blocked states over a still-open stream indicator; distinguish recoverable/fatal errors only when the producer supplies that classification. Show a neutral unknown/idle indicator when evidence is insufficient. After restart, persisted “running” without a verified owner must become stale/unknown, not live. Add less-observable states progressively instead of inventing heuristics to fill every glyph.
+
+### Latest prompt/output expansion — medium
+
+Read the latest user text and latest assistant text with their own timestamps, excluding tool results, host notices, hidden reasoning, and command wrappers. For live work use current in-memory text; for history load lazily. A prompt waiting for its answer may legitimately sit above an older assistant message: preserve timestamps rather than implying they form a matched turn.
+
+Render the requested 25-grapheme preview and accessible full text. Loading/error/empty states are necessary feedback, not an intermediate navigation page. Handle cancelled partial output, restored checkpoints, multiline text, attachments-only messages, and missing old timestamps. Never parse all full transcripts on each paint.
+
+### Spend and model power — medium, with a dollar-data gate
+
+The dollar mockup is a target, not authorization to relabel another usage unit as dollars. Use authoritative USD totals when available; otherwise show `$?` and offer separately labeled credits/tokens. Any estimate needs pricing basis, model mix, timestamp/rate version, and completeness. Do not silently sum known turns into an apparently complete total when others are unpriced, double-count cumulative usage, or reconstruct historical prices using today's rate card.
+
+For multi-model sessions, define whether the power prefix denotes the currently selected model or the cost-dominant model. Recommend current/last effective model, with mixed history explained in the tooltip. Treat power and price as a user-facing tier classification, not an empirical claim that a costly model is smarter. Resolve aliases through model metadata; unknown tier remains unknown. An accessibility label must disambiguate tier dollars from actual spend.
+
+### Uncommitted files and diff — medium workspace-wide, large attributable
+
+Define Δ as **current dirty files in the row's repository/worktree**, including staged, unstaged, and untracked files, deduplicated by path. Count each path once; treat a rename as one modified path and deleted paths as deleted. Clarify handling of submodules, ignored files, and unavailable worktrees. Unknown is `Δ?`, never `Δ0`.
+
+In a shared worktree this is a workspace total, not “files changed by this conversation.” Several rows can legitimately share it. Per-conversation attribution requires isolated worktrees, a recorded baseline plus change tracking, or an explicit attribution mechanism; a baseline alone still includes other writers. Do not promise attribution in the first release.
+
+Reuse IDE VCS state where available, refresh once per distinct worktree on a bounded cadence/event stream, and avoid per-row Git processes. Δ opens the corresponding current workspace diff. A historical row must not display today's checkout as the conversation's old diff; label it current-worktree state or omit it when its worktree is gone.
+
+### Repo, branch, harness, IDE, permissions — small locally, medium across origins
+
+Show common context once in the scope line; reveal differing/unknown values per row or optional columns. Keep original conversation origin distinct from the host currently viewing it. Branch is session/worktree context, not the viewer's current branch projected onto every row. Do not infer an originating IDE from a transcript merely being visible in that IDE. Permission mode is informational; changing it must use the existing session-scoped controls.
+
+### Search, filtering, sorting, and grouping — small to medium
+
+Start with title/summary search and filters for attention, running, project, and pinned state; label search scope. Full transcript search needs background indexing, privacy controls, cancellation, and bounded result loading. Sort by created/activity/spend only when their data is known; put unknowns consistently last. Preserve pinned ordering and expanded children with their parent. Grouping must not turn previews into independently sorted rows.
+
+### Pin, favorite, archive, open, fork, delete — mixed
+
+Reuse pin/open/rename/export/delete contracts. Prefer pin as the first favorite mechanism rather than two indistinguishable preferences. Archive is a reversible visibility flag, not deletion or execution cancellation; introduce storage only if missing and define its interaction with running sessions. Fork is a deliberate history action, distinct from merely displaying a parent/child relationship; verify runtime checkpoint support before offering it, and defer generic cross-harness forks. Confirm deletion with the exact title, preserve existing protections against autosave resurrecting deleted history, and do not invent bulk deletion for the first release.
+
+The specification excludes relationship visualization and attached-context browsing. Keep those exclusions even where the underlying runtime supports related features.
+
+## Delivery phases
+
+Estimates are rough engineering ranges for one contributor familiar with the plugin, excluding review queues and unrelated runtime migrations. They are incremental, not a project schedule; source-level design cannot establish measured delivery time.
+
+### Baseline and interaction spike — 2–4 engineering days
+
+Select target release/toolkit; map actual history, live-session, storage, and action paths. Build synthetic-data prototypes for the three requested placements; assess the dedicated tool-window alternative only if useful. Validate column fit, keyboard interactions, preview row accessibility, and stable identity. Decide timestamp/status/Δ/spend semantics before introducing persistence.
+
+**Exit:** a chosen UI integration point, fixture-backed row contract, and a working narrow-width table prototype. No core dependency required.
+
+### Minimal dense prototype — 1–3 engineering days
+
+Reuse current summaries, status indicators, default ordering, and existing open callbacks. Use fixed nonresizable columns, title, available age/context fields, and unknown placeholders or omitted unsupported cells. Keep the existing history renderer selectable. No new status taxonomy, sorting controls, column-width settings, previews, core changes, or storage migrations. Prefer a small renderer spike over extracting a comprehensive repository/controller architecture before first use.
+
+**Exit:** an actual dense history mode that opens existing conversations safely and can be compared with the current UI. Synthetic rows are acceptable for layout exploration but must be clearly labeled; connect real summaries before calling it a usable prototype.
+
+### Dense history hardening — 4–8 engineering days
+
+Harden the opt-in Existing/Dense switch; unified live/persisted rows; title, known start/activity age, truthful basic status, scope context, title search, sort, pin, open, and existing safe actions. Add disclosure previews with lazy loading only after the basic table is useful; custom sorting and column resizing are optional follow-ups, not release blockers. Display honest unknowns for spend and Δ when not yet backed by data. Preserve legacy history and picker behavior.
+
+**Exit:** every conversation remains discoverable across running→idle→closed transitions; opening/expanding never sends a message; old data works without migration. This is a useful independently shippable product.
+
+### Live attention and integrated split — 5–10 engineering days
+
+Add structured permission/question/error state and last-activity events; establish precedence, stale-owner behavior, and keyboard navigation to attention. Integrate upper-list/lower-chat splitter, collapse, independent scrolling, minimum heights, and persisted layout. Keep history-only available. Implement trustworthy workspace Δ and diff where VCS integration allows it; keep attribution deferred.
+
+**Exit:** overview stays visible while another session streams or waits, and selecting/opening never interrupts unrelated work. No cross-process live claim without an owner protocol.
+
+### Optional conversation editor hosting — 8–15 engineering days
+
+Spike one editor-hosted conversation, first read-only if necessary; establish session ownership and close/restore semantics. Then enable interactive preview/pinned tabs and several conversation tabs. Add multi-view subscription only after lifecycle tests pass. Reuse the same history and command model.
+
+**Exit:** closing/moving/splitting views cannot duplicate sends, lose drafts, approve the wrong request, cancel unrelated streams, or resurrect deleted conversations.
+
+### Shared runtime and richer accounting — separate discovery scope
+
+Only after measured gaps: reliable cross-process owner events, optional CLI list, cross-client attach, complete USD accounting, attributable changes, archive/fork parity, full-text index, or additional harness adapters. Size each separately; these are not a single cheap “polish” phase. Share contract fixtures before extracting a library or introducing a daemon.
+
+## Validation and acceptance
+
+Use failing tests before implementation, then targeted tests and the supported full suite. A documentation proposal is not evidence that these checks already pass.
+
+- **Identity:** provisional IDs, SDK/durable IDs, two simultaneous opens, live/persisted dedup, restored/forked histories, deleted rows, and stable selection during refresh.
+- **Semantics:** missing versus zero, no fabricated success, pending permission/question precedence, recoverable/fatal errors, cancellation, stale running after restart, and historical records lacking timestamps/usage.
+- **Formatting:** grapheme fixtures, exact age thresholds and future clocks, unknown spend/tier, partial pricing, mixed models, 25-grapheme previews, and independent preview timestamps.
+- **Navigation:** expansion causes no runtime calls; Open reuses an owner; Send only targets its conversation; legacy shortcuts and resume gates remain intact.
+- **VCS:** staged+unstaged same path, untracked/deleted/renamed files, shared worktrees, missing worktrees, multi-root projects, and exact diff target.
+- **Layouts:** narrow sidebar, small window height, divider keyboard control, independent scrolling, editor close/restoration, simultaneous sessions, draft preservation, and focus return.
+- **Accessibility:** keyboard-only completion of every action; named columns despite hidden headers; accessible expanded state; full-text focus disclosure; visible focus; no color/emoji-only meaning; screen-reader checks at scaled fonts. Apply WCAG 2.2 AA equivalents suitable for native desktop UI.
+- **Performance:** benchmark synthetic histories with thousands of summaries and very large transcripts. Proposed budgets: warm visible page within 200ms and simple selection/expansion feedback within 100ms on a named reference machine; cold reads asynchronous with progress. Measure before accepting these budgets. No transcript or Git I/O on the UI thread, no unbounded component-per-history construction, and no listener/timer leaks after toggling layouts.
+- **Privacy and rollback:** no transcript/preview payloads in telemetry; no new network dependency for history; UI flag off returns to the existing renderer without losing data. Use redacted fixtures, never real private conversations in snapshots.
+
+## Choices for proceeding
+
+**Low-risk experiment:** implement dense history using existing navigation only. Best if the question is whether the table itself is valuable; smallest maintained surface.
+
+**Recommended JetBrains product path:** dense history, then the collapsible upper-list/lower-chat layout. Keep existing history as a compatibility fallback and preserve an optional history-only placement. This directly addresses the requested sidebar experience without forcing shared-runtime work.
+
+**Editor-centric path:** dense sidebar plus conversation editor tabs. Choose this when several visible conversations are a primary requirement; accept the larger session/view lifecycle refactor and treat editor hosting as its own deliverable.
+
+**Cross-client platform path:** shared summary/event/owner contract before CLI and JetBrains watch/attach. Choose only if conversations started outside the IDE must be live and steerable at launch. It is substantially more than an alternate history renderer.
+
+**Recommended decision:** authorize the baseline spike and dense-history release, with integrated split as the intended next placement. Reserve editor tabs as an opt-in follow-up. Require an explicit demonstrated gap before changing core; do not make complete dollars, change attribution, all status glyphs, or cross-process steering prerequisites for the useful first version.
