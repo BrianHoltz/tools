@@ -44,18 +44,20 @@
 
 #### Default: dense list
 
-**Conversations**　⌕ Search…　　All ▾　　Idle ↑　　＋
+**Conversations**　⌕ Search…　All ▾　m ↑　＋
 
-| | Conversation | Started | Idle | $ | Δ | Model |
+| | | | | | | |
 | :---: | :--- | ---: | ---: | ---: | ---: | :--- |
-| ◉ | phantom-agent | 22m | 3s | .18 | 2 | elite |
-| ◇ | enable copilot in IDEA | 1d | 8m | .42 | 1 | elite |
-| ✓ | Wysiwyg editor: what does formatting mean? | 2d | 1d | 1.26 | · | elite |
-| ! | code-puppy extension not starting | 2d | 2d | .63 | 3 | elite |
+| ◉ | phantom-agent | b:22m | m:3s | $.18 | Δ2 | elite |
+| ◇ | enable copilot in IDEA | b:1d | m:8m | $.42 | Δ1 | elite |
+| ✓ | Wysiwyg editor: what doe… | b:2d | m:1d | $1.26 | Δ0 | elite |
+| ! | code-puppy extension not… | b:2d | m:2d | $.63 | Δ3 | elite |
 
-**◉** running · **◇** needs you · **✓** done · **!** failed · **◷** queued. An unread dot sits beside the title; a tiny pencil marks an unsent draft. Those are independent of lifecycle state. In the UI, glyphs are fixed-size icons, not variable-width emoji.
+No visible column labels. Each compact token carries its own meaning; accessible column names remain available to assistive technology. **◉** running · **◇** needs you · **✓** done · **!** failed · **◷** queued. An unread dot sits beside the title; a tiny pencil marks an unsent draft. Those are independent of lifecycle state. In the UI, glyphs are fixed-size icons, not variable-width emoji.
 
-**Started** = age since conversation creation; **Idle** = time since agent/user activity. Use one rounded-down unit (`3s`, `8m`, `3h`, `2d`); exact timestamps live on hover/focus. **$** = conversation spend in USD; omit the repeated currency symbol and leading zero. **Δ** = uncommitted files; `·` = none. `elite` is the display alias for `auto-elite`.
+Titles contain at most **25 displayed characters, including the single Unicode ellipsis `…`** when truncated: retain the first 24 grapheme clusters, then append `…`. Never split a composed character or emoji. Full titles appear on hover and keyboard focus, and remain the accessible names.
+
+**b:** = age since conversation began; **m:** = time since the last agent/user activity. Use one rounded-down unit (`m:3s`, `m:8m`, `b:3h`, `b:2d`); exact timestamps live on hover/focus. Spend retains its currency symbol but omits a leading zero below one dollar (`$.18`, `$1.26`, `$0`); unknown spend is `$?`, not zero. **Δ3** = three uncommitted files; **Δ0** = none. An optional breakdown **Δ2+3-1** means two modified, three added, and one deleted file; these categories are disjoint, not line counts. Exact paths and counts live in the expanded view. `elite` is the display alias for `auto-elite`.
 
 Repository `relationship-shared`, branch `main`, harness Code Puppy, IDE IDEA, and permission mode YOLO live in a quiet scope line above the table—not four copies in every row. Mixed values become optional columns; shared values stay in the scope line.
 
@@ -63,11 +65,11 @@ Repository `relationship-shared`, branch `main`, harness Code Puppy, IDE IDEA, a
 
 Select **phantom-agent**, then expand with **→** or its disclosure control:
 
-| | Conversation | Started | Idle | $ | Δ | Model |
+| | | | | | | |
 | :---: | :--- | ---: | ---: | ---: | ---: | :--- |
-| ◉ | ▾ phantom-agent | 22m | 3s | .18 | 2 | elite |
+| ◉ | ▾ phantom-agent | b:22m | m:3s | $.18 | Δ2+3-1 | elite |
 
-　↳ anchor `phantom-agent` → current `phantom-doctor`　 **+38 −6**　　[More ▾]
+　↳ anchor `phantom-agent` → current `phantom-doctor`　 **+38 −6 lines**　[More ▾]
 
 **More** adds the latest exchange inline, clipped to one line per message:
 
@@ -79,20 +81,20 @@ Files open on click; the change summary opens the diff. Keep the rest of the lis
 
 #### Sidebar: keep the signal, drop the columns
 
-At narrow widths, retain the same row rhythm with status, title, and one right-aligned idle value. No miniature spreadsheet and no three-line cards.
+At narrow widths, retain status, the same 25-character title limit, and one right-aligned activity token. Available width may truncate titles further. No miniature spreadsheet and no three-line cards.
 
-| | Conversation | Idle |
+| | | |
 | :---: | :--- | ---: |
-| ◉ | phantom-agent | 3s |
-| ◇ | enable copilot in IDEA | 8m |
-| ✓ | Wysiwyg editor: what does… | 1d |
-| ! | code-puppy extension not… | 2d |
+| ◉ | phantom-agent | m:3s |
+| ◇ | enable copilot in IDEA | m:8m |
+| ✓ | Wysiwyg editor: what doe… | m:1d |
+| ! | code-puppy extension not… | m:2d |
 
 #### Visual and interaction contract
 
-- **Density:** 28px desktop rows, 12px text, 16px glyph column; tabular numerals and right-aligned metrics. Title absorbs remaining width. Start with approximate widths of 52/40/44/24/56px for Started/Idle/$/Δ/Model; headers remain readable. No vertical gridlines, pill badges, or per-row action chrome.
+- **Density:** 24px desktop rows, 12px text, 14px glyph column, and 4px inter-column gaps; tabular numerals and right-aligned metrics. Title is capped at 25 characters and absorbs remaining width up to that limit. Metrics size to their content; no visible header row, vertical gridlines, pill badges, or per-row action chrome. Blank header cells above are a Markdown rendering accommodation, not UI labels.
 - **Hierarchy:** title high contrast; metrics quieter but still accessible. Very faint horizontal separators, a subtle selected-row tint and focus edge. Amber diamond for attention, green running ring, muted check, red error mark; shape and accessible names carry meaning without color.
-- **Triage:** default Idle ascending; an Attention filter isolates approvals, questions, and failures. Clicking a header sorts; a second click reverses. Hover/focus reveals resume, archive, and overflow actions without shifting columns.
+- **Triage:** default activity age ascending (`m ↑`); an Attention filter isolates approvals, questions, and failures. A named Sort control selects the metric and direction without requiring visible column headers. Hover/focus reveals resume, archive, and overflow actions without shifting columns.
 - **Keyboard:** ↑/↓ select, → expands, ← collapses, Enter opens the conversation, / focuses search, Esc clears it. Provide named buttons, announced sort/expansion state, and visible focus. Full truncated titles appear on hover and keyboard focus.
 - **Touch:** use 44px rows and visible overflow controls for coarse pointers. Compact must not mean impossible to hit.
 
