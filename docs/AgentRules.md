@@ -52,7 +52,7 @@ This file is the global layer; a repo's AGENTS.md supplies project/team context,
 6. **Don't Count**: Never label things sequentially with numbers or letters. It's opaque and brittle and lazy. Use names. Exceptions may be granted for long or immutable sequences.
 7. **Don't Narrate**: Except in designated sections such as work logs, documents should not narrate their history or exhibit consciousness of previous versions. Omit apologetic or performative text. Documents are timeless; all that matters is whether the text helps the reader.
 8. **Don't Fade**:  End each turn with a clear terse bulleted summary. Each bullet must be <25 words. Only **Did** is mandatory; omit the other bullets unless they add useful information.
-   * **Did**: what the agent did. If there is an anchor doc, link its basename so it opens in the current IDE. Include the link here whether or not the agent modified the doc.
+   * **Did**: what the agent did. Select or open the anchor doc in this conversation’s IDE window; verify it. Never switch windows. If unavailable, give its path.
    * **Didn't**: work the user might reasonably think the agent completed but did not. Omit obvious non-actions.
    * **My Next**: the agent's recommended next action, if any.
    * **Your Next**: the user's recommended next action, if any.
