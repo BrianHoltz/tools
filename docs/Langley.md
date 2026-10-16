@@ -51,7 +51,7 @@
 | ▶️ | phantom-agent | ✦22m | ◴0m | $.18 | Δ2 | elite |
 | ❓ | enable copilot in IDEA | ✦1d | ◴8m | $.42 | Δ1 | elite |
 | ✅ | Wysiwyg editor: what doe… | ✦2d | ◴1d | $1.26 | Δ0 | elite |
-| ! | code-puppy extension not… | ✦2d | ◴2d | $.63 | Δ3 | elite |
+| ☠️ | code-puppy extension not… | ✦2d | ◴2d | $.63 | Δ3 | elite |
 
 No visible column labels. Accessible column names and hover/focus labels explain the compact tokens. Status uses the vocabulary below. An unread dot sits beside the title; a tiny pencil marks an unsent draft. These are independent of lifecycle state. Render all status symbols in a fixed-width icon slot; platform emoji width must not shift the metrics.
 
@@ -74,7 +74,8 @@ Reuse [Status Vocabulary](../.wibey/docs/StatusVocabulary.md#status-definitions)
 | ⏰ | Awaiting | A committed, expected event is pending; not generic inactivity. |
 | 👀 | Under review | Awaiting another person’s feedback. |
 | ⏸️ | Paused | Intentionally suspended; never use merely because idle time is increasing. |
-| ! | Failed | Conversation-specific execution error; not FIX_FAILED, which means a deployed fix failed. |
+| ⚠️ | Errored | ERRORED: the effort encountered an unexpected problem that might not be fatal. |
+| ☠️ | Failed | FAILED: the effort encountered an unexpected fatal problem and needs a new effort. |
 | ❌ | Canceled | Explicitly canceled, not failed. |
 | ✅ | Done | RESOLVED / DONE: the requested work is complete, not merely a finished response. |
 
@@ -107,12 +108,12 @@ At narrow widths, retain status, the same 25-character title limit, and one righ
 | ▶️ | phantom-agent | ◴0m |
 | ❓ | enable copilot in IDEA | ◴8m |
 | ✅ | Wysiwyg editor: what doe… | ◴1d |
-| ! | code-puppy extension not… | ◴2d |
+| ☠️ | code-puppy extension not… | ◴2d |
 
 #### Visual and interaction contract
 
 - **Density:** 24px desktop rows, 12px text, 14px glyph column, and 4px inter-column gaps; tabular numerals and right-aligned metrics. Title is capped at 25 characters and absorbs remaining width up to that limit. Metrics size to their content; no visible header row, vertical gridlines, pill badges, or per-row action chrome. Blank header cells above are a Markdown rendering accommodation, not UI labels.
-- **Hierarchy:** title high contrast; metrics quieter but still accessible. Very faint horizontal separators, a subtle selected-row tint and focus edge. Amber action/question glyphs, green running triangle, muted completion check, red error mark; shape and accessible names carry meaning without color.
+- **Hierarchy:** title high contrast; metrics quieter but still accessible. Very faint horizontal separators, a subtle selected-row tint and focus edge. Amber action/question glyphs, green running triangle, muted completion check, red fatal-error skull; shape and accessible names carry meaning without color.
 - **Triage:** default activity age ascending (`◴ ↑`); an Attention filter isolates approvals, questions, and failures. A named Sort control selects the metric and direction without requiring visible column headers. Hover/focus reveals resume, archive, and overflow actions without shifting columns.
 - **Keyboard:** ↑/↓ select, → expands, ← collapses, Enter opens the conversation, / focuses search, Esc clears it. Provide named buttons, announced sort/expansion state, and visible focus. Full truncated titles appear on hover and keyboard focus.
 - **Touch:** use 44px rows and visible overflow controls for coarse pointers. Compact must not mean impossible to hit.
