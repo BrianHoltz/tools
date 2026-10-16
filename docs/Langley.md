@@ -23,8 +23,7 @@
 - uncommitted files
 - model
 - expanded
-  - anchor file
-  - current file
+  - file currently being worked on
   - git diff lines
   - latest prompt with time
   - latest output with time
@@ -49,8 +48,7 @@ Conversations　⌕ Search…　All ▾　◴ ↑　＋
 | | | | | | | |
 | :---: | :--- | ---: | ---: | ---: | ---: | :--- |
 | ▶️ | ▾ phantom-agent | ✦22m | ◴0m | $.18 | Δ2 | elite |
-| | ↳ anchor: phantom-agent | | | | | |
-| | current: phantom-doctor | | | | +38 −6 lines | |
+| | file: phantom-doctor | | | | +38 −6 lines | |
 | | user: Add a minimal off-VPN in… | 3m | | | | |
 | | agent: Restore trap added. Chec… | 0m | | | | |
 | ❓ | enable copilot in IDEA | ✦1d | ◴8m | $.42 | Δ1 | elite |
