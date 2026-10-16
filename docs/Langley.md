@@ -53,7 +53,7 @@
 | ✅ | Wysiwyg editor: what doe… | ✦2d | ◴1d | $1.26 | Δ0 | elite |
 | ☠️ | code-puppy extension not… | ✦2d | ◴2d | $.63 | Δ3 | elite |
 
-No visible column labels. Accessible column names and hover/focus labels explain the compact tokens. Status uses the vocabulary below. An unread dot sits beside the title; a tiny pencil marks an unsent draft. These are independent of lifecycle state. Render all status symbols in a fixed-width icon slot; platform emoji width must not shift the metrics.
+No visible column labels. Accessible column names and hover/focus labels explain the compact tokens. Status follows [Status Vocabulary](../.wibey/docs/StatusVocabulary.md#status-definitions). An unread dot sits beside the title; a tiny pencil marks an unsent draft. These are independent of lifecycle state. Render all status symbols in a fixed-width icon slot; platform emoji width must not shift the metrics.
 
 Titles contain at most **25 displayed characters, including the single Unicode ellipsis `…`** when truncated: retain the first 24 grapheme clusters, then append `…`. Never split a composed character or emoji. Full titles appear on hover and keyboard focus, and remain the accessible names.
 
@@ -63,21 +63,7 @@ Repository `relationship-shared`, branch `main`, harness Code Puppy, IDE IDEA, a
 
 #### Status glyphs
 
-Reuse [Status Vocabulary](../.wibey/docs/StatusVocabulary.md#status-definitions) where its meaning fits; do not infer investigative or deployment phases from generic agent execution.
-
-| Glyph | Conversation status | Meaning / vocabulary reuse |
-| :---: | :--- | :--- |
-| *(blank)* | Queued / unstarted | Not executing yet; preserve the vocabulary’s blank unstarted status. |
-| ▶️ | Running | STARTED / IN_PROGRESS: agent is executing, not necessarily INVESTIGATING or FIXING. |
-| 🛑 | Action needed | BLOCKED: approval, authentication, or another external action is required. |
-| ❓ | Answer needed | BLOCKED: a question or decision requires the user. |
-| ⏰ | Awaiting | A committed, expected event is pending; not generic inactivity. |
-| 👀 | Under review | Awaiting another person’s feedback. |
-| ⏸️ | Paused | Intentionally suspended; never use merely because idle time is increasing. |
-| ⚠️ | Errored | ERRORED: the effort encountered an unexpected problem that might not be fatal. |
-| ☠️ | Failed | FAILED: the effort encountered an unexpected fatal problem and needs a new effort. |
-| ❌ | Canceled | Explicitly canceled, not failed. |
-| ✅ | Done | RESOLVED / DONE: the requested work is complete, not merely a finished response. |
+Use [Status Vocabulary](../.wibey/docs/StatusVocabulary.md#status-definitions) as the single source of truth for status glyphs, names, and meanings.
 
 Use accessible status names and shape as well as color. Creation and idle glyphs stay in their metric columns, never in the status slot. Unread and draft indicators remain independent.
 
