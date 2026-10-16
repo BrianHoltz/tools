@@ -15,15 +15,14 @@
 
 ## Agent Conversation List
 
-- Status: queued/running/waiting/completed/failed state; pending approval or user input, unread activity, unsent draft, and errors
+- [Status](../.wibey/docs/StatusVocabulary.md#status-definitions): ▶️ 🛑 ❓ ⏰ 👀 ⏸️ ⚠️ ☠️ ❌ ✅
 - Title
 - Started
 - Idle
 - Cost
 - uncommitted files
-- model
+- Model power/expense: $–$$$
 - expanded
-  - file currently being worked on
   - git diff lines
   - latest prompt with time
   - latest output with time
@@ -45,56 +44,25 @@
 
 Conversations　⌕ Search…　All ▾　◴ ↑　＋
 
-| | | | | | | |
-| :---: | :--- | ---: | ---: | ---: | ---: | :--- |
-| ▶️ | ▾ phantom-agent | ✦22m | ◴0m | $.18 | Δ2 | elite |
-| | file: phantom-doctor | | | | +38 −6 lines | |
-| | user: Add a minimal off-VPN in… | 3m | | | | |
-| | agent: Restore trap added. Chec… | 0m | | | | |
-| ❓ | enable copilot in IDEA | ✦1d | ◴8m | $.42 | Δ1 | elite |
-| ✅ | Wysiwyg editor: what doe… | ✦2d | ◴1d | $1.26 | Δ0 | elite |
-| ☠️ | code-puppy extension not… | ✦2d | ◴2d | $.63 | Δ3 | elite |
+| | | | | | |
+| :---: | :--- | ---: | ---: | ---: | ---: |
+| ▶️ | ▾ phantom-agent | ✦22m | ◴0m | $$$.18 | Δ2 |
+| | 👤 Add a minimal off-VPN in… | | ◴3m | | |
+| | 🤖 Restore trap added. Chec… | | ◴0m | | |
+| ❓ | enable copilot in IDEA | ✦1d | ◴8m | $$.42 | Δ1 |
+| ✅ | Wysiwyg editor: what doe… | ✦2d | ◴1d | $1.26 | Δ0 |
+| ☠️ | code-puppy extension not… | ✦2d | ◴2d | $$$.63 | Δ3 |
 
 - Headers hidden; accessible column names and hover/focus labels retained.
 - Titles: ≤25 grapheme clusters; truncate to 24 + `…`. Full title on hover/focus and in accessible names.
-- → or disclosure: expand directly to files, diff, and latest exchange; no intermediate state.
+- → or disclosure: expand latest exchange; no intermediate state.
 - Message previews: ≤25 grapheme clusters including `…`, excluding role/time; full text on hover/focus.
-- Click file: open. Click changes: diff. Expansion never resumes execution.
+- Click changes: diff. Expansion never resumes execution.
 - ✦: age since creation. ◴: age since last agent/user activity, not execution state.
 - Ages: round down to one unit; minimum `0m`, never seconds. Exact timestamps on hover/focus.
-- Spend: `$.18`, `$1.26`, `$0`; unknown `$?`.
+- Spend: `$.18`, `$1.26`, `$0`; unknown `$?`. Prefix count: $ low, $$ medium, $$$ high model power/expense.
 - Files: `Δ3` total; `Δ0` none; `Δ2+3-1` = modified/added/deleted, disjoint counts—not lines.
-- Model: `elite` aliases `auto-elite`.
 - Shared repo/branch/harness/IDE/permissions: scope line; mixed values: optional columns.
-
-#### Status glyphs
-
-- [Status Vocabulary](../.wibey/docs/StatusVocabulary.md#status-definitions): canonical glyphs, names, meanings.
-- Fixed-width status slot; accessible names and shapes, not color alone.
-- ✦/◴: metrics only. Unread dot and draft pencil: independent indicators beside title.
-
-#### Sidebar: keep the signal, drop the columns
-
-- Status + title + right-aligned ◴ age.
-- Titles ≤25 characters; truncate further to fit.
-
-| | | |
-| :---: | :--- | ---: |
-| ▶️ | phantom-agent | ◴0m |
-| ❓ | enable copilot in IDEA | ◴8m |
-| ✅ | Wysiwyg editor: what doe… | ◴1d |
-| ☠️ | code-puppy extension not… | ◴2d |
-
-#### Visual and interaction contract
-
-- Density: 24px rows, 12px text, 14px status slot, 4px gaps; content-sized, right-aligned tabular metrics.
-- Chrome: no visible headers, vertical gridlines, pills, or persistent row actions. Blank mockup headers: Markdown syntax only.
-- Hierarchy: high-contrast titles, quieter accessible metrics, faint separators, selected tint, visible focus edge.
-- Sort: default `◴ ↑`; named control selects metric/direction. Attention filter: approvals, questions, failures.
-- Actions: resume/archive/overflow on hover/focus; no column shift.
-- Keys: ↑/↓ select; →/← expand/collapse; Enter open; / search; Esc clear.
-- Accessibility: named controls; announced sort/expansion state.
-- Touch: 44px rows; visible overflow controls.
 
 ## Categorization Framework
 
