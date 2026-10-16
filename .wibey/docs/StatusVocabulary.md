@@ -23,7 +23,7 @@
 | ↗️ | RELAYED       | Our team's work handed off; other team carrying forward                | In Progress           | —                         | —                 | —                 | Resolution |
 | ⏸️ | PAUSED        | Intentionally shelved; not active but not yet canceled                 | —                    | —                         | —                 | —                 | —         |
 |      | **Iterating** |                                                                        |                       |                            |                    |                    |            |
-| ⚠️ | ERRORED | The effort encountered an unexpected problem that might not be fatal | — | — | — | — | — |
+| ⚠️ | FAULTED | The effort encountered an unexpected problem that might not be fatal | — | — | — | — | — |
 | ☠️ | FAILED | The effort encountered an unexpected fatal problem and needs a new effort | — | — | — | — | — |
 | 👎   | NOT_APPROVED  | Change/fix not approved and so was not deployed                        | Won't Do              | —                         | —                 | Canceled           | —         |
 | ❌   | CANCELED      | Fix attempt canceled; back to investigating                            | Canceled / Won't Do   | —                         | —                 | Canceled           | —         |
