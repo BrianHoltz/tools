@@ -84,7 +84,7 @@ The cheap part is drawing rows. The expensive parts are knowing what an agent is
 - **Completed:** comparative material separated into [Langley Comps](LangleyComps.md); conversation-list specification preserved here. JetBrains upstream and CLI session/history entry points inspected.
 - **Working recommendation:** JetBrains-first optional dense history renderer, reusing existing actions and whatever status signals are already available. Fixed columns and existing ordering are sufficient for the first prototype.
 - **Prototype exclusions:** custom sorting, resizable columns, excerpt expansion, richer status classification, dollar accounting, and attributed file counts are not prerequisites.
-- **Next investigation:** confirm the target release/UI toolkit; compare minimal history replacement with integrated splitter and editor-tab lifecycle costs.
+- **Next investigation:** select the target release/UI toolkit before coding. An in-flight replacement UI already has merged/reactive history concepts; evaluate its dense-renderer seam rather than committing to classic-only widgets. Compare integrated splitter and editor-tab lifecycle costs.
 - **Parallel-agent scope:** independently evaluate placement and integration choices. Private source citations and verified data gaps are in the internal companion, `docs/LangleyImplementation.md`, in the team repository. Do not assume the developer checkout, installed plugin, and upstream main match.
 - **Open choices:** preferred prototype placement; whether conversations outside the IDE need live attachment at launch; whether editor tabs are essential or a later option. No decision is required to finish this proposal.
 
@@ -92,7 +92,7 @@ The cheap part is drawing rows. The expensive parts are knowing what an agent is
 
 **Assessment date: 2026.10.16.Fri.** This is a design proposal, not an implemented feature or a runtime-tested compatibility claim. Source-level implementation evidence belongs in the internal companion, `LangleyImplementation.md`, under the team repository's docs directory; private code excerpts and internal repository links are deliberately excluded here.
 
-Treat the installed plugin, a developer's local branch, upstream main, and in-flight UI replacements as different baselines. Before implementation, select the target release and UI toolkit with the maintainers. A speculative toolkit migration is not a reason to build two production renderers from scratch: keep the list model toolkit-neutral and implement against the accepted release path.
+Treat the installed plugin, a developer's local branch, upstream main, and in-flight UI replacements as different baselines. Before implementation, select the target release and UI toolkit with the maintainers. Source inspection also identifies an active upstream alternative that replaces the classic chat UI; preserving the existing history presentation must not mean retaining an entire obsolete toolkit. A speculative toolkit migration is not a reason to build two production renderers from scratch: keep the list model toolkit-neutral and implement against the accepted release path.
 
 Distinguish these concepts throughout the design:
 
@@ -169,7 +169,7 @@ Register a separate Conversations tool window while retaining the existing Wibey
 
 ### JetBrains-first implementation
 
-Introduce small, proposed components rather than adding table logic to a large chat coordinator:
+For the prototype, add only a dense renderer and a thin adapter to existing history state/actions. Reuse any existing merged history model and reactive status stream. Extract the following proposed responsibilities only as the implementation earns them; they are not a prerequisite framework to build before showing a row:
 
 - **ConversationListRepository:** reads existing summaries, lazily loads preview data, and merges local live sessions with persisted rows. Existing transcript/storage readers remain authoritative.
 - **ConversationRow:** immutable identity, title, timestamps with provenance, status/reason, preview references, workspace context, optional spend, and optional file summary. Missing is distinct from zero.
@@ -256,7 +256,7 @@ Show common context once in the scope line; reveal differing/unknown values per 
 
 ### Search, filtering, sorting, and grouping — small to medium
 
-Start with title/summary search and filters for attention, running, project, and pinned state; label search scope. Full transcript search needs background indexing, privacy controls, cancellation, and bounded result loading. Sort by created/activity/spend only when their data is known; put unknowns consistently last. Preserve pinned ordering and expanded children with their parent. Grouping must not turn previews into independently sorted rows.
+The prototype can retain existing search and ordering without introducing new controls. Later, add title/summary search and filters for attention, running, project, and pinned state; label search scope. Full transcript search needs background indexing, privacy controls, cancellation, and bounded result loading. Sort by created/activity/spend only when their data is known; put unknowns consistently last. Preserve pinned ordering and expanded children with their parent. Grouping must not turn previews into independently sorted rows.
 
 ### Pin, favorite, archive, open, fork, delete — mixed
 
