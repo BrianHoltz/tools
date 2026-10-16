@@ -40,7 +40,8 @@
 
 ### Conversation table mockups
 
-**One conversation, one tight row.** No cards, timestamp sentences, or repeated badges. Titles come from the supplied screenshot; their completed endings and all other values below are illustrative mock data, not observed telemetry or Air capabilities.
+- One conversation per row; no cards or repeated badges.
+- Screenshot-derived titles; completed endings and metrics are illustrative, not telemetry or Air capabilities.
 
 #### Default: dense list
 
@@ -53,23 +54,24 @@
 | ✅ | Wysiwyg editor: what doe… | ✦2d | ◴1d | $1.26 | Δ0 | elite |
 | ☠️ | code-puppy extension not… | ✦2d | ◴2d | $.63 | Δ3 | elite |
 
-No visible column labels. Accessible column names and hover/focus labels explain the compact tokens. Status follows [Status Vocabulary](../.wibey/docs/StatusVocabulary.md#status-definitions). An unread dot sits beside the title; a tiny pencil marks an unsent draft. These are independent of lifecycle state. Render all status symbols in a fixed-width icon slot; platform emoji width must not shift the metrics.
-
-Titles contain at most **25 displayed characters, including the single Unicode ellipsis `…`** when truncated: retain the first 24 grapheme clusters, then append `…`. Never split a composed character or emoji. Full titles appear on hover and keyboard focus, and remain the accessible names.
-
-**✦** = born: age since conversation creation. **◴** = idle: time since the last agent/user activity, not a paused execution state. These are metric prefixes, not lifecycle statuses. Use one rounded-down unit, with minutes as the minimum resolution: ages below one minute display `0m`, never seconds (`◴0m`, `◴8m`, `✦3h`, `✦2d`); exact timestamps live on hover/focus. Spend retains its currency symbol but omits a leading zero below one dollar (`$.18`, `$1.26`, `$0`); unknown spend is `$?`, not zero. **Δ3** = three uncommitted files; **Δ0** = none. An optional breakdown **Δ2+3-1** means two modified, three added, and one deleted file; these categories are disjoint, not line counts. Exact paths and counts live in the expanded view. `elite` is the display alias for `auto-elite`.
-
-Repository `relationship-shared`, branch `main`, harness Code Puppy, IDE IDEA, and permission mode YOLO live in a quiet scope line above the table—not four copies in every row. Mixed values become optional columns; shared values stay in the scope line.
+- Headers hidden; accessible column names and hover/focus labels retained.
+- Titles: ≤25 grapheme clusters; truncate to 24 + `…`. Full title on hover/focus and in accessible names.
+- ✦: age since creation. ◴: age since last agent/user activity, not execution state.
+- Ages: round down to one unit; minimum `0m`, never seconds. Exact timestamps on hover/focus.
+- Spend: `$.18`, `$1.26`, `$0`; unknown `$?`.
+- Files: `Δ3` total; `Δ0` none; `Δ2+3-1` = modified/added/deleted, disjoint counts—not lines.
+- Model: `elite` aliases `auto-elite`.
+- Shared repo/branch/harness/IDE/permissions: scope line; mixed values: optional columns.
 
 #### Status glyphs
 
-Use [Status Vocabulary](../.wibey/docs/StatusVocabulary.md#status-definitions) as the single source of truth for status glyphs, names, and meanings.
-
-Use accessible status names and shape as well as color. Creation and idle glyphs stay in their metric columns, never in the status slot. Unread and draft indicators remain independent.
+- [Status Vocabulary](../.wibey/docs/StatusVocabulary.md#status-definitions): canonical glyphs, names, meanings.
+- Fixed-width status slot; accessible names and shapes, not color alone.
+- ✦/◴: metrics only. Unread dot and draft pencil: independent indicators beside title.
 
 #### Expanded: one extra line, not a detail form
 
-Select **phantom-agent**, then expand with **→** or its disclosure control:
+- → or disclosure: expand selected conversation.
 
 | | | | | | | |
 | :---: | :--- | ---: | ---: | ---: | ---: | :--- |
@@ -77,17 +79,19 @@ Select **phantom-agent**, then expand with **→** or its disclosure control:
 
 　↳ anchor `phantom-agent` → current `phantom-doctor`　 **+38 −6 lines**　[More ▾]
 
-**More** adds the latest exchange inline, clipped to one line per message:
+- More: latest exchange, one clipped line per message.
 
 > **You · 3m**　Add a minimal off-VPN install job; preserve proxy settings.
 >
 > **Agent · 0m**　Restore trap added. Checking the failure path…
 
-Files open on click; the change summary opens the diff. Keep the rest of the list visible. Expansion does not resume execution.
+- Click file: open. Click changes: diff.
+- Expansion preserves list visibility; never resumes execution.
 
 #### Sidebar: keep the signal, drop the columns
 
-At narrow widths, retain status, the same 25-character title limit, and one right-aligned activity token. Available width may truncate titles further. No miniature spreadsheet and no three-line cards.
+- Status + title + right-aligned ◴ age.
+- Titles ≤25 characters; truncate further to fit.
 
 | | | |
 | :---: | :--- | ---: |
@@ -98,11 +102,14 @@ At narrow widths, retain status, the same 25-character title limit, and one righ
 
 #### Visual and interaction contract
 
-- **Density:** 24px desktop rows, 12px text, 14px glyph column, and 4px inter-column gaps; tabular numerals and right-aligned metrics. Title is capped at 25 characters and absorbs remaining width up to that limit. Metrics size to their content; no visible header row, vertical gridlines, pill badges, or per-row action chrome. Blank header cells above are a Markdown rendering accommodation, not UI labels.
-- **Hierarchy:** title high contrast; metrics quieter but still accessible. Very faint horizontal separators, a subtle selected-row tint and focus edge. Amber action/question glyphs, green running triangle, muted completion check, red fatal-error skull; shape and accessible names carry meaning without color.
-- **Triage:** default activity age ascending (`◴ ↑`); an Attention filter isolates approvals, questions, and failures. A named Sort control selects the metric and direction without requiring visible column headers. Hover/focus reveals resume, archive, and overflow actions without shifting columns.
-- **Keyboard:** ↑/↓ select, → expands, ← collapses, Enter opens the conversation, / focuses search, Esc clears it. Provide named buttons, announced sort/expansion state, and visible focus. Full truncated titles appear on hover and keyboard focus.
-- **Touch:** use 44px rows and visible overflow controls for coarse pointers. Compact must not mean impossible to hit.
+- Density: 24px rows, 12px text, 14px status slot, 4px gaps; content-sized, right-aligned tabular metrics.
+- Chrome: no visible headers, vertical gridlines, pills, or persistent row actions. Blank mockup headers: Markdown syntax only.
+- Hierarchy: high-contrast titles, quieter accessible metrics, faint separators, selected tint, visible focus edge.
+- Sort: default `◴ ↑`; named control selects metric/direction. Attention filter: approvals, questions, failures.
+- Actions: resume/archive/overflow on hover/focus; no column shift.
+- Keys: ↑/↓ select; →/← expand/collapse; Enter open; / search; Esc clear.
+- Accessibility: named controls; announced sort/expansion state.
+- Touch: 44px rows; visible overflow controls.
 
 ## Categorization Framework
 
