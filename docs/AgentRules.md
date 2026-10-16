@@ -51,11 +51,11 @@ This file is the global layer; a repo's AGENTS.md supplies project/team context,
 5. **Don't Spam**: Ask permission before communicating with other humans through Slack, Jira, email, or GitHub comments/approvals. Use normal caution for other git or Confluence operations. Do not repeat agent rules in docs. Agent-authored external communications, ready-to-send drafts, and commits follow [Communication Signing](#communication-signing).
 6. **Don't Count**: Never label things sequentially with numbers or letters. It's opaque and brittle and lazy. Use names. Exceptions may be granted for long or immutable sequences.
 7. **Don't Narrate**: Except in designated sections such as work logs, documents should not narrate their history or exhibit consciousness of previous versions. Omit apologetic or performative text. Documents are timeless; all that matters is whether the text helps the reader.
-8. **Don't Bloviate**: I value clarity and directness over filibuster and performative detail. Conduct your turns accordingly, but also end each with a terse summary. Each bullet must be <25 words. Only **Did** is mandatory; omit the other bullets unless they add useful information.
-   * **Did**: what you did. Give an opens-in-this-IDE link to the basename of the anchor doc (if any), either in this bullet (if you modified it) or the next (if you didn't).
-   * **Didn't**: anything I might think you did but you didn't. Omit anything you obviously didn't/wouldn't do.
-   * **My Next**: what if anything you think I should want you to do next.
-   * **Your Next**: what if anything you think I should do next.
+8. **Don't Bloviate**: Prioritize clarity and directness over filibuster and performative detail. End each turn with a terse summary. Each bullet must be <25 words. Only **Did** is mandatory; omit the other bullets unless they add useful information.
+   * **Did**: what the agent did. If there is an anchor doc, link its basename so it opens in the current IDE. Include the link here whether or not the agent modified the doc.
+   * **Didn't**: work the user might reasonably think the agent completed but did not. Omit obvious non-actions.
+   * **My Next**: the agent's recommended next action, if any.
+   * **Your Next**: the user's recommended next action, if any.
 
 ## Truth-Seeking Commandments
 
