@@ -2,7 +2,11 @@
 
 ## Context
 
-Agent 2 needs to write to a file. It calls `fhold review register` and discovers Agent 1 already has a review hold — meaning Agent 1's changes are on disk but awaiting user review in the IDE.
+`fhold` coordinates whether a tracked Markdown file is in exclusive human-review mode or user-authorized parallel-write mode. Review mode is an exception for an imminent, intentional human review—not the default for every agent edit—because its exclusive hold blocks all other agents from writing that file.
+
+An agent may register a review hold only when it is highly confident the user intends to inspect and resolve this specific diff promptly, and is likely to do so within 10 minutes. Otherwise use the normal concurrent-write workflow. Register immediately before the first reviewed write; release immediately when the user accepts/rejects the diff. Do not renew or wait beyond 10 minutes. If the diff is still unresolved then, stop and ask the user to resolve it before any further writes to that file. Do not silently release the unresolved hold and continue: a later IDE rejection can revert subsequent edits. This is a behavioral limit; the current CLI's default hold TTL remains 30 minutes and does not enforce the 10-minute review window.
+
+When another agent discovers an existing review hold, it must show the owner and hold details and wait for the user's decision. A hold older than 10 minutes has exceeded the review window; ask the user to resolve it. Never release or take over an unresolved review hold automatically, because a later IDE rejection may revert subsequent writes. A review hold is not permission to make later writes while the user reviews.
 
 ## Menu (as presented to user)
 
@@ -20,11 +24,11 @@ Applies only to git-tracked markdown files.
 
 ### Review Hold (review_hold)
 
-**Meaning:** The agent's changes are on disk but awaiting review. If the user rejects any, the IDE reverts all changes made after those writes. The IDE may or may not detect the conflict on its own, and typically handles it poorly.
+**Meaning:** An exclusive, short-lived checkpoint for an imminent human review. If the user rejects the diff, the IDE may revert all changes made after those writes; the IDE may not detect that conflict reliably. Use only when the user is expected to resolve this exact diff within 10 minutes. Otherwise do not take this hold.
 
 **Tag:** `<path-hash>.review_hold`
 
-**When created:** At the start of all planned writes, via `fhold review register <file>`. Created atomically (O_EXCL). The hold remains active until all writes are complete. On success: exit 0, prints the tag path. On contention (review hold already exists): exit 2, prints the owning agent's session-id and task to stderr.
+**When created:** Only for a user-requested or clearly expected imminent diff review; register immediately before the first write, via `fhold review register <file>`. It is created atomically (O_EXCL). The hold remains active through the reviewable writes and the user's prompt review, for no more than 10 minutes. Release immediately when the user accepts/rejects. If unresolved at 10 minutes, stop and ask the user to resolve it; do not renew it or silently release and continue. On success: exit 0, prints the tag path. On contention (review hold already exists): exit 2, prints the owning agent's session-id and task to stderr.
 
 **Contents:**
 
@@ -37,7 +41,7 @@ pre-write-sha256: <hash of file before any writes>
 post-write-sha256: <hash of file after all writes complete>  ← written after release
 ```
 
-**Released by:** User resolves contention (accept or reject IDE diff) and tells agent; explicit `fhold review release`; TTL 30 min.
+**Released by:** Immediately after the user resolves the diff, using `fhold review release`. Ten minutes is the maximum intended review window, not a reason to auto-release an unresolved diff; after ten minutes stop and ask the user to resolve it. The CLI's configured stale-hold TTL is currently 30 minutes.
 
 **Auto-stale detection:** If `post-write-sha256` is set and current file hash differs → user rejected/modified the diff → hold is stale, auto-release on next check. The `post-write-sha256` is captured after `fhold review release` to mark what the user reviewed.
 
