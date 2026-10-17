@@ -372,10 +372,10 @@ def report_merge_conflicts(repo: Path, label: str):
         print(c(CYAN, f"Inspect Git's message above, resolve the issue in {repo}, then rerun laptop-synchronize."))
 
 
-def check_push_portability(repo: Path, cfg, label: str):
+def check_push_portability(repo: Path, cfg, label: str, upstream="HEAD@{upstream}"):
     exempt = set(cfg["portability_push_exempt"]) if repo == TOOLS else set()
     compiled = compile_patterns(cfg["internal_patterns"])
-    diff_r = run_git(repo, "diff", "-U0", "HEAD@{upstream}..HEAD")
+    diff_r = run_git(repo, "diff", "-U0", f"{upstream}..HEAD")
     if diff_r.returncode != 0:
         print(c(RED, f"Cannot inspect outgoing changes for {label}."))
         return False
@@ -403,7 +403,7 @@ def check_push_portability(repo: Path, cfg, label: str):
     return True
 
 
-def sync_repository(repo: Path, label: str, cfg):
+def sync_repository(repo: Path, label: str, cfg, *, remote=None, branch=None, public=True):
     if not repo.is_dir() or not (repo / ".git").exists():
         print(c(RED + BOLD, f"Required toolchain repository is missing or not a Git checkout: {repo}"))
         return False
@@ -437,16 +437,19 @@ def sync_repository(repo: Path, label: str, cfg):
             print(c(RED + BOLD, f"Could not commit local changes in {label}."))
             return False
 
-    remote, branch = detect_upstream(repo)
+    detected_remote, detected_branch = detect_upstream(repo)
+    remote = remote or detected_remote
+    branch = branch or detected_branch
+    upstream = f"{remote}/{branch}"
     print(c(CYAN, f"Pulling {label} from {remote}/{branch} (merge)…"))
     pull = run_git(repo, "pull", "--no-rebase", "--no-edit", remote, branch, capture=False)
     if pull.returncode != 0:
         report_merge_conflicts(repo, label)
         return False
 
-    if not check_push_portability(repo, cfg, label):
+    if public and not check_push_portability(repo, cfg, label, upstream):
         return False
-    ahead_r = run_git(repo, "rev-list", "--count", "HEAD@{upstream}..HEAD")
+    ahead_r = run_git(repo, "rev-list", "--count", f"{upstream}..HEAD")
     if ahead_r.returncode != 0:
         print(c(RED, f"Cannot determine outgoing commits for {label}."))
         return False
@@ -456,7 +459,7 @@ def sync_repository(repo: Path, label: str, cfg):
         return True
 
     print(c(CYAN, f"Pushing {label} to {remote}/{branch}…"))
-    push = run_git(repo, "push", remote, branch, capture=False)
+    push = run_git(repo, "push", remote, f"HEAD:refs/heads/{branch}", capture=False)
     if push.returncode != 0:
         print(c(RED + BOLD, f"Push failed for {label}."))
         return False
@@ -465,17 +468,21 @@ def sync_repository(repo: Path, label: str, cfg):
 
 
 def sync_toolchain(cfg):
-    repos = [(TOOLS, TOOLS_REPO_LABEL)]
+    repos = [(TOOLS, TOOLS_REPO_LABEL, {})]
     for item in cfg.get("toolchain_repos", []):
         repo = Path.home() / item["path"]
-        repos.append((repo, item.get("label", item["path"])))
+        repos.append((repo, item.get("label", "~/" + item["path"]), item))
     seen = set()
-    for repo, label in repos:
+    for repo, label, item in repos:
+        if item.get("optional") and not repo.exists():
+            print(c(YELLOW, f"[skip] Optional toolchain repository not installed: {label}"))
+            continue
         resolved = repo.resolve()
         if resolved in seen:
             continue
         seen.add(resolved)
-        if not sync_repository(repo, label, cfg):
+        options = {key: item[key] for key in ("remote", "branch", "public") if key in item}
+        if not sync_repository(repo, label, cfg, **options):
             return False
     return True
 

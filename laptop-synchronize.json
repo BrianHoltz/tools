@@ -24,8 +24,11 @@
     ".wibey/commands/say.md"
   ],
   "toolchain_repos": [
+    { "path": "src/code-puppy-ide", "optional": true, "public": false },
     { "path": "src/idea-markdown-editor", "label": "~/src/idea-markdown-editor" },
-    { "path": "src/vscode-markdown-editor", "label": "~/src/vscode-markdown-editor" }
+    { "path": "src/vscode-markdown-editor", "label": "~/src/vscode-markdown-editor" },
+    { "path": "src/wibey-jetbrains-plugin", "optional": true, "public": false, "remote": "fork", "branch": "brian/local-combined" },
+    { "path": "src/wibey-vscode-extension", "optional": true, "public": false }
   ],
   "managed_exact": [
     "laptop-synchronize",
