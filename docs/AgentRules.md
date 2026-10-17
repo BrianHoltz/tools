@@ -294,6 +294,10 @@ For any question about family members, genealogy, life events, relationships, DN
 
 ## Rules For Work Laptop
 
+### Project Content and VCS Roots
+
+The `relationship-shared` IDE project contains only that repository and explicitly attached AI/IDE toolchain repositories. Follow [GitScheme.md § Work project roots](GitScheme.md#work-project-roots) for the allowlist and validation procedure. Never attach `~/src`, map every sibling repository, accept bulk detected-root suggestions, or apply the personal workspace layout to this work project. Reading a sibling repository does not authorize adding it as a content or VCS root. Preserve other projects and every repository's staged/unstaged changes when repairing mappings.
+
 ### Coding Workflow
 
 Use `/tdd` for the full TDD workflow: pull main, branch, failing tests, implement, run tests, full suite, coverage (100% new flows/conditions). In agent-toolkit repos (`shared/` symlink), see `shared/docs/WibeyAgentRef.md` § Coding Workflow (TDD). Run postman/newman if available.

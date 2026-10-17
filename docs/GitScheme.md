@@ -4,13 +4,14 @@
 
 - **Authoritative location:** `~/src/tools/docs/GitScheme.md` in the public `tools` repo is the cross-laptop reference for personal repo and workspace layout.
 - **Current structure:** Private monorepo at `~` tracking personal Documents and My Drive; all project repositories under `~/src` are standalone GitHub repos outside the monorepo's tracked scope
-- **Workspace file**: `~/Personal.code-workspace` (local, not tracked)
+- **Personal workspace file**: `~/Personal.code-workspace` (local, not tracked)
 - **Status**: ✅ Northstar achieved — migration complete as of 2026-07-16
 
 **Quick links:**
 
 - [Requirements](#requirements) — why we're doing this
-- [Workspace Architecture](#workspace-architecture--north-star) — the end state (current)
+- [Workspace Architecture](#workspace-architecture--north-star) — personal workspace layout
+- [Work project roots](#work-project-roots) — bounded relationship-shared project
 - [Repo Census](#repo-census) — current state of each repo
 - [Operating Rules](#operating-rules) — how to maintain it
 
@@ -23,6 +24,8 @@
 - **Work laptop:** Do not mirror Google Drive. Read-only access acceptable; all real edits on personal laptop.
 
 ## Workspace Architecture (North Star)
+
+This section describes the **personal** workspace only. Its `~/src` module is not a template for the [work project](#work-project-roots). Repository independence does not imply that every repository belongs in every IDE project.
 
 ### North Star: 1 monorepo at `$HOME`, 3 content roots, lpscc standalone
 
@@ -134,6 +137,8 @@ Current state: the home monorepo tracks personal content; sibling project reposi
 
 ### IDE Setup
 
+These settings apply only to the personal workspace, not the relationship-shared work project.
+
 IDE project at `~/IdeaProjects/Personal/`:
 
 **Content roots:**
@@ -187,6 +192,26 @@ A module that owns a parent directory must not exclude a path that is another mo
 - `.github/` at `~/IdeaProjects/Personal/` are adapters only
 - Canonical agent machinery belongs in `BrianHoltz/tools` repo
 - Attach the real repo path `~/src/tools` as the IDEA content root and VCS root; do not rely on the `~/bin` symlink for IDE root configuration.
+
+## Work project roots
+
+The work-laptop IDE project at `~/src/relationship-shared` is a bounded team-docs and AI/IDE-toolchain workspace, not an inventory of everything under `~/src`.
+
+**Allowed repositories**, attached individually at their real paths when present:
+
+- `~/src/relationship-shared`
+- `~/src/tools`
+- `~/src/code-puppy-ide`
+- `~/src/idea-markdown-editor`
+- `~/src/vscode-markdown-editor`
+- `~/src/wibey-jetbrains-plugin`
+- `~/src/wibey-vscode-extension`
+
+Give each attached repository its own bounded content root/module and explicit Git VCS mapping. Use `$PROJECT_DIR$` for relationship-shared and `$PROJECT_DIR$/../<repo>` for these siblings; never use a blank catch-all VCS mapping. This project allowlist is independent of [Laptop Synchronize's manifest](../laptop-synchronize.json), which controls synchronization rather than IDE membership.
+
+**Never broaden this project to `~/src`**, `$HOME`, or every detected sibling Git root. Do not accept bulk “Add roots” suggestions. Catalog services, pipelines, infrastructure repositories, application repos that merely use AI, and unrelated checkouts stay outside this project. Reading a sibling file or opening it in an editor does not authorize attaching its repository. Add another toolchain repo only when Brian explicitly requests its inclusion. Do not change the personal workspace to repair this work project.
+
+**Validate both kinds of roots:** inspect `.idea/modules.xml`, every loaded module's `<content url>`, and `.idea/vcs.xml`; module names alone do not prove their paths are bounded. Resolve macros and symlinks and verify the content-root and VCS-root sets equal the selected allowlist, with no parent `~/src` root or unrelated repositories. Back up settings before editing, preserve existing file inodes, and leave repository contents, indexes, branches and other IDE projects untouched. Verify the live IDE repository list and Commit pane after settings reload; an on-disk edit alone is not proof that the running IDE adopted it.
 
 ## Operating Rules
 
