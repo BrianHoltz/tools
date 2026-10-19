@@ -270,6 +270,8 @@ For any question about family members, genealogy, life events, relationships, DN
 
 ## Rules For Work Laptop
 
+For repo-file links, link the filename to open in the current IDE, followed by `([GHE](enterprise-file-url))`.
+
 ### Project Content and VCS Roots
 
 The `relationship-shared` IDE project contains only that repository and explicitly attached AI/IDE toolchain repositories. Follow [GitScheme.md § Work project roots](GitScheme.md#work-project-roots) for the allowlist and validation procedure. Never attach `~/src`, map every sibling repository, accept bulk detected-root suggestions, or apply the personal workspace layout to this work project. Reading a sibling repository does not authorize adding it as a content or VCS root. Preserve other projects and every repository's staged/unstaged changes when repairing mappings.
