@@ -226,13 +226,15 @@ TypeDown WYSIWYG markdown editor (tarikkavaz.typedown-markdown-editor) has no se
 
 ### Shuzijun source build
 
-The editable IDEA source checkout is `~/src/idea-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz fork](https://github.com/BrianHoltz/markdown-editor) of the [Apache-licensed upstream plugin](https://github.com/shuzijun/markdown-editor). Keep `origin` pointed at the fork and `upstream` at Shuzijun; the fork makes these local improvements available to other machines without pushing personal changes to the upstream maintainer. Maintained source version `2.0.7-local.11` retains plugin ID `com.shuzijun.markdown-editor` and builds against the installed IDEA 2026.2.3 runtime instead of downloading another IntelliJ distribution.
+The editable IDEA source checkout is `~/src/idea-markdown-editor`, branch `brian/markdown-ux`, in the [BrianHoltz fork](https://github.com/BrianHoltz/markdown-editor) of the [Apache-licensed upstream plugin](https://github.com/shuzijun/markdown-editor). Keep `origin` pointed at the fork and `upstream` at Shuzijun; the fork makes these local improvements available to other machines without pushing personal changes to the upstream maintainer. Maintained source version `2.0.7-local.14` retains plugin ID `com.shuzijun.markdown-editor` and builds against the installed IDEA 2026.2.3 runtime instead of downloading another IntelliJ distribution.
 
 The VS Code improvements map to IDEA as follows:
 
 - Shuzijun already has JCEF browser find through `CefBrowser.find()`, IntelliJ Structure View through `getStructureViewBuilder()`, Vditor outline, one `FileEditor` instance per Markdown file, and locally bundled Vditor translations. The VS Code search overlay, Explorer TreeView, multipanel registry, and locale bundler are unnecessary.
 - `src/main/resources/template/default.html` and `vditor/style.css` supply a single-row adaptive toolbar with a keyboard-accessible `»` overflow tray, viewport-clamped tooltips for narrow panes, a persistent upper-right distraction-free toggle, and a raw-HTML visibility toggle. The visibility toggle lives inside the Vditor root so it inherits light/dark icon colors, with full opacity in both modes. The leftmost floppy-disk button force-saves on click regardless of whether the buffer changed; its icon is dim when saved, full opacity when unsaved or saving, and red when saving fails. A reload button immediately to its right re-fetches the file from disk and shares the save button's responsive-toolbar priority so the pair stays visible together; on a dirty buffer the first click arms a three-second confirmation window (shown via `vditor.tip`, not a native JS dialog — JBCefBrowser here has no `CefJSDialogHandler`, so `window.confirm()` would be suppressed and silently no-op) and the second click within that window discards the buffer and reloads. Hidden-toolbar mode also removes rich-editor margin annotations and hides raw HTML markup without changing the Markdown source.
 - Plain clicks use Vditor's link handling; Option-click positions the caret for editing. Same-document fragments resolve duplicate and Unicode heading slugs plus named HTML anchors, including anchors whose raw markup is hidden. Relative Markdown links with fragments open the target IDEA editor and queue navigation until its JCEF page finishes loading.
+- Search keeps native `CefBrowser.find()` highlighting/navigation and adds a live count of literal, case-insensitive, non-overlapping matches in visible editor text. `vditor/search-count.js` excludes hidden editor modes; a disposable JS-to-Swing bridge discards results for obsolete queries. Changing the query starts a new native find session. Opening search selects its query after pending IDE focus transfers settle and makes the field the preferred focus target while the toolbar is visible.
+- File editors use off-screen JCEF rendering; non-file panels retain windowed rendering. On macOS, a windowed JCEF native view can keep receiving typed characters at the Markdown insertion point even while Swing reports the search field focused and paints its caret and blue border. Releasing native focus and waiting for Swing focus alone is insufficient. OSR gives browser content and the Swing search field one keyboard-input path; do not restore unconditional windowed rendering or treat a focus-owner assertion as proof of correct text routing.
 - `MarkdownHtmlPanel` persists the two appearance preferences in IntelliJ `PropertiesComponent`, so they apply across Markdown files and IDE restarts.
 - IDE appearance synchronization is source-integrated: theme changes wait for Vditor initialization, replace or create the generated stylesheet safely, and reapply Vditor's light or dark content theme.
 - `META-INF/plugin.xml` declares `com.intellij.modules.jcef` as a required dependency, replacing the installed-JAR compatibility patch.
@@ -243,20 +245,21 @@ The VS Code improvements map to IDEA as follows:
 
 The target shared Markdown Preview font-size preference is 14px; change it through Settings while IDEA is running. Typography comes from the bundled preview stylesheet; custom preview CSS is independent of the editor.
 
-`node --test test/asset-compatibility.test.cjs` checks Lute's Vditor initialization API, cache-isolated template references, typography/table CSS invariants, and theme-variable overrides. A jsdom smoke test verifies startup and computed typography and cell-wrapping styles for synthetic nine-column tables in IR and WYSIWYG modes. It does not measure browser layout geometry or establish interactive feature parity in installed JCEF.
+`node --test test/*.test.cjs` runs 13 tests covering Lute initialization, cache-isolated assets, typography/table CSS, theme overrides, literal match counts, stale-result rejection, focus handoff/cancellation, and OSR selection. The focus harness executes production Java methods with deterministic queues; it does not emulate macOS native text routing. A live scratch-editor test verified typed characters entered search without changing the Markdown document or disk file; Brian confirmed the installed ⌘F fix on 2026.10.18.Sun. A jsdom smoke test verifies startup and computed typography and cell-wrapping styles for synthetic nine-column tables in IR and WYSIWYG modes. It does not measure browser layout geometry or establish interactive feature parity in installed JCEF.
 
 Build and preserve the installable ZIP:
 
 ```sh
 cd ~/src/idea-markdown-editor
-export JAVA_HOME="$HOME/Applications/IntelliJ IDEA 2026.2.3.app/Contents/jbr/Contents/Home"
-./gradlew --no-daemon \
-  -PlocalIdePath="$HOME/Applications/IntelliJ IDEA 2026.2.3.app" \
-  clean buildPlugin
+export JAVA_HOME="/Applications/IntelliJ IDEA.app/Contents/jbr/Contents/Home"
+node --test test/*.test.cjs &&
+./gradlew --no-daemon -Dorg.gradle.java.home="$JAVA_HOME" \
+  -PlocalIdePath="/Applications/IntelliJ IDEA.app" \
+  clean test buildPlugin
 STAMP=$(date "+%Y%m%d.%a.%H%M")
-OUT="$HOME/Downloads/markdown-editor-2.0.7-local.11-$STAMP-zoom.zip"
-cp -p build/distributions/markdown-editor-2.0.7-local.11.zip "$OUT"
-cmp build/distributions/markdown-editor-2.0.7-local.11.zip "$OUT"
+OUT="$HOME/Downloads/markdown-editor-2.0.7-local.14-$STAMP-search.zip"
+cp -p build/distributions/markdown-editor-2.0.7-local.14.zip "$OUT"
+cmp build/distributions/markdown-editor-2.0.7-local.14.zip "$OUT"
 ```
 
 Install the Downloads copy with **Settings → Plugins → gear → Install Plugin from Disk**, then restart IDEA. The source build replaces the Marketplace plugin because it retains the same plugin ID.
