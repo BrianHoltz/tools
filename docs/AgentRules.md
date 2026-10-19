@@ -34,7 +34,8 @@ This file is the global layer; a repo's AGENTS.md supplies project/team context,
   - [PR Diff Source of Truth](#pr-diff-source-of-truth)
   - [Git Merge Strategy](#git-merge-strategy)
   - [Team Tool Discovery](#team-tool-discovery)
-  - [Agent-Phantom Pattern: Off-VPN Work Registry](#agent-phantom-pattern-off-vpn-work-registry)
+  - [Phantom-Agent Pattern: Off-VPN Work Registry](#phantom-agent-pattern-off-vpn-work-registry)
+  - [Phantom-Doctor: Off-VPN Network Diagnostics](#phantom-doctor-off-vpn-network-diagnostics)
 - [Portable Agent Tooling](#portable-agent-tooling)
   - [Codex Integration](#codex-integration)
   - [Custom Commands](#custom-commands)
@@ -71,63 +72,34 @@ This file is the global layer; a repo's AGENTS.md supplies project/team context,
 
 ## Tools Repository
 
-The canonical repository is `~/src/tools/`, the local checkout of the public [tools repo](https://github.com/BrianHoltz/tools). [AgentRules.md](AgentRules.md) lives at `~/src/tools/docs/AgentRules.md`. `~/bin/` is just a legacy symlink to `~/src/tools/`, retained for compatibility with existing paths and PATH settings. Use the canonical path for edits, commits, new configuration, scripts, and adapter targets. Git synchronizes the repository across laptops.
+The canonical repository is `~/src/tools/`, the public [tools repo](https://github.com/BrianHoltz/tools), synchronized across laptops by Git. [AgentRules.md](AgentRules.md) lives at `~/src/tools/docs/AgentRules.md`. `~/bin/` is a legacy compatibility symlink, not the repository name. Use the canonical path for edits, commits, configuration, scripts, and adapter targets; call the repo `~/src/tools/` in conversation and commits. Relay tool output containing the legacy path verbatim, but describe the repo canonically.
 
-Name this repository `~/src/tools/` in conversation, status reports, and commit messages — never `~/bin/`. Referring to it by the legacy symlink reads as confusion about which path is canonical, even when the underlying file is the same. If a tool's own output names the `~/bin/` path (e.g. a command's `-h` text or an error message), relay that verbatim but describe the repo itself as `~/src/tools/`.
+Agent adapters link to `~/src/tools/docs/AgentRules.md`; installation depends on host and agent:
 
-Agent adapter installation targets link to `~/src/tools/docs/AgentRules.md`; installed adapters depend on the host and agent:
-
-- `~/.codex/AGENTS.md` — Codex global instructions; see [Codex Integration](#codex-integration) for profiles, overrides, and setup.
+- `~/.codex/AGENTS.md` — [Codex global instructions](#codex-integration).
 - `~/.claude/CLAUDE.md` — Claude Code CLI and Wibey at Walmart.
 - `~/.cursor/cursorrules` — Cursor.
-- `~/.code_puppy/AGENTS.md` — Code Puppy's global layer. Code Puppy also loads `<CWD>/.code_puppy/AGENTS.md` and repo-root `./AGENTS.md`. When this adapter is installed, AgentRules loads each session; do not ask the user where the Commandments live.
-- `<repo>/.github/copilot-instructions.md` — GitHub Copilot in VS Code. Copilot reads the open repo's adapter, not `~/.claude/CLAUDE.md`.
+- `~/.code_puppy/AGENTS.md` — Code Puppy global instructions; it also loads `<CWD>/.code_puppy/AGENTS.md` and repo-root `./AGENTS.md`. With the global adapter installed, do not ask where the Commandments live.
+- `<repo>/.github/copilot-instructions.md` — GitHub Copilot in VS Code reads this repo adapter, not `~/.claude/CLAUDE.md`.
 
-Home-directory agent folders such as `~/.codex/` and `~/.agents/skills/`, and workspace-local `.agents/` and `.github/` trees are adapters, not canonical sources. Personal agent machinery belongs in `~/src/tools`; do not treat a workspace-local `.github/skills/` directory as its source of truth.
+Home agent folders (`~/.codex/`, `~/.agents/skills/`) and workspace `.agents/` and `.github/` trees are adapters, not canonical sources. Personal agent machinery belongs in `~/src/tools/`, not workspace-local `.github/skills/`.
 
-Shell configuration adapters in `~/` resolve to these canonical files:
+Home shell adapters map to `~/src/tools/shellrc/`: `.shellrc.common` → `shellrc.common` (shared zsh/bash PATH/env), `.zprofile` → `zprofile` (zsh login), `.zshrc` → `zshrc` (zsh interactive), `.bash_profile` → `bash_profile` (bash login/interactive), `.bashrc` → `bashrc` (bash interactive).
 
-- `~/.shellrc.common` → `~/src/tools/shellrc/shellrc.common` — shared PATH/env for zsh + bash
-- `~/.zprofile` → `~/src/tools/shellrc/zprofile` — zsh login shell config
-- `~/.zshrc` → `~/src/tools/shellrc/zshrc` — zsh interactive shell config
-- `~/.bash_profile` → `~/src/tools/shellrc/bash_profile` — bash login/interactive shell config
-- `~/.bashrc` → `~/src/tools/shellrc/bashrc` — bash interactive shell config
+Prefer the home aliases `~/gdrive` → `~/My Drive` and `~/lpscc` → Google Drive CloudStorage `Shared drives/LP SCC Financial` in tool/IDE config. Attach `~/lpscc` itself as a workspace root, never `~/My Drive/Libertarian/LPSCC` directly.
 
-Canonical personal path aliases in `~/`:
-
-- `~/gdrive` → `~/My Drive` — preferred short path for My Drive
-- `~/lpscc` → the Google Drive CloudStorage `Shared drives/LP SCC Financial` directory — preferred short path for LP SCC Financial
-
-Use these aliases in local tool/IDE config when possible to avoid space-heavy paths and keep paths consistent across settings. For workspace roots, attach `~/lpscc` itself; do **not** attach `~/My Drive/Libertarian/LPSCC` directly.
-
-The `~/src/tools/` repo also contains personal tool settings and reference docs (not symlinked):
-
-- [Tools.md](Tools.md) — IDE/editor comparison matrix, extension patches, keybinding customizations, and tool-specific configuration notes
-
-To update the above files, edit the canonical files under `~/src/tools/` and commit in the `~/src/tools/` repo.
+[Tools.md](Tools.md) contains IDE/editor comparisons, extension patches, keybindings, and configuration notes. Edit these rules, shell sources, and reference docs canonically under `~/src/tools/` and commit there.
 
 ### Personal and Team Sources
 
-The repos serve different scopes:
+- **Personal:** `~/src/tools/` is public on GitHub and available on both laptops (`git pull`); it owns personal tools, rules, and cross-platform skills.
+- **Team:** `relationship-shared/` is internal on Walmart GHE and available only on the work laptop; it owns team skills, docs, and commands. Never try accessing it from the personal laptop.
 
+**Work laptop:** resolve team skills from `shared/.wibey/skills/` first (they may be newer than portable copies); personal skills come from `~/src/tools/.wibey/skills/`. The Walmart-internal Wibey VS Code extension is available here; use it when needed.
 
-|                           | `~/src/tools/`                               | `relationship-shared/`       |
-| ------------------------- | -------------------------------------------- | ---------------------------- |
-| Git host                  | GitHub (personal, public)                    | Walmart GHE (team, internal) |
-| Available on              | both laptops                                 | work laptop only             |
-| Contains                  | personal tools, rules, cross-platform skills | team skills, docs, commands  |
-| Access on personal laptop | always (`git pull`)                          | never (no VPN/auth)          |
+**Personal laptop:** resolve maintained skills at `~/src/tools/.wibey/skills/<name>/SKILL.md`; do not look for `shared/` or expect the Wibey extension. Wibey-style workspace adapters use `.wibey/skills/`; Codex uses [its discovery locations](#codex-integration).
 
-**Skills by laptop:**
-
-- **Work laptop**: team skills from `shared/.wibey/skills/` (relationship-shared); personal skills from `~/src/tools/.wibey/skills/`. The Wibey VS Code extension is Walmart-internal and only present on the work laptop, never on the personal laptop.
-- **Personal laptop**: for skills maintained in these repos, use `~/src/tools/.wibey/skills/`. Wibey-style workspace adapters use `.wibey/skills/`; Codex adapters use [its documented discovery locations](#codex-integration). The Wibey extension is not available or expected here.
-
-Team-owned portable skills live canonically in relationship-shared and are copied into `~/src/tools/.wibey/skills/` through the [mirror workflow](#portable-skills-and-mirrors). Personal-only skills live canonically in tools.
-
-**When resolving a skill on personal laptop**: look in `~/src/tools/.wibey/skills/<name>/SKILL.md`. Do not attempt to read `shared/` — the symlink doesn't exist. Do not expect the Wibey extension to be present.
-
-**When resolving a skill on work laptop**: check `shared/.wibey/skills/` first (team version may be newer than `~/src/tools/` copy). The Wibey extension is available and should be used if needed.
+Team-owned portable skills are canonical in relationship-shared and copied into tools through the [mirror workflow](#portable-skills-and-mirrors). Personal-only skills are canonical in tools.
 
 ## Write Rules
 
@@ -261,15 +233,15 @@ Before using the current date for anything, run `date "+%Y-%m-%d %H:%M %Z"`. Run
 
 Use [Extended Date/Time Format](https://www.loc.gov/standards/datetime/) (EDTF) with these modifications; use canonical forms where chronological text sorting is required:
 
-- Use **periods** as date component separators instead of hyphens (e.g. `2026.03.27` not `2026-03-27`). Periods prevent unwanted line breaks in cramped table layouts, are analogous to decimal points, save space in variable-width fonts, and cannot be confused with ranges.
+- Use **periods** as date component separators instead of hyphens (e.g. `2026.03.27` not `2026-03-27`). Periods avoid line breaks and ambiguity with ranges.
 - In human dates, leading year zeroes are optional; a leading `-` is mandatory for BCE. Canonical sortable dates use a fixed four-digit year.
-- **Exception: filenames and directory names use hyphens** (e.g. `2026-03-27`, not `2026.03.27`). The periods rationale above (line-wrap avoidance, range disambiguation) doesn't apply to filenames; hyphens instead avoid a trailing dot ambiguous with a file extension and match the sortable `YYYY-MM-DD` convention already established across `aidocs/`, `memos/`, `releases/`, and `incidents/`. Prose dates inside those same files still use periods.
+- **Exception: filenames and directory names use hyphens** (e.g. `2026-03-27`, not `2026.03.27`). Use sortable `YYYY-MM-DD` names, consistent with `aidocs/`, `memos/`, `releases/`, and `incidents/`. Prose dates inside those same files still use periods.
 - When space allows, append day of week e.g. 2026.07.27.Mon
 - When a time is included, use a compact four-digit 24-hour time, e.g. `2026.09.22.Tue.1149`; add `:ss` for seconds and `.fraction` for subsecond precision (e.g. `1112`, `1112:08`, `1112:08.23`).
 - A timezone suffix is optional when context supplies it. Prefer a human-readable abbreviation such as `PT`, `PST`, or `PDT`; an unambiguous numeric UTC offset such as `-0700` is also allowed when useful.
 - When a date-time is embedded in a version number, retain only the periods separating the date, day of week, and time; do not add punctuation inside the time.
 - When year is not needed (e.g. when obvious from context and not needed as a search target), you may use mm.dd.Dow
-- Use hyphens as range indicators instead of slashes (e.g. `2026.03.01-2026.03.27` not `2026-03-01/2026-03-27`). Slashes read like ratios or alternatives, not ranges.
+- Use hyphens as range indicators instead of slashes (e.g. `2026.03.01-2026.03.27` not `2026-03-01/2026-03-27`).
 - Use `yyyy<` for dates after a year and `yyyy>` for dates before a year, so the date itself remains the sortable prefix (e.g. `1900<`, `1900>`).
 - Represent an unknown month or day with `X` (e.g. `1900.XX` or `1900.XX.XX`).
 - Mark an approximate date by appending `c` after the date specification (e.g. `1900c`, `1900.XXc`, or `1900.05.17c`). Put `c` before a trailing `<` or `>` (e.g. `1900c<` or `1900c>`).
@@ -316,18 +288,11 @@ For every work-laptop PR review, include the Wibey `pr-agent` plugin's `pr-agent
 
 ### PR Diff Source of Truth
 
-When reviewing a PR or describing what a branch/PR changes relative to its base:
-
-- Use `gh pr diff <number>` (or `gh pr view <number> --json files`) as the **sole authoritative source** — this is the merge diff GitHub shows on Files changed.
-- Never use `git diff main..branch` — branches accumulate merge commits and ancestry artifacts that don't reflect the PR diff.
-- Commits show *how* changes were made; the diff defines *what* the PR changes.
-- If `gh pr diff` and `git diff main..branch` disagree, `gh pr diff` is authoritative.
+When reviewing or describing a PR/branch against its base, use `gh pr diff <number>` or `gh pr view <number> --json files` as the sole authoritative change set: GitHub's merge diff. Never substitute `git diff main..branch`; merge ancestry can make it disagree. Commits explain how; the PR diff defines what changed.
 
 ### Git Merge Strategy
 
-Use merge, not rebase. Rebase rewrites SHAs, turning every Jira comment, CI link, Slack message, and agent log that referenced the old SHAs into a broken pointer. The cleaner linear history isn't worth the audit trail damage.
-
-Merge commits are honest: they record that the integration happened at that point in time, on the file states that actually existed.
+Use merge, never rebase. Rebase rewrites SHAs and breaks references in Jira, CI, Slack, and agent logs. Merge commits preserve the integration point and the file states involved.
 
 ### Team Tool Discovery
 
@@ -340,39 +305,15 @@ Read the command/skill file before executing it, exactly as you would for a work
 
 ### Phantom-Agent Pattern: Off-VPN Work Registry
 
-When Zscaler/corporate proxy blocks network-heavy binary downloads (pnpm install, gradle downloads, IDE plugin marketplace installs, etc.), use the **phantom-agent** pattern. Confirmed root cause in one episode: Walmart's SSL-inspection appliance (`SSL_Decryption_Authority_SSLO_*.wal-mart.com`) completes the TLS handshake but then hangs with 0 bytes received on specific binaries — reproducible via `curl` through either configured corporate proxy, so it is a content-inspection block, not a misconfigured proxy or a dead host.
+For Zscaler/corporate-proxy blocks on binary downloads (pnpm, Gradle, IDE plugins, etc.), use **phantom-agent**. An SSL-inspection handshake followed by a hang with zero bytes on specific binaries, reproducible through corporate proxies, indicates content filtering rather than a dead host or proxy misconfiguration.
 
-**The registry:** `~/.wibey/commands/phantom-agent.sh` — bare-minimum off-VPN task registry. Agents add `job:name()` functions here when network constraints block their work.
+The registry is `~/.wibey/commands/phantom-agent.sh`. Add a `job:name()` function containing only the minimum blocked download/install command (e.g. `pnpm install`, not the build); commit its canonical update in `~/src/tools/`. Tell the user to disconnect VPN, run `phantom-agent`, and reconnect; then resume builds on VPN. Keep each job focused, add/remove jobs per episode, and never bundle unrelated work. Use this for package-manager reset/403/timeouts, not general connectivity, authentication, or work without external downloads.
 
-**Workflow:**
-
-1. When blocked by VPN on a package manager install/download, identify the BARE MINIMUM command needed (e.g., `pnpm install`, not the full build).
-2. Add a new `job:` function to `phantom-agent.sh` with that single command.
-3. Commit the registry update to `~/src/tools/`.
-4. Tell the user: disconnect VPN, run `phantom-agent`, reconnect VPN, and the work will continue.
-5. After reconnection, the build/compilation can proceed on VPN.
-
-**Key principle:** phantom-agent grows and shrinks with each episode. Its git history tracks the evolution of what *must* run offline, vs. what merely *can* run offline. Never bundle unrelated work into a job function; each should be a single, focused download or install step.
-
-**Watch for pre-existing dotfiles that hardcode on-VPN endpoints** (e.g. `~/.gradle/gradle.properties` systemProp proxy settings, intentionally configured for builds while on VPN). A job that needs the same tool off-VPN must move such a file aside and restore it unconditionally afterward — never edit or delete it permanently; the on-VPN config is still needed once reconnected. Capture the command's exit status with `|| status=$?` rather than letting it run bare, since the script's `set -e` would otherwise abort before the restore step runs.
-
-**Example job:**
-
-```bash
-job:vscode-markdown-install() {
-    echo "→ VSCode Markdown: pnpm install"
-    cd /Users/b0h0166/src/vscode-markdown-editor
-    pnpm install
-}
-```
-
-Use when: Network calls fail with 403/timeout on package managers. Do not use for: general connectivity issues, authentication, or work that doesn't require external downloads.
+If pre-existing dotfiles hardcode on-VPN endpoints (e.g. `~/.gradle/gradle.properties`), move them aside for the off-VPN job and restore them unconditionally. Never permanently edit/delete them. Capture failure with `|| status=$?` so `set -e` cannot skip restoration.
 
 ### Phantom-Doctor: Off-VPN Network Diagnostics
 
-`~/.wibey/commands/phantom-doctor.sh` is a general-purpose network/proxy diagnostic script the user runs manually while VPN is disconnected (an agent cannot run it then, since agent connectivity itself depends on the host network). It checks connectivity, DNS resolution, proxy env vars, and known-problem hosts, then prints a plain-text report.
-
-Agents extend this script's checks when new network failure modes are diagnosed (e.g. a new host that needs DNS verification), but do not rely on it being run automatically — it is a human-invoked tool for the disconnected state where the agent itself cannot operate.
+`~/.wibey/commands/phantom-doctor.sh` is human-invoked while VPN is disconnected, when agents lack connectivity. It reports connectivity, DNS, proxy variables, and known-problem hosts. Extend checks for newly diagnosed failure modes; never assume it runs automatically.
 
 ## Portable Agent Tooling
 
@@ -404,47 +345,20 @@ Each discovered skill needs SKILL.md frontmatter with `name` and `description`. 
 
 ### Custom Commands
 
-User-level commands source from `~/src/tools/.wibey/commands/`. When triggered, read the source file before executing. On the personal laptop, these source files should also be installed into the real home-directory adapter locations used by local agents (for example `~/.claude/commands/` and, when relevant, `~/.wibey/commands/`), rather than relying on a particular workspace such as `~/IdeaProjects/Personal`.
+User command sources are `~/src/tools/.wibey/commands/*.md`; read the source before executing a named command. On the personal laptop, install adapters in actual agent home locations (e.g. `~/.claude/commands/` and, when relevant, `~/.wibey/commands/`), not only a workspace such as `~/IdeaProjects/Personal`.
 
-In Codex, these Markdown commands are readable workflows; their presence in `.wibey/commands/` does not register native slash commands. When the user invokes one by name, resolve and read its source, then execute through the available tools. Read command definitions in [the source directory](../.wibey/commands/); the [sync manifest](../laptop-synchronize.json) identifies mirrored and personal-only commands.
+Codex treats these Markdown files as readable workflows, not registered slash commands: resolve the source and execute it through available tools. The [source directory](../.wibey/commands/) holds definitions; the [sync manifest](../laptop-synchronize.json) identifies mirrored and personal-only commands.
 
-Install paths:
-
-- Source commands: `~/src/tools/.wibey/commands/*.md`
-- Wibey user commands: `~/.wibey/commands/*.md` — **must be hardlinks, not symlinks** (Wibey's extension filters with `entry.isFile()`, which returns `false` for symlinks, silently dropping them)
-
-To install or reinstall **all** user commands as hardlinks (glob — never drifts as commands are added):
+Wibey adapters at `~/.wibey/commands/*.md` **must be hardlinks, not symlinks**: its `entry.isFile()` discovery silently filters symlinks. Install/reinstall every command with the glob:
 
 ```sh
 mkdir -p ~/.wibey/commands
 for f in ~/src/tools/.wibey/commands/*.md; do ln -f "$f" ~/.wibey/commands/; done
 ```
 
-**Work-laptop session setup:** Verify that every source command has a matching hardlink in `~/.wibey/commands/`. File existence alone does not prove a hardlink; compare device and inode:
+At work-laptop session setup, verify each adapter exists, is not a symlink, and shares device/inode with its source (`os.path.samefile`); existence alone is insufficient. For missing/mismatched adapters, run the install loop and reload the IDE window. Reload after adding/changing commands. Keep source names/paths unchanged; if discovery still fails, verify valid YAML frontmatter with `description`.
 
-```sh
-python3 - <<'PYTHON'
-from pathlib import Path
-import os
-source = Path.home() / 'src/tools/.wibey/commands'
-adapter = Path.home() / '.wibey/commands'
-for command in source.glob('*.md'):
-    target = adapter / command.name
-    if target.is_symlink() or not target.exists() or not os.path.samefile(command, target):
-        print(f'REINSTALL: {command.name}')
-PYTHON
-```
-
-If any command needs reinstalling, run the install loop and reload the IDE window.
-
-Maintenance/debug checklist:
-
-- If a user command is missing: run the install loop above.
-- Verify hardlinks using the device-and-inode check above.
-- After adding or changing files, reload the IDE window.
-- Keep the source files in `~/src/tools/.wibey/commands/`; do not rename or move them.
-- If discovery still fails, check YAML frontmatter: `description` must be present and valid.
-- TODO: design and implement a bridge so Wibey/Claude custom skills and commands are discoverable and usable from GitHub Copilot (not just Wibey/Claude command loaders).
+TODO: implement a bridge for GitHub Copilot discovery of Wibey/Claude commands and skills.
 
 ### Portable Skills and Mirrors
 
@@ -464,4 +378,4 @@ Portability checks scan for configured internal markers; reference-integrity che
 
 TODO: remove work-only signing links and paths from portable skill and command bodies at the team source, then re-mirror them.
 
-*[doc-audit](https://github.com/BrianHoltz/tools/blob/main/.wibey/skills/doc-audit/SKILL.md): 2026.10.13.Tue*
+*[doc-audit](https://github.com/BrianHoltz/tools/blob/main/.wibey/skills/doc-audit/SKILL.md): 2026.10.19.Mon*
