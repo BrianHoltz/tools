@@ -163,6 +163,8 @@ Run `~/src/tools/safewrite -h` for full options. Run `~/src/tools/fhold -h` for 
 
 ### Other file operation rules
 
+- **Agent-managed worktrees:** Brian generally does not use Git worktrees by choice. Agents may use them, but own their setup, synchronization, review handoff, and cleanup; Brian must not have to manage or juggle worktrees or branches. Proposed changes must be visible in the existing conversation IDE project's Commit/Changes window before asking him to review. Opening a file from another worktree is not sufficient. Arrange the review in the existing project without switching windows, disturbing unrelated staged/unstaged changes, or silently committing the proposal to an unrelated branch; verify the changed file is visible there.
+
 - Never `rm` directly on user files — use `trash` or move them into `~/.Trash/`. Exception: files under `/tmp/` and `tmp/` may be deleted with plain `rm` without confirmation.
 - Duplicate/conflicting files: ask which to keep before deleting either
 - No VCS changes unless you're certain the user wants them
