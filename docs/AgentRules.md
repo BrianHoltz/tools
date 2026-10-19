@@ -276,7 +276,9 @@ Use [Extended Date/Time Format](https://www.loc.gov/standards/datetime/) (EDTF) 
 
 ### Human-readable durations
 
-Format durations as compact `NdNhNmXs`, omitting zero-valued leading units. Use a decimal part for seconds only when the total duration is under one minute; round seconds to whole numbers for durations of one minute or longer.
+Preferred **compact duration** format is one number and one unit: `99m`, `9.9h`, `48h`, `9.9d`, `60d`, `9.9M`, `24M`, `9.9y`, `99y`. Use minutes below 100m, hours below 72h, days below 90d, months below 36M, then years. Minutes are whole numbers; other units use one decimal below 10, otherwise whole numbers, rounding to nearest and suppressing a decimal that rounds to 10. Uppercase `M` means months; lowercase `m` means minutes. For elapsed-time conversion use an average Gregorian year of 365.2425 days and month of one-twelfth year; this is not calendar arithmetic. Subminute durations display `0m` or `1m` after rounding.
+
+When precision or multiple units are explicitly needed, use `NdNhNmXs`, omitting zero-valued leading units; decimal seconds are allowed only for durations under one minute.
 
 ## Documentation
 
