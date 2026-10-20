@@ -170,7 +170,6 @@ Run `~/src/tools/safewrite -h` for full options. Run `~/src/tools/fhold -h` for 
 ### Other file operation rules
 
 - **Agent-managed worktrees:** Brian generally does not use Git worktrees by choice. Agents may use them, but own their setup, synchronization, review handoff, and cleanup; Brian must not have to manage or juggle worktrees or branches. Proposed changes must be visible in the existing conversation IDE project's Commit/Changes window before asking him to review. Opening a file from another worktree is not sufficient. Arrange the review in the existing project without switching windows, disturbing unrelated staged/unstaged changes, or silently committing the proposal to an unrelated branch; verify the changed file is visible there.
-
 - Never `rm` directly on user files — use `trash` or move them into `~/.Trash/`. Exception: files under `/tmp/` and `tmp/` may be deleted with plain `rm` without confirmation.
 - Duplicate/conflicting files: ask which to keep before deleting either
 - No VCS changes unless you're certain the user wants them
@@ -256,7 +255,7 @@ Use [Extended Date/Time Format](https://www.loc.gov/standards/datetime/) (EDTF) 
 
 ### Human-readable durations
 
-Preferred **compact duration** format is one number and one unit: `99m`, `9.9h`, `48h`, `9.9d`, `60d`, `9.9M`, `24M`, `9.9y`, `99y`. Use minutes below 100m, hours below 72h, days below 90d, months below 36M, then years. Minutes are whole numbers; other units use one decimal below 10, otherwise whole numbers, rounding to nearest and suppressing a decimal that rounds to 10. Uppercase `M` means months; lowercase `m` means minutes. For elapsed-time conversion use an average Gregorian year of 365.2425 days and month of one-twelfth year; this is not calendar arithmetic. Subminute durations display `0m` or `1m` after rounding.
+Preferred **compact duration** format is one number and one unit: `99m`, `9.9h`, `48h`, `9.9d`, `60d`, `9.9M`, `24M`, `9.9y`, `99y`. Use seconds below 200s, minutes below 100m, hours below 72h, days below 90d, months below 36M, then years. Seconds are whole numbers; other units use one decimal below 10, otherwise whole numbers, rounding to nearest and suppressing a decimal that rounds to 10. Uppercase `M` means months; lowercase `m` means minutes. For elapsed-time conversion use an average Gregorian year of 365.2425 days and month of one-twelfth year; this is not calendar arithmetic. Subminute durations display `0m` or `1m` after rounding.
 
 When precision or multiple units are explicitly needed, use `NdNhNmXs`, omitting zero-valued leading units; decimal seconds are allowed only for durations under one minute.
 
