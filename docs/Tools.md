@@ -2,6 +2,8 @@
 
 ## Local Modifications in Use
 
+- **IDEA memory — 2026.10.20.Tue:** Set the affected project’s JPS build heap from observed 700 MiB to configured 2048 MiB; next-build verification pending. The OOM occurred parsing chat-bloated workspace XML, not IDEA’s 14000 MiB heap. Swap cannot exceed Java’s heap cap; parser copies amplify file size. Three-month chat archival saves essentially nothing; no history or main-IDE heap changes.
+
 - **Code Puppy** — Walmart-internal technology, maintained and built on the Walmart work laptop only; its absence from a personal laptop and its Downloads folder is expected. Source modifications: [ToolMods.md](ToolMods.md#code-puppy-maintained-source-builds). Mods, most important first:
   - **JetBrains 2026.2.3 render fix** — stock Code Puppy renders a blank panel on IDEA 2026.2.3: the webview resource handler implements the raw `CefResourceHandler`, which 2026.2's JCEF extended, so the first request throws `AbstractMethodError`. The local fix extends `CefResourceHandlerAdapter` and keeps `CUSTOM_SCHEME_ENABLED = false` (custom `cpwebview://` navigation never commits on that build). No upstream tag through 0.31.2 has either change, and the flag deliberately reverses upstream's custom-scheme approach, so expect a merge conflict whenever upstream edits `WebviewAssetScheme.kt` or `CpWebviewSchemeSetup.kt`.
   - **Active-context suggestion pill** (JetBrains, VS Code, Cursor) — suggests the active editor's file or selection as attachable context, keeping distinct selection identities. Not in upstream.
