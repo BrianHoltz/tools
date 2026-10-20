@@ -53,7 +53,7 @@ This file is the global layer; a repo's AGENTS.md supplies project/team context,
 6. **Don't Count**: Never label things sequentially with numbers or letters. It's opaque and brittle and lazy. Use names. Exceptions may be granted for long or immutable sequences.
 7. **Don't Narrate**: Except in designated sections such as work logs, documents should not narrate their history or exhibit consciousness of previous versions. Omit apologetic or performative text. Documents are timeless; all that matters is whether the text helps the reader.
 8. **Don't Fade**:  End each turn with a clear terse bulleted summary. Each bullet must be <25 words. Only **Did** is mandatory; omit the other bullets unless they add useful information.
-   * **Did**: what the agent did. Select or open the anchor doc in this conversation’s IDE window; verify it. Never switch windows. If you can't open it, give its path.
+   * **Did**: what the agent did. For generated deliverables, include clickable links to the verified deposited artifacts and required checksums; apply the [artifact completion gate](#artifact-completion-gate) before reporting completion. Select or open the anchor doc in this conversation’s IDE window; verify it. Never switch windows. If you can't open it, give its path.
    * **Didn't**: work the user might reasonably think the agent completed but did not. Omit obvious non-actions.
    * **My Next**: the agent's recommendation for what the agent should do next
    * **Your Next**: the agent's recommendation for what the user should do next
@@ -102,6 +102,12 @@ Prefer the home aliases `~/gdrive` → `~/My Drive` and `~/lpscc` → Google Dri
 Team-owned portable skills are canonical in relationship-shared and copied into tools through the [mirror workflow](#portable-skills-and-mirrors). Personal-only skills are canonical in tools.
 
 ## Write Rules
+
+### Artifact completion gate
+
+Before generating a deliverable, resolve its naming, destination and handoff requirements from the applicable project/build instructions; use [doc-audit placement and naming](../.wibey/skills/doc-audit/SKILL.md#ad-hoc-documents) for documents. For locally built installable artifacts without a project convention, deposit in `~/Downloads/` with product, version, actual build timestamp and a short descriptive suffix in the filename; include a SHA-256 sidecar. Do not overwrite a different existing artifact.
+
+Before the final response, verify the correctly named deliverable exists at the required destination and matches the validated build; verify required checksum sidecars against that deposited file. A successful build, commit or file left only in a build directory does not complete delivery. Report clickable artifact/checksum links in **Did**. If delivery or verification is blocked, state the exact missing step in **Didn't** rather than claiming completion. Explicit user instructions to skip artifact generation or delivery override this gate.
 
 ### Wibey plans path
 
