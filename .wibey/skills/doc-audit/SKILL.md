@@ -1,11 +1,15 @@
 ---
 name: doc-audit
-description: Audit and improve maintained documentation for accuracy, structure, links, duplication, and durable wording. Use for documentation audits and substantive edits to project or reference docs; exclude ephemeral scratch notes.
+description: Audit and improve maintained documentation for accuracy, structure, links, duplication, and durable wording. Use doc-audit interview for user-guided cleanup proposals and decisions. Exclude ephemeral scratch notes.
 ---
 
 # Doc Audit Skill
 
 Consolidated reference for documentation authoring, project document formatting, and audit standards. Describes patterns for any repo: immortal (timeless) vs mortal (time-bound) docs, mortal doc structure, evidence, temporal writing, and consistency audits.
+
+## Governing rule
+
+Laser-focus documents on empowering humans and agents to understand the current state and future paths. Ruthlessly remove stale material and historical narrative unless critical to that understanding; tombstone only when the deletion itself needs a durable pointer. Only closed task-table entries and Work Logs are exempt. Apply this test to every section, including evidence and resolved investigations. Lean toward compression/deletion: Git preserves the discussion. Commit messages must clearly tombstone removed topics and why they were retired, so readers can recover them without keeping a recap in the document.
 
 ## Contents
 
@@ -34,6 +38,7 @@ Consolidated reference for documentation authoring, project document formatting,
   - [Where Pending Work Lives](#where-pending-work-lives)
   - [Where Pending Questions Live](#where-pending-questions-live)
   - [Cross-References for Pending Work/Questions](#cross-references-for-pending-workquestions)
+- [Doc-audit interview](#doc-audit-interview) — user-guided cleanup
 - [Doc Audit Checklist](#doc-audit-checklist) — run on every non-trivial edit
   - [Task Creep Audit](#task-creep-audit)
   - [Active Work Hygiene Audit](#active-work-hygiene-audit)
@@ -471,6 +476,22 @@ A ⚠️ glyph used in a table cell, heading, or prose WITHOUT a link to a canon
 | Pending Investigation | `🔍 Investigation: [question summary](#pending-investigations)` |
 | Draft Next Comms item | `📤 Draft: [draft heading](#draft-next-comms)` |
 | Inline TODO | write `TODO` inline — no link (TODOs are never linked) |
+
+## Doc-audit interview
+
+Invoke with “doc-audit interview [document]” to audit first, then agree cleanups interactively—not rewrite first and request approval afterward.
+
+- Read the document deeply and skeptically under the [governing rule](#governing-rule). Verify current-behavior claims against their authoritative sources; distinguish stale claims from unimplemented intentions.
+- Give a short prioritized queue: misleading current truth first, then obsolete narrative, duplication, and overlapping future plans. Organize by named, cohesive cleanup—not line order or arbitrary size targets.
+- Present one proposal at a time: **Change** (what and why), **Scope** (affected sections and what stays), one short verbatim **Worst passage**, and **Uncertainties** (specific sub-cleanups needing judgment). Recommend a disposition for each uncertainty; do not manufacture questions.
+- End with one decision request: apply, adjust, or keep? Wait before editing that proposal. Do not ask the user to redesign the document or approve an opaque whole-document rewrite.
+- Apply the answer precisely; preserve unresolved ideas and deliberate edits. A shipped feature does not automatically obsolete a similarly named future proposal. Clarify consequential ambiguity before deleting it.
+- Re-read immediately before writing and follow the host’s write/coordination rules. Validate links, headings, vocabulary, and factual consistency; commit the approved cohesive pass separately when authorized. Then give a terse outcome and present the next proposal.
+- Adapt to answers: carry forward stated preferences and settled distinctions. “Apply this and show the next” authorizes that proposal, not the entire queue; “do all these cleanups” covers the presented batch, not unrelated future deletions. Do not repeatedly re-ask settled questions.
+- Keep judgment with the user, mechanics with the agent. Recommend deletion/linking rather than relocating clutter or narrating the cleanup. Preserve recoverability through clear commit messages, not in-document tombstones without reader value.
+- When finished, summarize remaining decisions and verification gaps. Keep the interview in chat; the document contains only the resulting current truth and useful future paths.
+
+**Proposal shape:** “Change: … Scope: … Worst passage: ‘…’ Uncertainties: … Recommendation: … Apply this pass?” Omit empty uncertainty sections.
 
 ## Doc Audit Checklist
 

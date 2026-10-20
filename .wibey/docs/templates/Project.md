@@ -3,7 +3,7 @@
 ## Summary
 
 <!-- AGENT GUIDE: two kinds of content below:
-     LITERALS  = bold labels (Trackers, What/Why/How/Which/Who/When) and `PLACEHOLDER` values: keep the labels, replace the placeholders.
+     LITERALS  = headings, bold labels (Where/What/Why/How/Which/Who/When/G-Rated Summary/Radically Candid Summary), and `PLACEHOLDER` values: keep the headings and labels, replace the placeholders.
      META      = *italicized text*: guidance on what to write; replace with real content and drop the italics. Delete optional lines that don't apply.
      All content must be terse bullets, never paragraphs. Every PR must be hyperlinked—no free-text PR numbers.
 
@@ -12,25 +12,35 @@
    -->
 
 - **Where** Tracked: *(all related tickets, chronologically oldest first; typical order: OPIF, Epic, Predecessor(s), Main)*
+
   - **YYYY.MM.DD.Dow** OPIF: [`OPIF-ID`](https://jira.megacorp.com/browse/OPIF-ID) *title* *(omit if no OPIF)*
   - **YYYY.MM.DD.Dow** Epic: [`EPIC-ID`](https://jira.megacorp.com/browse/EPIC-ID) *title*
-  - **YYYY.MM.DD.Dow** [`FIRST-TICKET-ID`](https://jira.megacorp.com/browse/MAIN-TICKET-ID) *title*
+  - **YYYY.MM.DD.Dow** [`FIRST-TICKET-ID`](https://jira.megacorp.com/browse/FIRST-TICKET-ID) *title*
 - **What**: *what the project does*
 - **Why**: *justification, rationale, business impact*
 - **How**: *high-level approach; abstract enough to write on day one without needing updates later*
 - **Which**: *our system(s) involved*
+
   - *Adjacent systems, if any*
 - **Who**: *implementer(s)*
+
   - *Adjacent teams and stakeholders, if any*
-- **When**: *omit sub-items that are N/A, else include a date with trialing question mark if it's uncommitted*
+- **When**: *omit sub-items that are N/A, else include a date with a trailing question mark if it's uncommitted*
+
   - Started: `YYYY.MM.DD.Dow`
   - Ready for review: `YYYY.MM.DD.Dow`
   - Stg: `YYYY.MM.DD.Dow`
   - Prod: `YYYY.MM.DD.Dow`
+- **G-Rated Summary**: *Tell a simple story around one approachable example, using terse sub-bullets rather than paragraphs.*
+
+  - *Start with a familiar situation: a customer shopping, a seller listing an item, or an engineer handling a request. Show what goes wrong today and how this project makes it better; keep only the details needed to understand the example.*
+  - *Use plain language and terminology a Walmart engineer would recognize. Assume familiarity with only the most basic Catalog engineering concepts and systems.*
+- **Radically Candid Summary**: *Give the inside story via [Radical Candor](https://www.radicalcandor.com/).*
+
+  - *Say why this work is really happening, identify charter boundaries and tensions, be frank about deadlines and pragmatic considerations and competing demands on the relevant teams and systems.*
+  - *Avoid ruinous empathy (withholding hard truths), obnoxious aggression (candor without care), and manipulative insincerity (political positioning instead of honest assessment). Care means helping people confront reality and improve, not cushioning the message until it says nothing.*
 
 ## Contents
-
-<!-- AGENT GUIDE: Interfaces and Engineering Considerations do not get sub-bullets in the Contents. Their subsections are standardized and predictable — sub-bullets add noise without aiding navigation. -->
 
 - [Summary](#summary)
 - [Tasks](#tasks)
@@ -42,8 +52,6 @@
 - [Pending Investigations](#pending-investigations)
 - [Resolved Investigations](#resolved-investigations)
 - [Ad Hoc Sections](#ad-hoc-sections)
-- [Interfaces](#interfaces)
-- [Engineering Considerations](#engineering-considerations)
 - [Context](#context)
 - [Appendices](#appendices)
 - [Evidence](#evidence)
@@ -65,12 +73,12 @@ Status glyphs and meanings: see [StatusVocabulary.md](../StatusVocabulary.md). F
 
 **Follow-on work** (tech debt, known gaps, future improvements explicitly out of scope) goes at the bottom of this table with "Follow-on." prefix in the Notes column. No status glyph — follow-on tasks were never in scope, so they have no lifecycle state. Point to Jira tickets or TODOs in code where applicable. If a follow-on item blocks or is blocked by something, it's not follow-on — it's a real task; move it up.
 
-**Doc updates** (repo docs, playbooks, Confluence) that need doing as a result of this project are tasks — add them to this table. Static doc links belong in [References](#references).
+**Doc updates** (repo docs, playbooks, Confluence) that need doing as a result of this project are tasks — add them to this table. Static doc links belong in [Context → Documents](#documents).
 
 **Jira column rule:** Include the Jira column **only if this project involves two or more tickets.** Single-ticket projects omit this column; the ticket belongs in Summary § Where Tracked instead, not duplicated here. For multi-ticket projects, show only one ticket per row (the most relevant one; others go in Notes if necessary).
 
-| Task         | Jira                                                             | Status | Notes |
-| -------------- | ------------------------------------------------------------------ | -------- | ------- |
+| Task         | Jira                                                              | Status | Notes |
+| ------------ | ----------------------------------------------------------------- | ------ | ----- |
 | Example task | [CATGTRLSHP-NNN](https://jira.megacorp.com/browse/CATGTRLSHP-NNN) |        |       |
 
 ## Active Work
@@ -111,75 +119,15 @@ Team decisions archived for audit trail. Each entry includes the decision, ratio
 
 ## Pending Investigations
 
-Empirical unknowns *we can answer ourselves* — "Does this approach work?" or "What is the actual performance?" Record specific, named questions. You control the investigation through analysis, testing, measurement, or code review. Minor clarifications from other teams are fine; the core work is ours. When completed: findings are absorbed into doc edits (Task notes, Interfaces, Engineering Considerations, Work Log), or archived in Resolved Investigations if they have no natural home in the doc.
+Empirical unknowns *we can answer ourselves* — "Does this approach work?" or "What is the actual performance?" Record specific, named questions. You control the investigation through analysis, testing, measurement, or code review. Minor clarifications from other teams are fine; the core work is ours. When completed: findings are absorbed into doc edits (Task notes, project-specific sections, Work Log), or archived in Resolved Investigations if they have no natural home in the doc.
 
 ## Resolved Investigations
 
-Completed investigations whose findings lack a natural home elsewhere in the doc. Record only insights that are important to preserve but do not fit naturally into Interfaces, Engineering Considerations, Task notes, or Work Log. Do not duplicate findings already documented in the narrative sections — absorb them there instead. When a finding belongs in the body of the doc, skip this archive entry. Subject to distillation and editing; not delete-safe (unlike Decisions).
+Completed investigations whose findings lack a natural home elsewhere in the doc. Record only insights that are important to preserve but do not fit naturally into project-specific sections, Task notes, or Work Log. Do not duplicate findings already documented in the narrative sections — absorb them there instead. When a finding belongs in the body of the doc, skip this archive entry. Subject to distillation and editing; not delete-safe (unlike Decisions).
 
 ## Ad Hoc Sections
 
-Project-specific sections live here, between Open Questions and Interfaces. Use them for anything that doesn't fit neatly into the standard sections below: e.g. Callers and Cutover, Migration Design, Data Provenance, Endpoint Design. These sections are often the primary narrative of a project; the standard sections that follow are frequently thin or N/A by comparison. Delete this placeholder heading and replace it with whatever the project needs.
-
-## Interfaces
-
-Sections below are parallel to the repo description. Each captures the delta introduced by this project. When a subsection is N/A, collapse it into a bullet in the list below instead of devoting a subsection heading to it. Only create a `###` subsection for interfaces that have real content.
-
-<!-- AGENT GUIDE: The N/A list goes here, immediately after the Interfaces heading. Example:
-- **Inbound API, Outbound API, Inbound Kafka, Outbound Kafka**: N/A — no changes.
-Then only subsections with content follow as ### headings. -->
-
-### Configuration
-
-- New CCM keys, feature flags, and environment variables introduced by this project. Include NON-PROD and PROD values, and whether each key gates a specific phase.
-
-### Inbound API
-
-- New or modified REST endpoints introduced by this project: method, path, request/response schema, business logic, error codes.
-
-### Inbound Kafka
-
-- New or modified Kafka consumers introduced by this project: topic, consumer group, message schema, flow description.
-
-### Outbound Kafka
-
-- New or modified Kafka producers introduced by this project: topic, trigger conditions, message schema.
-
-### Outbound API
-
-- New or modified outbound service calls introduced by this project: base URL, endpoints called, timeout/retry strategy, error handling.
-
-### Database Tables
-
-- New or modified tables introduced by this project: schema, read/write operations by endpoint, migration notes.
-
-## Engineering Considerations
-
-Cross-cutting concerns that any reviewer or on-call engineer would want to know. Same N/A rule as Interfaces: collapse N/A subsections into a bullet list here instead of giving each a heading.
-
-### Security
-
-- Auth model changes, new consumer registrations in sr.yaml, policy exceptions, or encryption considerations introduced by this project.
-
-### Risk Assessment
-
-- Frank, honest bulleted list of biggest risks, in descending severity. Can be used to fill in CRQ risk and blast radius.
-
-### Testing
-
-- Terse summary of unit tests, postman suites, stage test plan, any manual or E2E (w/ partners) testing.
-
-### Performance / Scalability
-
-- Traffic volume assumptions, rate limit assertions, latency budget, and any load-test results relevant to this project. Might be terse or N/A.
-
-### Alerting, Monitoring, Logging
-
-- New or updated alerts, dashboards, and log patterns introduced by this project. What would page you at 3am and how would you diagnose it?
-
-### Multi-Tenancy
-
-- How this project's changes behave across tenants, marts, and locales. Note any tenant-specific feature flag gating or data partitioning.
+Project-specific sections live here, between Resolved Investigations and Context. Use descriptive headings for material the project actually needs: e.g. Callers and Cutover, Migration Design, Data Provenance, Endpoint Design, Rollout Risks, or Test Strategy. Document relevant contracts, configuration, security, operational risks, and validation here when substantive; omit empty categories and N/A inventories. Delete this placeholder heading and replace it with whatever the project needs.
 
 ## Context
 
@@ -197,7 +145,7 @@ Cross-cutting concerns that any reviewer or on-call engineer would want to know.
 
 ## Appendices
 
-Things barely worth keeping, that don't (any longer) merit an ad hoc section above. When even appendix space isn't warranted, delete the content and leave a one-line tombstone in the doc (e.g. "Deep comparison removed: see git history YYYY-MM-DD") so readers know where to find it.
+Things barely worth keeping, that don't (any longer) merit an ad hoc section above. When even appendix space isn't warranted, delete the content and leave a one-line tombstone in the doc (e.g. "Deep comparison removed: see git history YYYY.MM.DD") so readers know where to find it.
 
 Appendix subsections are just `###` headings with descriptive names: don't prefix with "Appendix A:", "Appendix B:", etc. The numbering/lettering forces renumbering on insert/delete, and the "Appendix" label is WET with the parent section heading.
 
