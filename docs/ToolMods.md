@@ -18,6 +18,15 @@ Source: `~/src/code-puppy-ide`; JetBrains uses [feature/active-context-pill](htt
 
 Validation: the 2026.10.12 JetBrains build and all 205 JVM tests pass. The built Downloads ZIP includes the callback, navigation, and zoom fixes; source changes do not establish that a running IDE has loaded the rebuilt plugin. VS Code 0.28.2 installation and its separate validation are recorded in [Tools.md](Tools.md#local-modifications-in-use).
 
+### Next native-plugin modification
+
+When next modifying the Code Puppy JetBrains plugin, close the remaining native-UI portability gaps before packaging:
+
+- **Editor links:** port the shared webview's `editor-link.ts` handling to native link dispatch: absolute paths, `file:`, `jetbrains:` and `vscode:` destinations, percent-decoding and line-number navigation. Keep unsafe-scheme filtering and add regression tests; native currently handles only a simpler `file:` form.
+- **Live UI sizing:** verify that changing IDEA zoom or Appearance font size refreshes an already-open conversation, including controls and code. Native uses IDEA font sizing but lacks the old UI-settings listener; add a native refresh hook if verification shows it is needed.
+
+These are follow-up changes, not features already included in the native image-paste build. Do not revive browser-specific JCEF workarounds for the native UI.
+
 ### Markdown link color too dark in dark themes
 
 Conversation Markdown links have a separate HTML rendering path from terminal output. The shared webview anchor renderer must apply its existing theme-aware `link` class; otherwise Chromium uses browser-default blue even when the host supplies a readable link-color token. The 2026.10.15 local JetBrains 0.30.3 build includes this one-line renderer fix and a regression test. Webview unit tests pass (1,110), JVM tests pass (257), and the plugin structure/build checks pass. A rollback copy precedes the installed-JAR update; IDEA must restart before the rebuilt plugin is active. The same shared renderer serves both IDE hosts, but the VS Code installation requires its own rebuilt package.
