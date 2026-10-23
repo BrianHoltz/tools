@@ -77,7 +77,7 @@ The ZIP must be the dependency-complete installable artifact, not a JAR from `bu
 
 ### Rebuilding the Local Code Puppy JetBrains Plugin
 
-Repo: `~/src/code-puppy-ide` (fork `r0b0m29/code-puppy-ide`, monorepo for both the VS Code extension and the JetBrains plugin), branch `feature/active-context-pill`. That branch merges local-only commits (active-editor-context suggestion, JDK 21 build detection, JCEF-proxy-warm startup fix) onto upstream `main`. Full release flow lives in `docs/ai/RELEASING.md` in that repo — this is the shortcut for a local-only install build, no release/tag/publish:
+Repo: `~/src/code-puppy-ide` (fork `r0b0m29/code-puppy-ide`, monorepo for both the VS Code extension and the JetBrains plugin), branch `feature/active-context-pill`. That branch merges current upstream `main` with the remaining local patches listed in [ToolMods.md](ToolMods.md#code-puppy-maintained-source-builds). Full release flow lives in `docs/ai/RELEASING.md` in that repo — this is the shortcut for a local-only install build, no release/tag/publish:
 
 ```bash
 cd ~/src/code-puppy-ide
@@ -86,10 +86,10 @@ git merge --no-edit origin/main
 # Resolve conflicts: diff each hunk, prefer upstream when it has absorbed a
 # local fix (check for a same-purpose class/import on the other side before
 # keeping both — duplicated fixes are a DRY violation, not a safe default).
-bash scripts/build-jetbrains-variants.sh
+bash scripts/build-jetbrains.sh
 ```
 
-The script builds the webview once, then both JetBrains variants (`legacy` for IDE builds 243–261, unsuffixed `main` for 262+) into `releases/`. IDEA 2026.2.x needs the unsuffixed `code-puppy-jetbrains-<version>.zip`. JDK 21 is auto-detected (`scripts/gradle-jetbrains.sh`) — no `PATH` changes needed, see that repo's RELEASING.md if it can't find one. First build is slow (Gradle daemon + IntelliJ SDK warm-up, ~2 min); reruns are fast.
+The script builds one native JetBrains ZIP for IDE builds 243+ into `releases/`; no React build or separate legacy build is needed. JDK 21 is auto-detected and registered with Kotlin's toolchain resolver by `scripts/gradle-jetbrains.sh`. The release's legacy filename, when present, is an updater compatibility alias, not a different implementation.
 
 After `buildPlugin` succeeds, stage the timestamped Downloads copy per the [Local Build Artifact Rule](#local-build-artifact-rule):
 

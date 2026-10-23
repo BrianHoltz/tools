@@ -10,30 +10,29 @@ Patch and modification procedures. See Tools.md for tool preferences, standings,
 
 Source: `~/src/code-puppy-ide`; JetBrains uses [feature/active-context-pill](https://gecgithub01.walmart.com/r0b0m29/code-puppy-ide/tree/feature/active-context-pill), while the isolated VS Code build uses [brian/vscode-0.28.2-local](https://gecgithub01.walmart.com/r0b0m29/code-puppy-ide/tree/brian/vscode-0.28.2-local). See [Tools.md](Tools.md#rebuilding-the-local-code-puppy-jetbrains-plugin) for builds, artifact naming, installation, and Marketplace overwrite precautions.
 
-- **Editor context:** active-file and selection suggestions preserve distinct selection identities. Shared webview changes serve both IDE hosts; JetBrains-only runtime fixes do not apply to VS Code.
-- **JDK discovery and startup:** `scripts/gradle-jetbrains.sh` locates and validates JDK 21; the JetBrains host warms proxy settings before JCEF initialization.
-- **JCEF configuration:** leave IDEA's JCEF mode at its default. The forced in-process override `-Djcef.remote.enabled=false` is removed; Brian confirmed Code Puppy works after restart on 2026.10.21.Wed. The installed artifact is normal/main 0.31.2, not legacy.
-- **Local rendering patches:** the maintained source and installed minimal build still extend `CefResourceHandlerAdapter` and disable custom-scheme registration in favor of `http://cpwebview/`. Their necessity with default JCEF settings is unverified. Do not describe these patches as required for IDEA 2026.2.3 or Langley; compare stock main before proposing a general upstream fix.
-- **IDE zoom:** `CodePuppyWebviewPanel` listens to UI settings as well as look-and-feel and editor-scheme changes. It refreshes theme tokens and whole-browser zoom from IDEA's label-font size, including fixed-pixel controls and code. Conversation font harmonization remains separate from this zoom fix.
+### Local patches still required
 
-Validation: the 2026.10.12 JetBrains build and all 205 JVM tests pass. The built Downloads ZIP includes the callback, navigation, and zoom fixes; source changes do not establish that a running IDE has loaded the rebuilt plugin. VS Code 0.28.2 installation and its separate validation are recorded in [Tools.md](Tools.md#local-modifications-in-use).
+- **Editor context:** opt-in active-file and selection suggestions remain local. Native JetBrains and the VS Code webview have separate presentation implementations.
+- **JDK toolchain:** `scripts/gradle-jetbrains.sh` registers the detected JDK 21 with Kotlin's toolchain resolver as well as setting `JAVA_HOME`.
+- **Native paste compatibility:** upstream `NativeAttach.kt` owns image paste, file drops, encoding and attachment identity. Keep only the small `AttachHandler` compatibility patch for Swing's legacy paste overload and disabled/read-only inputs, with regression tests; do not restore the duplicate `NativeAttachmentTransfer` adapter.
+- **VS Code editor links and colors:** the shared webview patch routes absolute paths and supported editor URIs to the IDE and uses theme-aware link colors. JetBrains no longer uses that renderer.
+
+### Upstream behavior: no local patch to reapply
+
+Native JetBrains supplies image caching/forwarding, clipboard-image encoding, file attachment drops, theme-aware Markdown link colors, and IDEA-based font sizing. JCEF startup warming, callback adapters, custom-scheme/HTTP navigation workarounds, repaint nudges and browser zoom patches are obsolete: upstream has removed the browser layer. Do not revive them or force IDEA's JCEF configuration for Code Puppy.
+
+The combined branch includes upstream's native UI and removal of JetBrains-specific React code. Source integration and a built ZIP do not establish that the installed IDE has loaded that build.
 
 ### Next native-plugin modification
 
-When next modifying the Code Puppy JetBrains plugin, close the remaining native-UI portability gaps before packaging:
+- **Editor links:** port the webview's `editor-link.ts` handling to native dispatch: absolute paths, `file:`, `jetbrains:` and `vscode:` destinations, percent-decoding and line navigation. Retain unsafe-scheme filtering and add tests; native still handles only a simpler `file:` form.
+- **Live UI sizing:** verify that IDEA zoom or Appearance font-size changes refresh an already-open conversation, controls and code. Native uses IDEA fonts but has only a look-and-feel listener; add a UI-settings refresh hook if verification requires it.
 
-- **Editor links:** port the shared webview's `editor-link.ts` handling to native link dispatch: absolute paths, `file:`, `jetbrains:` and `vscode:` destinations, percent-decoding and line-number navigation. Keep unsafe-scheme filtering and add regression tests; native currently handles only a simpler `file:` form.
-- **Live UI sizing:** verify that changing IDEA zoom or Appearance font size refreshes an already-open conversation, including controls and code. Native uses IDEA font sizing but lacks the old UI-settings listener; add a native refresh hook if verification shows it is needed.
+These remain native follow-ups, not completed features. Retain each only while upstream lacks equivalent behavior.
 
-These are follow-up changes, not features already included in the native image-paste build. Do not revive browser-specific JCEF workarounds for the native UI.
+### Terminal link-color configuration
 
-### Markdown link color too dark in dark themes
-
-Conversation Markdown links have a separate HTML rendering path from terminal output. The shared webview anchor renderer must apply its existing theme-aware `link` class; otherwise Chromium uses browser-default blue even when the host supplies a readable link-color token. The 2026.10.15 local JetBrains 0.30.3 build includes this one-line renderer fix and a regression test. Webview unit tests pass (1,110), JVM tests pass (257), and the plugin structure/build checks pass. A rollback copy precedes the installed-JAR update; IDEA must restart before the rebuilt plugin is active. The same shared renderer serves both IDE hosts, but the VS Code installation requires its own rebuilt package.
-
-The webview renders the backend `code_puppy` Python agent's Rich-library terminal output. Rich's default `markdown.link_url` style (`rich/default_styles.py`) is literal ANSI `blue`, which renders near-navy and unreadable against dark theme backgrounds (e.g. `tokyo-night`). None of the bundled theme presets in `code_puppy/plugins/theme/themes.py` remap `blue` — their `color_remap` dicts are empty for the affected dark themes.
-
-Fix: `code_puppy/plugins/theme/rich_themes.py` already provides a live Rich-console color-remap hook (`apply_remap()`, persisted via `rich_color_remap_json` in config) intended for exactly this — it patches `Console.get_style()` to swap decorative color names (cyan, blue, magenta, bright_*) while leaving red/yellow/green/white alone. No source patch needed: set `rich_color_remap_json = {"blue": "#7aa2f7"}` in `~/.code_puppy/puppy.cfg` (`#7aa2f7` matches `tokyo-night`'s own lighter blue, already used in that config's `osc_palette_json`). Takes effect on next Code Puppy restart (the theme plugin calls `reapply_from_config()` at import). Re-set if the config is ever regenerated or a different theme's remap needs the same fix.
+Rich terminal output has a separate color path from native Markdown. If dark-theme terminal URLs are unreadable, the engine's supported `rich_color_remap_json` setting can map `blue` to a readable theme color such as `#7aa2f7` in `~/.code_puppy/puppy.cfg`. This is configuration, not a plugin source patch, and takes effect after an engine restart. Do not edit the installed engine package.
 
 ## VS Code / Cursor: Zaaack Markdown Editor
 
