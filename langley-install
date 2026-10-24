@@ -91,6 +91,28 @@ def wait_until(predicate, timeout, message):
         time.sleep(1)
 
 
+def quit_and_wait(app, timeout):
+    """The process state, not AppleScript's exit code, confirms shutdown."""
+    try:
+        subprocess.run(["osascript", "-e", 'on run argv', "-e",
+                        'tell application (item 1 of argv) to quit', "-e", 'end run',
+                        str(app)], check=True, timeout=min(timeout, 30),
+                       capture_output=True, text=True)
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
+        detail = error.stderr or str(error)
+        print(f"Quit request reported: {detail}. Checking actual IDEA shutdown.", flush=True)
+    wait_until(lambda: not idea_pids(app), timeout,
+               "IDEA remains running; no plugin files changed and no force-quit attempted")
+    print("Confirmed IDEA has exited.", flush=True)
+
+
+def relaunch(app, timeout):
+    subprocess.run(["open", "-a", str(app)], check=True, timeout=30)
+    wait_until(lambda: bool(idea_pids(app)), timeout,
+               "IDEA relaunch was not observed; inspect the installation log")
+    print("IDEA process observed after relaunch.", flush=True)
+
+
 def execute(args, files, run_dir):
     app = args.app.resolve()
     destination = args.plugins.resolve() / "langley"
@@ -109,17 +131,24 @@ def execute(args, files, run_dir):
     old_pids = idea_pids(app)
     print(f"Validated staging. Original IDEA PIDs: {old_pids}", flush=True)
     if old_pids:
-        # Normal quit: IDEA may save state, ask about tasks, or cancel shutdown.
-        subprocess.run(["osascript", "-e", 'on run argv', "-e",
-                        'tell application (item 1 of argv) to quit', "-e", 'end run',
-                        str(app)], check=True, timeout=args.timeout)
-    wait_until(lambda: not idea_pids(app), args.timeout,
-               "IDEA did not exit; installed plugin left unchanged")
-    install_staged(staged, destination, backup, files)
+        quit_and_wait(app, args.timeout)
+    else:
+        wait_until(lambda: not idea_pids(app), args.timeout,
+                   "IDEA started during staging; installed plugin left unchanged")
+    try:
+        install_staged(staged, destination, backup, files)
+    except Exception:
+        # install_staged restores the old plugin on failure. Do not leave the
+        # user's IDE closed when that recovery succeeded.
+        if destination.is_dir() and not backup.exists():
+            print("Installation failed; relaunching IDEA with its previous plugin.", flush=True)
+            try:
+                relaunch(app, args.timeout)
+            except Exception as recovery_error:
+                print(f"Recovery relaunch also failed: {recovery_error}", flush=True)
+        raise
     print(f"Installed and verified. Previous plugin preserved at {backup}", flush=True)
-    subprocess.run(["open", "-a", str(app)], check=True, timeout=30)
-    wait_until(lambda: bool(idea_pids(app)), args.timeout,
-               "Plugin installed, but IDEA relaunch was not observed")
+    relaunch(app, args.timeout)
     verify_tree(destination, files)
     print("IDEA relaunched; disk installation verified. Live plugin behavior is not verified.", flush=True)
 

@@ -128,6 +128,39 @@ class InstallTests(unittest.TestCase):
         self.assertFalse((run_dir / "previous-langley").exists())
         self.assertEqual(run.call_count, 1)
 
+    def test_quit_error_still_installs_when_idea_exited(self):
+        errors = [
+            installer.subprocess.CalledProcessError(1, "osascript", stderr="User canceled. (-128)"),
+            installer.subprocess.TimeoutExpired("osascript", 1),
+        ]
+        for index, error in enumerate(errors):
+            with self.subTest(error=type(error).__name__), tempfile.TemporaryDirectory() as temp:
+                original_root = self.root
+                self.root = Path(temp)
+                args, run_dir = self.execute_args()
+                self.root = original_root
+                with patch.object(installer, "idea_pids", side_effect=[[12], [], [13]]), patch.object(installer.subprocess, "run", side_effect=[error, None]) as run:
+                    installer.execute(args, {Path("new"): b"new"}, run_dir)
+                self.assertEqual(run.call_count, 2)
+                self.assertEqual((args.plugins / "langley/new").read_bytes(), b"new")
+
+    def test_canceled_quit_never_installs_while_idea_remains_running(self):
+        args, run_dir = self.execute_args()
+        error = installer.subprocess.CalledProcessError(1, "osascript", stderr="User canceled. (-128)")
+        with patch.object(installer, "idea_pids", return_value=[12]), patch.object(installer.subprocess, "run", side_effect=error) as run:
+            with self.assertRaises(TimeoutError):
+                installer.execute(args, {Path("new"): b"new"}, run_dir)
+        self.assertEqual((args.plugins / "langley/old").read_text(), "previous")
+        self.assertEqual(run.call_count, 1)
+
+    def test_failed_install_relaunches_restored_plugin(self):
+        args, run_dir = self.execute_args()
+        with patch.object(installer, "idea_pids", side_effect=[[12], [], [13]]), patch.object(installer.subprocess, "run") as run, patch.object(installer, "install_staged", side_effect=ValueError("verification failed")):
+            with self.assertRaisesRegex(ValueError, "verification failed"):
+                installer.execute(args, {Path("new"): b"new"}, run_dir)
+        self.assertEqual(run.call_args_list[-1].args[0][:2], ["open", "-a"])
+        self.assertEqual((args.plugins / "langley/old").read_text(), "previous")
+
     def test_apply_requires_agent_preflight(self):
         with patch("sys.argv", [str(SOURCE), str(self.package), "--apply"]):
             with self.assertRaises(SystemExit):
