@@ -109,6 +109,13 @@ Before generating a deliverable, resolve its naming, destination and handoff req
 
 Before the final response, verify the correctly named deliverable exists at the required destination and matches the validated build. Verify integrity internally; never generate or deliver checksum sidecars or include checksum files in Downloads. A successful build, commit or file left only in a build directory does not complete delivery. Report clickable artifact links in **Did**. If delivery or verification is blocked, state the exact missing step in **Didn't** rather than claiming completion. Explicit user instructions to skip artifact generation or delivery override this gate.
 
+Retain locally built IDE artifacts (plugin ZIPs, VSIXs) in `~/Downloads/` by product:
+
+- **Product:** the filename before the version, plus its extension. Variants such as `-legacy` and each packaging are separate products.
+- **Build timestamp:** filenames must carry the actual build time, as `YYYYMMDD.Dow.HHMM` or a project convention such as Langley's. Retention reads the filename, never file metadata; names without a verifiable timestamp are never pruned.
+- **Keep:** the newest build in each of the last three hours, days, weeks (Monday-start) and months that have builds, plus any build matching an installed IDE plugin or extension. Trash the rest.
+- **Run:** `~/src/tools/prune-artifacts --apply` after each deposit; omit `--apply` to preview.
+
 ### Wibey plans path
 
 Do not use `~/.wibey/plans/` or its subdirectories. If an IDE, extension, or MCP tool directs a write there, stop and report the source to the user.

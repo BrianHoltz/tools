@@ -1,0 +1,167 @@
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Brian Holtz
+# SPDX-License-Identifier: MIT
+"""Prune locally built IDE artifacts: keep the newest of each recent period.
+
+Usage: prune-artifacts [--apply] [DIRECTORY]   (default ~/Downloads; dry run unless --apply)
+
+See docs/AgentRules.md § Artifact retention for the policy.
+"""
+
+import argparse
+import hashlib
+import json
+import re
+import subprocess
+import sys
+import zipfile
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
+
+PERIODS = {
+    "hour": lambda t: (t.date(), t.hour),
+    "day": lambda t: t.date(),
+    "week": lambda t: t.isocalendar()[:2],
+    "month": lambda t: (t.year, t.month),
+}
+KEEP_PER_PERIOD = 3
+EXTENSIONS = {".zip", ".vsix"}
+WEEKDAY = r"(Mon|Tue|Wed|Thu|Fri|Sat|Sun)"
+STAMP = re.compile(r"(?:^|-)(\d{8})\." + WEEKDAY + r"\.(\d{4})(\d{2})?(?:-|$)")
+VERSION_DATE = re.compile(r"^\d+\.\d+\.(\d{8})(?:-" + WEEKDAY + r"\.(\d{4})(\d{2})?)?(?:-|$)")
+
+
+def parse_artifact(name):
+    """Return (product, build time), or None for names lacking a verifiable build timestamp."""
+    path = Path(name)
+    if path.suffix not in EXTENSIONS:
+        return None
+    tokens = path.stem.split("-")
+    split = next((index for index, token in enumerate(tokens) if token[:1].isdigit()), None)
+    if not split:
+        return None
+    rest = "-".join(tokens[split:])
+    match = STAMP.search(rest)
+    if match:
+        day, weekday, clock, seconds = match.groups()
+    elif (match := VERSION_DATE.match(rest)):
+        day, weekday, clock, seconds = match.groups()
+        if clock is None:
+            clock, seconds = "2359", "59"
+    else:
+        return None
+    try:
+        built = datetime.strptime(day + clock + (seconds or "00"), "%Y%m%d%H%M%S")
+    except ValueError:
+        return None
+    if weekday and built.strftime("%a") != weekday:
+        return None
+    return "-".join(tokens[:split]) + path.suffix, built
+
+
+def retained(times):
+    """Map each kept build time to the periods it represents (restic-style: periods having builds)."""
+    reasons = {}
+    for period, bucket in PERIODS.items():
+        newest = {}
+        for time in sorted(times, reverse=True):
+            newest.setdefault(bucket(time), time)
+        for time in list(newest.values())[:KEEP_PER_PERIOD]:
+            reasons.setdefault(time, []).append(period)
+    return reasons
+
+
+def _digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def _file_digest(path):
+    return _digest(path.read_bytes()) if path.is_file() else None
+
+
+def installed(path, jetbrains_roots, vscode_roots):
+    """True when the artifact's payload matches an installed IDE plugin or extension."""
+    try:
+        with zipfile.ZipFile(path) as archive:
+            if path.suffix == ".vsix":
+                package = json.loads(archive.read("extension/package.json"))
+                prefix = f"{package['publisher']}.{package['name']}-{package['version']}".lower()
+                files = [name for name in archive.namelist()
+                         if name.startswith("extension/") and not name.endswith("/")
+                         and name != "extension/package.json"]
+                for root in vscode_roots:
+                    for directory in Path(root).glob("*"):
+                        if directory.name.lower().startswith(prefix) and files and all(
+                                _file_digest(directory / name[len("extension/"):]) == _digest(archive.read(name))
+                                for name in files):
+                            return True
+                return False
+            jars = [name for name in archive.namelist() if name.endswith(".jar")]
+            return bool(jars) and any(all(_file_digest(Path(root) / name) == _digest(archive.read(name))
+                                          for name in jars) for root in jetbrains_roots)
+    except (zipfile.BadZipFile, KeyError, ValueError, OSError):
+        return False
+
+
+@dataclass
+class Item:
+    path: Path
+    product: str
+    built: datetime
+    reasons: list = field(default_factory=list)
+
+
+def plan(directory, jetbrains_roots, vscode_roots):
+    """Every eligible artifact with its retention reasons; an empty list means prune."""
+    items = []
+    for path in sorted(Path(directory).iterdir()):
+        parsed = path.is_file() and parse_artifact(path.name)
+        if parsed:
+            items.append(Item(path, *parsed))
+    for product in {item.product for item in items}:
+        group = [item for item in items if item.product == product]
+        reasons = retained([item.built for item in group])
+        for item in group:
+            item.reasons = list(reasons.get(item.built, []))
+    for item in items:
+        if not item.reasons and installed(item.path, jetbrains_roots, vscode_roots):
+            item.reasons = ["installed"]
+    return sorted(items, key=lambda item: (item.product, item.built), reverse=True)
+
+
+def default_jetbrains_roots():
+    home = Path.home()
+    return [*home.glob("Library/Application Support/JetBrains/*/plugins"), *home.glob(".local/share/JetBrains/*")]
+
+
+def default_vscode_roots():
+    home = Path.home()
+    return [home / name / "extensions" for name in (".vscode", ".vscode-insiders", ".cursor", ".windsurf")]
+
+
+def system_trash(path):
+    subprocess.run(["trash", str(path)], check=True)
+
+
+def main(argv=None, trash=system_trash, jetbrains=None, vscode=None):
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("directory", nargs="?", default=str(Path.home() / "Downloads"))
+    parser.add_argument("--apply", action="store_true", help="move unretained artifacts to Trash")
+    args = parser.parse_args(argv)
+    items = plan(args.directory, default_jetbrains_roots() if jetbrains is None else jetbrains,
+                 default_vscode_roots() if vscode is None else vscode)
+    product = None
+    for item in items:
+        if item.product != product:
+            product = item.product
+            print(product)
+        action = "keep " + ",".join(item.reasons) if item.reasons else ("trash" if args.apply else "would trash")
+        print(f"  {item.built:%Y.%m.%d.%a.%H%M}  {action:<28} {item.path.name}")
+        if args.apply and not item.reasons:
+            trash(item.path)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
