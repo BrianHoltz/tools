@@ -2,7 +2,6 @@
 name: doc-audit
 description: Audit and improve maintained documentation for accuracy, structure, links, duplication, and durable wording. Use doc-audit interview for user-guided cleanup proposals and decisions. Exclude ephemeral scratch notes.
 ---
-
 # Doc Audit Skill
 
 Consolidated reference for documentation authoring, project document formatting, and audit standards. Describes patterns for any repo: immortal (timeless) vs mortal (time-bound) docs, mortal doc structure, evidence, temporal writing, and consistency audits.
@@ -33,6 +32,10 @@ Laser-focus documents on empowering humans and agents to understand the current 
   - [Evidence](#evidence)
   - [Work Log](#work-log)
 - [Drafting Comms](#drafting-comms) — evidence-linking bar for outbound messages
+  - [Compose](#compose)
+  - [Substantiate](#substantiate)
+  - [Verify](#verify)
+  - [Maintain](#maintain)
 - [Rules About Pending Work](#rules-about-pending-work)
   - [Tasks Pipeline](#tasks-pipeline)
   - [Where Pending Work Lives](#where-pending-work-lives)
@@ -44,7 +47,6 @@ Laser-focus documents on empowering humans and agents to understand the current 
   - [Active Work Hygiene Audit](#active-work-hygiene-audit)
   - [When to Audit](#when-to-audit)
   - [What to Audit](#what-to-audit)
-- [Audit Date Format](#audit-date-format) — format and placement
 - [See Also](#see-also)
 - [Temporal Writing Rules](#temporal-writing-rules) — timeless perspective, absolute dates, no future prose
   - [Timeless Perspective](#timeless-perspective)
@@ -54,7 +56,6 @@ Laser-focus documents on empowering humans and agents to understand the current 
   - [Naming](#naming)
   - [When to Create](#when-to-create)
 - [Styling Discipline](#styling-discipline) — footnotes, table cells, links, escaping
-  - [Footnote Glyphs](#footnote-glyphs-in-tables)
   - [Table Cell Vocabulary](#table-cell-vocabulary)
   - [Escaping](#escaping)
   - [Hyperlinks](#hyperlinks)
@@ -93,22 +94,22 @@ Organize mortal docs with the following sections:
 **● required, ○ optional, — not applicable:**
 
 
-| Section          | Projects | Incidents, Releases | Memos |
-| ---------------- | -------- | -------------------- | ----- |
-| Summary          | ●       | ●                   | ●    |
-| Contents         | ●       | ○                   | ○    |
-| References       | ●       | ○                   | ●    |
-| Tasks            | ●       | ○                   | —    |
-| Active Work      | ●       | ○                   | —    |
-| Next Daily Jira Update | ○       | ○                   | —    |
-| Draft Next Comms    | ○       | ●                   | ○    |
-| Pending Decisions | ○       | ○                   | ○    |
-| Decisions        | ○       | ○                   | ○    |
-| Pending Investigations | ○       | ●                   | ○    |
+| Section                 | Projects | Incidents, Releases | Memos |
+| ----------------------- | -------- | -------------------- | ----- |
+| Summary                 | ●       | ●                   | ●    |
+| Contents                | ●       | ○                   | ○    |
+| References              | ●       | ○                   | ●    |
+| Tasks                   | ●       | ○                   | —    |
+| Active Work             | ●       | ○                   | —    |
+| Next Daily Jira Update  | ○       | ○                   | —    |
+| Draft Next Comms        | ○       | ●                   | ○    |
+| Pending Decisions       | ○       | ○                   | ○    |
+| Decisions               | ○       | ○                   | ○    |
+| Pending Investigations  | ○       | ●                   | ○    |
 | Resolved Investigations | ○       | ○                   | ○    |
-| Diagnosis           | —       | ●                   | —    |
-| Evidence            | ●       | ●                   | ●    |
-| Work Log         | ●       | ●                   | ○    |
+| Diagnosis               | —       | ●                   | —    |
+| Evidence                | ●       | ●                   | ●    |
+| Work Log                | ●       | ●                   | ○    |
 
 ### Summary
 
@@ -169,7 +170,7 @@ Acceptable columns (not all required):
 
 - **Task** — terse, permanent title/description designed not to change
 - **LOE** — prior estimated person-days. Only for planning; remove after Jira tickets created. Never log effort after completion.
-- **Jira** — **omit unless two or more tickets exist for this project.** When present: terse anchor text linked to ticket. Single-ticket projects have no Jira column — the project tracker belongs in Summary/Where Tracked, not duplicated in every task row. 
+- **Jira** — **omit unless two or more tickets exist for this project.** When present: terse anchor text linked to ticket. Single-ticket projects have no Jira column — the project tracker belongs in Summary/Where Tracked, not duplicated in every task row.
 - **Status** — glyph + MM.DD date
 - **Notes** — detailed explanation, blockers, rationale
 
@@ -191,6 +192,7 @@ Acceptable columns (not all required):
 **⚠️ Agent rule:** Scan a task table top-to-bottom. By default, assume each task depends on the one directly above it. If a `⬆️` marker appears, it signals a non-adjacent dependency to an earlier row — follow the marker to find the actual prerequisite. Do not infer dependencies from row order when a marker is present; the marker overrides row order for that task.
 
 **Task title durability & bolding:** Task titles serve as stable reference targets for dependencies. Choose titles that are:
+
 - Self-contained (omit project/repo prefixes that would be redundant when referenced)
 - Durable (unlikely to be rephrased; title changes break references)
 - Meaningful (first ≤5 words should make the reference unambiguous)
@@ -200,6 +202,7 @@ For example, "Create new AD group" is better than "variant-group-shell: create n
 **Bold task titles only if they are dependencies for later tasks.** If a task title appears as a `⬆️ DEPENDS_ON` reference in any later task's Notes cell, bold the title in the Task column. If a task has no downstream dependencies, leave it unbolded (normal text). This visual convention signals at a glance which tasks are reference targets and which are leaf nodes.
 
 **Marker rules:**
+
 - If a task has one or more direct dependencies on prior tasks in the same table, the Notes cell **must start with** the marker followed by a **bold reference** to the first ≤5 words of the target task's title:
   ```
   ⬆️ **Create new AD group**. Do not submit until...
@@ -211,6 +214,7 @@ For example, "Create new AD group" is better than "variant-group-shell: create n
 - **Row order must respect dependencies:** If A→B (B depends on A), then A must appear before B in the table. But if C appears before B, C may or may not be a prerequisite of B — that relationship is declared only by the marker, never inferred from position.
 
 **Example — linear chain (no markers needed):**
+
 ```markdown
 | Task | Status | Notes |
 | --- | --- | --- |
@@ -218,9 +222,11 @@ For example, "Create new AD group" is better than "variant-group-shell: create n
 | **Register GitHub App** | | Must use group name in GARS request... (implicitly depends on Create new AD group) |
 | **Complete SailPoint integration** | | Do not submit until GitHub registration complete... (implicitly depends on Register GitHub App) |
 ```
+
 (No `⬆️` markers needed; each task depends on the one directly above it.)
 
 **Example — non-adjacent dependency (marker required):**
+
 ```markdown
 | Task | Status | Notes |
 | --- | --- | --- |
@@ -229,6 +235,7 @@ For example, "Create new AD group" is better than "variant-group-shell: create n
 | **Register GitHub App** | | ⬆️ **Create new AD group**. Must use group name in GARS request... |
 | **Complete SailPoint integration** | | Follows Register GitHub App (implicitly) |
 ```
+
 (Register GitHub App depends on Create new AD group, which is 2 rows back — marker required. Check org webhooks is independent and can appear anywhere. Complete SailPoint integration depends on the immediately preceding Register GitHub App — no marker needed.)
 
 In this example, "Check org webhooks" comes after the AD group task but does not depend on it — the bold `⬆️` references on the other two tasks make their prerequisites explicit and linkable. The table is ordered for readability and to respect declared dependencies, but position alone never implies a prerequisite relationship.
@@ -236,9 +243,11 @@ In this example, "Check org webhooks" comes after the AD group task but does not
 **Glyph: `⬆️` (up arrow).** Literal and intuitive in top-to-bottom reading order: "the task above" → must complete first. The priority is that the reference is **bold** and matches the source task title exactly so readers can click/search to find the prerequisite.
 
 **English form (timeline/review tables):** When a table explicitly opts out of ⬆️ markers (declared via an agent note above the table), express dependencies at the start of the Notes cell as:
+
 ```
 **Depends on:** **Task Title A**, **Task Title B**.
 ```
+
 "Depends on:" label and all task titles are bold; titles are comma-separated; period closes the dependency declaration before the rest of the note. "Blocked by" is reserved for tasks whose Status cell carries a 🛑 or ❓ glyph — do not use it as a synonym for a task dependency.
 
 ### Active Work
@@ -246,6 +255,7 @@ In this example, "Check org webhooks" comes after the AD group task but does not
 Mutable working state for in-progress items. Answers: "What are we doing right now?"
 
 **Scope & Organization:**
+
 - **ALL and only ▶️ (in-progress) tasks get a subsection here** — one `###` heading per task. No more, no fewer. If a task is in-progress, it has a section; if a task is not in-progress, it has no section.
 - **Active Work heading must match (be verbatim or a prefix of) the task title** — the `###` heading slug must resolve to the task title when linked. Examples:
   - Task: `**Check repo settings**` → Active Work: `### Check repo settings` ✅
@@ -256,18 +266,21 @@ Mutable working state for in-progress items. Answers: "What are we doing right n
 - **Task titles in Tasks table should link to Active Work** — when a task title is in progress, make the entire title a link to its Active Work subsection: `[**Task Title**](#task-title)`. This enables one-click navigation from planning to execution state.
 
 **Why task titles must be TERSE and DURABLE:**
+
 - Task titles serve as **anchor identifiers** — they are the only stable reference point between Tasks table and Active Work. Changing a task title after work begins breaks all existing links and makes it impossible to find the corresponding Active Work subsection.
 - **TERSE** — keep titles to ≤5 words if possible; use bold for clarity. No narrative context or qualifiers (dates, statuses, decision rationale) belong in the title.
 - **DURABLE** — once a task title is published, treat it as immutable for the lifetime of the doc session. If you need to add detail, context, or status updates, put them in Notes (Tasks table) or in the Active Work subsection body — never in the title.
 - **When in doubt, Notes not title** — if you're tempted to qualify or expand the title (e.g., "Review [X] before doing [Y]"), that content belongs in the Notes column, not in the title. The title is the label; Notes carry the conditions/context.
 
 **Content Rules:**
+
 - Contains subtasks, blockers, partial results, dependencies for the in-progress work
 - Next agent or human picks up here after an interruption
 - Strictly organized by `###` heading per ▶️ task — one section per task, no free-form prose at the top level
 - **DRY with Tasks** — no information here that is not grounded in a ▶️ task row. If you find yourself writing subtasks for work that has no corresponding ▶️ task, add the task first
 
 **Completion & Archival:**
+
 - **Concluded work moves to Work Log, never to Active Work.** When a ▶️ task completes, clear its subtasks from here and add one terse Work Log entry summarizing what was decided/discovered
 - **Completed work in Active Work is a violation.** Do not mark tasks as "DONE" in Active Work or leave past-tense status updates here. The moment a task is no longer in-progress, remove its section entirely
 - **Once cleared, a completed task has no Active Work subsection** — all its detail lives in the Work Log entry for that session
@@ -295,7 +308,7 @@ Holds only unsent outbound communication drafts. For formatting, provenance, evi
 **Incident docs only.** Structured record of the investigation's epistemic state regarding causation. Two subsections:
 
 - **Differential Diagnosis** — ranked table of candidate causes (Theory | P% | Status). P% is a betting odd on the theory being a significant contributor; need not sum to 100%. Ordered highest probability first; reordering is a claim that must be justifiable from the Work Log. Status glyphs: ▶️ Active · ⏭️ Queued · ✅ Ruled out. Ruled-out rows stay in the table as a record of losing bets — do not delete; log the reasoning in Work Log. P% on ruled-out rows stays at its last active value: the historical weight is informative. *(Exception to the prose falsified-hypothesis deletion rule in [Temporal Writing Rules](#temporal-writing-rules): that rule applies to narrative prose, not to Differential Diagnosis table rows, which are a structured record.)*
-- **Cause** — withheld from the template; add only when a theory is Leading: tested against named alternatives with none falsifying it. Never create speculatively. Distinguish the proximate trigger (immediate cause) from the systemic root cause (underlying condition). Use "supported by [†]" for each supporting claim and "leading" to characterize the overall theory. When written, update Status to `🎯 DIAGNOSED`. See [IncidentRCA.md](../../../docs/IncidentRCA.md#counterfactual-analysis) for the counterfactual methodology.
+- **Cause** — withheld from the template; add only when a theory is Leading: tested against named alternatives with none falsifying it. Never create speculatively. Distinguish the proximate trigger (immediate cause) from the systemic root cause (underlying condition). Use "supported by" followed by a linked neutral [evidence glyph](#evidence) for each supporting claim and "leading" to characterize the overall theory. When written, update Status to `🎯 DIAGNOSED`. See [IncidentRCA.md](../../../docs/IncidentRCA.md#counterfactual-analysis) for the counterfactual methodology.
 
 *Note: Pending investigative threads belong in the top-level [Pending Investigations](#pending-investigations) section, not here. Diagnosis is for the epistemic state of causation (what could cause this?), while Pending Investigations captures what we don't yet know (what can we answer ourselves?).*
 
@@ -307,7 +320,7 @@ Ruled-out theories never reach Decisions — their closure path is the Work Log 
 
 **Placement:** Dedicated `## Evidence` section near the bottom, above Work Log.
 
-**Inline evidence citations:** Choose a cute decorative Unicode glyph (for example ❀, ✿, ❁, ✧ or ♡) for each unique evidence target in the document. Append its linked glyph to the end of the supported claim, with no intervening space: `claim text[❀](#e-descriptive-slug)`. Never put the glyph at the start of a bullet or claim. Evidence-first prose states the evidence before the proposed action; its citation still follows the evidence claim.
+**Inline evidence citations:** Choose a neutral decorative Unicode glyph (for example ❀, ✿, ❁ or ✧) for each unique evidence target in the document. The glyph identifies a source only; it must not imply a problem, question, warning, uncertainty, priority, approval, or task status. Do not use symbols such as ⚠️, ❗, ❓, 🔍, 🔔, ✅ or ❌ as citation markers. Append its linked glyph to the end of the supported claim, with no intervening space: `claim text[❀](#e-descriptive-slug)`. Never put the glyph at the start of a bullet or claim. Evidence-first prose states the evidence before the proposed action; its citation still follows the evidence claim.
 
 Append the same plain glyph to the end of the target evidence heading: `### Brief evidence description ❀`. Keep the explicit descriptive anchor stable. Repeated citations to that target reuse its glyph; different targets in the same document must have different glyphs, even across sections or tables. Do not use daggers, numbered markers, or task-status glyphs for evidence citations.
 
@@ -392,36 +405,44 @@ Entry: `- **HH:MM:** Entry text`
 
 ## Drafting Comms
 
-**North star — minimum reader effort to independently verify:** every rule below exists to get the reader from "I read a claim" to "I saw the same data myself" in the fewest possible motions — ideally one click, at worst one click plus one paste-and-run. If a rule and this goal ever seem to conflict, this goal wins. Before finalizing any comms draft, reread every evidence sentence and ask: *could a skeptical reader verify this in under 10 seconds, without asking me a follow-up question?* If not, fix the sentence — don't explain why it can't be fixed.
+Apply to outbound messages and ready-to-send drafts, including Draft Next Comms. Minimize the recipient's effort to understand, verify, and act. Follow Compose → Substantiate → Verify → Maintain; approval to draft is not approval to send.
 
-**When drafting Slack messages, emails, or other outbound communication — including Draft Next Comms:**
+### Compose
 
-- **Draft Next Comms structure:** Include only unsent drafts. Each is a `###` heading naming the target followed immediately by the paste-ready body as plain text—never a blockquote. Do not add a `Status:` line, `DRAFT`/`READY` label, approval reminder, editorializing, or lead-in sentence.
-- **Inline evidence links:** Every empirical or diagnostic claim in the draft body must link inline to the exact primary record/result/document that supports it. Link each distinct factual clause; no dangling evidence and no internal evidence-glyph/footnote anchors in outbound bodies.
-- **No self-referential evidence:** Never use the same incident document, another agent-authored repo artifact, or `aidocs` as evidence. If the workflow requires an incident link, include it once at the end for context only; it does not support any claim.
-- **Name the owner:** A request or recommendation to another team must identify the specific system/team and link its applicable on-call handle/support route to verified ownership evidence. Do not substitute an umbrella org/platform name for a team.
-- **Provenance:** End every datestamped draft with a blank line and `*Powered by {Model} in {Harness} in {IDE} via {skill-or-command}*`. For every Powered-by signature, including drafts, external communications, and git commit messages, resolve values using [runtime provenance](https://github.com/BrianHoltz/tools/blob/main/docs/AgentRules.md#communication-signing): Code Puppy and Wibey must include both core and active extension/plugin versions, independently of the IDE version; retain explicit unknown or CLI n/a when applicable. Never mention doc-audit. Name [triage](../../commands/triage.md) when it is in play; otherwise name the other skill or command actually used. Link a skill to its `SKILL.md` or a command to its canonical command file. Omit `via` when no skill or command other than doc-audit applies. Workflow-specific provenance rules may change formatting, but cannot override this selection rule. Doc-audit [audit-date markers](#audit-date-format) are separate from Powered-by signatures.
-- **Sent lifecycle:** Do not retain a sent message, stub, or sent-status line in Draft Next Comms. Delete it and add one Work Log entry naming the destination and message URL or Slack `ts`. A recurring daily Jira update is a different artifact: overwrite it for the next cadence rather than deleting its section.
-- **Approval:** A draft is not authorization to send it. Get the user's approval before communicating with other humans.
-- **Task linkage:** When a reply blocks a Task, the task Notes must link the draft and the draft must name the blocked task.
+- **Ask the fewest, easiest questions.** Lead with the root question whose answer decides the rest. Drop questions another answer settles, or that we can answer ourselves; defer later-stage asks until their stage. For each likely answer, state what we will do so the recipient can reply in one line.
+- **Lead with the ask or finding.** Name the recipient and requested action; include only context needed to answer or act. Distinguish observations from hypotheses and questions; do not present an inference as an established diagnosis.
+- **Audience-aware context.** When invoking a procedure, rule, contract, form, or ownership boundary, link the relevant canonical instruction and identify the specific gap or decision. Assume recipients know their system; explain only what they need to respond. Prefer a short linked phrase over a tutorial: “The [onboarding guide](url) covers X; does it also apply to Y?”
+- **Ownership and action.** For cross-team requests, name the specific system/team and link its applicable support route to inspected ownership instructions, not an umbrella organization. Link recommendations to the exact tool record or form where the recipient acts. When proposing a non-Slack support route, also link the most relevant verified Slack alternative and explain the choice; never invent channels or imply Slack is unsupported without evidence.
+- **Link presentation.** Link every named Walmart tool/platform. Use descriptive Markdown links, not bare URLs; identify the relevant field, row, or instruction in the label when relevance is non-obvious. Convert links to the destination's native format when sending. For catalog entities, follow [Catalog Entity Presentation](#catalog-entity-presentation).
 
-- **Give the reader the manual when it matters.** If a draft invokes a documented procedure, rule, contract, form, or ownership boundary, link the exact canonical documentation that tells the reader how it works or what to do; do not merely name it or link our incident record.
-- **Reference the doc that drives the question.** Frame uncertainty as "the [onboarding guide](url) says X but doesn't cover Y" — not a bare "we're not sure about Y." Citing the source proves the agent read it, surfaces exactly where the gap is, and lets the reviewer click through to confirm.
-- **Link every Walmart tool or platform mentioned by name.** IOP, DX, Kafka Studio, Jira SD, Confluence pages, Kibana, ServiceNow — if it has a URL, link it. Every unlinked tool name is a missed chance for the reviewer to verify.
-- **Never use bare URLs in Slack drafts.** Slack auto-links raw URLs, but they're unreadable in the project doc. Use `[descriptive text](url)` so the doc is reviewable; strip markdown to bare URLs only at send time if needed.
-- **Context is not evidence:** A draft may link its owning incident or project for context, but every evidentiary claim must link to its primary source instead.
-- **Link every diagnostic claim to the tool that confirmed it.** "Catalog looks fine" → link to the Editorial URL you checked. "Offer is DELISTED" → link to Castar. "Feed processed 3 times" → link to Ingestion Portal. One click = reader can verify without asking a follow-up question.
-- **Every empirical claim needs evidence when a primary source can expose it.** Name the specific entity and link directly to its filtered tool record or result—not a Slack conversation, a tool landing page, or our incident doc. If no durable permalink exists, give the exact runnable recipe with the tool link.
-- **Present catalog entities using [Catalog Entity Presentation](#catalog-entity-presentation).** That canonical rule defines the first-mention glyph links, styled ID/title, and repeated-mention exception.
-- **Link every recommendation to the tool where the recipient acts on it.** "Seller needs to resubmit" → link to Ingestion Portal showing current feed state. "Check if other variants are affected" → link to Editorial BVShell. One click = recipient can action the recommendation immediately.
-- **Verify every draft link through safe-browse before finalizing.** Open every destination, including quoted comments, context, manuals, support forms, Slack channels and provenance links; inspect the fully loaded human-visible page, not HTTP status, a backend response or an agent's assurance. Evidence must immediately display the exact claimed entity/data; context and action links must immediately identify their relevance or destination. Verify redirects, filters, anchors and channel/form names. Replace or remove links landing on errors, API-auth walls, app-launch interstitials, unrelated pages or missing anchors; if no direct result permalink exists, use the inline runnable recipe below. Recheck changed URLs. Record execution evidence outside the paste-ready draft; never claim all links verified while any remains blocked or uninspected.
-- **Explain non-obvious relevance in the linked text.** For every draft link, if the destination needs interpretation to connect it to the claim or context, include that interpretation in the hyperlink label: identify the relevant row, field, instruction or section and what it establishes. A generic label such as “branch commit” does not explain a credential finding; attribution or temporal proximity must not imply causation. Remove irrelevant links rather than rationalizing them. Keep already self-explanatory labels short.
-- **Support-route auditability:** Cite the canonical support instructions actually inspected. When proposing a non-Slack route, name and link the most relevant verified Slack alternative being bypassed and explain the route choice; do not infer a channel name or imply Slack is unsupported without evidence.
-- **THE EYEBALL TEST — every evidence link must pass it, no exceptions:** open the link cold, with zero other context, and look. If what you see does **not immediately and exactly show the data that backs the claim** — same filter, same records, same result — the link fails and must not be used. This rules out three specific failure modes agents keep repeating:
-  1. **Landing-page/homepage links.** A link to a tool's default screen (e.g. a SQL editor's blank landing page, a dashboard's home view) shows nothing about the claim. It is not evidence; it's a link to the building, not the room.
-  2. **Unfiltered/live-tail links.** A link to a topic browser, log stream, or dashboard showing *whatever is currently flowing* — not the specific records that support the claim — will show different data to the next viewer. If the tool can't preserve the filter/query/time-range in the URL, this pattern doesn't produce valid evidence links.
-  3. **Our own artifacts.** Anything living in this repo (`shared/`) or written by an agent — SQL files, incident docs, memos — is our interpretation of evidence, not the evidence itself. See the bullet above.
-- **When no permalink exists: give the recipe, not the narration.** Never spend a sentence explaining *why* a link can't exist ("no shareable result link exists for this tool, query available on request") — that costs the reader a full sentence and hands them **zero** verification power; they now have to come back and ask you for the query before they can check anything at all. Instead, name the tool, link the tool's own entry URL if it has one, and put the exact, runnable, copy-pasteable query or click-path **inline, in the same sentence**: ❌ "We confirmed via Lenses SQL Studio (no shareable result link exists for this tool, query available on request): two jobs are racing..." ✅ "Run `` SELECT * FROM `topic` WHERE _key IN (...) `` in [Lenses SQL Studio](url) to see it yourself: two jobs are racing..." The tool's homepage link plus an inline recipe is a legitimate two-step verification path — one click to the tool, one paste to reproduce — which is categorically different from the landing-page failure mode above (a bare link with *no* recipe, forcing the reader to reconstruct the query themselves from nothing).
+### Substantiate
+
+Every distinct empirical or diagnostic clause needs inline primary evidence. Use one of these verification paths:
+
+- **Direct result:** Link the exact record or result showing the claimed entity/data, preserving filters and time range. Open it cold: the claimed data must be visible without reconstructing the investigation. A landing page alone, unrelated Slack discussion, unfiltered live stream, or internal evidence-glyph/footnote anchor does not qualify.
+- **Reproduction recipe:** If no direct result permalink exists, link the tool and give the complete copy-pasteable query or exact click-path in the same sentence. Include the entity, filters, environment, and time range needed to reproduce the observation. Do not offer “query available on request” or spend prose explaining why a permalink is unavailable. This path permits a tool-entry link only when paired with the recipe; it does not permit agents to bypass access or execution restrictions.
+
+**Source versus interpretation:** Our incident docs, memos, SQL files, and analyses do not independently establish the operational facts they describe. Cite the underlying primary records instead. A code commit can establish code behavior; a canonical rule can establish policy, regardless of authorship. Neither alone proves live operational state. Include an owning project/incident link once at the end for context when useful or required, never as substitute evidence.
+
+Illustrative wording, not a verified finding:
+
+- **Good:** “In [Lenses SQL Studio](url), run `SELECT * FROM example_topic WHERE _key = 'example-key' AND event_time >= '2026-10-22T14:00:00Z' AND event_time < '2026-10-22T15:00:00Z'` on the named cluster to inspect the matching events.” Actual drafts must use a verified URL, cluster, schema, and executable query.
+- **Bad:** “The [topic browser](url) confirms duplicate processing; query available on request.” A live stream without the matching records/filter neither establishes the claim nor lets the recipient reproduce it.
+
+### Verify
+
+- **Inspect every unique destination through [safe-browse](../../commands/safe-browse.md) before finalizing.** Open the fully loaded human-visible page, including evidence, quoted comments, context, manuals, support routes, catalog glyphs, and provenance links. HTTP status, backend responses, and another agent's assurance do not count.
+- **Apply the matching gate.** Direct evidence must visibly show the claimed records and scope. Recipe links must open the named tool, and the recipe must reproduce the observation; where execution is reserved to the user, obtain their result rather than running it yourself. Context/action links must visibly identify the relevant instruction or destination. Check redirects, filters, anchors, and channel/form names. Replace or remove failed links and recheck changed URLs.
+- **Record verification outside the paste-ready body.** Record inspected destinations and what they establish, plus any remaining blockers. An uninspected or blocked link prevents claiming verification complete; follow the applicable auth/blocking workflow rather than silently weakening the claim.
+- **Sign and obtain approval.** Follow [Communication Signing](https://github.com/BrianHoltz/tools/blob/main/docs/AgentRules.md#communication-signing) for provenance discovery, required versions, formatting, and publication gates. Use triage when that command is in play; otherwise name/link the responsible workflow, omit `via` when none applies, and never name doc-audit. Get explicit user approval before sending to other humans.
+
+**Final check:** Clear ask; audience-appropriate context; every factual clause supported; every destination inspected; recipes complete; applicable owner/action/entity rules satisfied; provenance valid; send approval obtained before transmission. If a check fails, fix it or report the specific blocker outside the draft.
+
+### Maintain
+
+- **Unsent drafts only.** In Draft Next Comms, use a plain `###` heading naming the target, followed immediately by the paste-ready body, never a blockquote. Omit status labels, approval reminders, editorial comments, and lead-ins.
+- **Blocked tasks:** When a task awaits a reply, its Notes link to the draft and the draft names the blocked task.
+- **After sending:** Remove the draft entirely and add one Work Log entry with destination and message permalink or Slack `ts`. For the recurring [Next Daily Jira Update](#next-daily-jira-update), overwrite the draft for the next cadence instead of deleting its section.
 
 ## Rules About Pending Work
 
@@ -452,7 +473,6 @@ Tasks flow through the document deterministically: Tasks → Active Work → Wor
 **Empirical Investigations:**
 
 - **Pending Investigations** — empirical unknowns *we can answer ourselves*. Record specific, named questions about state, metrics, or facts. You control the investigation through logs, testing, measurement, or analysis. Minor clarifications from other teams are fine; the core work is ours. Minor questions within an investigation don't demote it to Draft Comms — but if *they* control the outcome and you're waiting for their decision, it's Draft Comms instead. When completed: findings are absorbed into doc edits (Task notes, Context, Evidence, Work Log), or archived in [Resolved Investigations](#resolved-investigations) if they have no natural home elsewhere.
-
 - **Resolved Investigations** — completed investigations whose findings have no natural home in Interfaces, Engineering Considerations, Task notes, or Work Log. Archive only insights that are important to preserve but do not fit the narrative. Subject to distillation — findings that belong in the body should be absorbed there instead, and this archive entry omitted.
 
 **Inline Placeholders:**
@@ -468,14 +488,15 @@ A ⚠️ glyph used in a table cell, heading, or prose WITHOUT a link to a canon
 
 **Standard inline reference forms:**
 
-| What you're referencing | Inline form |
-| --- | --- |
-| In-progress Task | `▶️ Task: [task name](#tasks)` |
-| Blocked Task | `🛑 Task: [task name](#tasks)` |
-| Pending Decision | `❓ Decision: [question summary](#pending-decisions)` |
-| Pending Investigation | `🔍 Investigation: [question summary](#pending-investigations)` |
-| Draft Next Comms item | `📤 Draft: [draft heading](#draft-next-comms)` |
-| Inline TODO | write `TODO` inline — no link (TODOs are never linked) |
+
+| What you're referencing | Inline form                                                     |
+| ----------------------- | --------------------------------------------------------------- |
+| In-progress Task        | `▶️ Task: [task name](#tasks)`                                |
+| Blocked Task            | `🛑 Task: [task name](#tasks)`                                  |
+| Pending Decision        | `❓ Decision: [question summary](#pending-decisions)`           |
+| Pending Investigation   | `🔍 Investigation: [question summary](#pending-investigations)` |
+| Draft Next Comms item   | `📤 Draft: [draft heading](#draft-next-comms)`                  |
+| Inline TODO             | write `TODO` inline — no link (TODOs are never linked)         |
 
 ## Doc-audit interview
 
@@ -553,18 +574,6 @@ Forensic check that Active Work contains only current in-progress state (invoked
 - Any doc with any of the standard pre-defined sections
 - But never any ephemeral ad hoc docs e.g. under `aidocs/` or `tmp/`
 
-## Audit Date Format
-
-Place at the bottom of the `## Status` section (if present), else at the end of the `## Contents` section (if present), else at the end of the doc. Format as a single italic non-list-item line where `doc-audit` links to this skill:
-
-```
-*[doc-audit](https://gecgithub01.walmart.com/CatalogRelationships/relationship-shared/blob/main/.wibey/skills/doc-audit/SKILL.md): YYYY.MM.DD.Dow*
-```
-
-Example: `*[doc-audit](https://gecgithub01.walmart.com/CatalogRelationships/relationship-shared/blob/main/.wibey/skills/doc-audit/SKILL.md): 2026.06.19.Thu*`
-
-Update the date whenever the full checklist is run.
-
 ## See Also
 
 If this repo uses the Agent Toolkit (i.e. has a toplevel `shared` symlink), then see:
@@ -636,27 +645,7 @@ If updating a doc created on an earlier date, move it into the current date fold
 
 Standardized formatting so agents and humans produce visually consistent docs.
 
-### Footnote Glyphs in Tables
-
-Evidence citations in tables follow the document-wide unique-glyph standard above. Ordinary non-evidence table footnotes may use these nearby visual markers:
-
-**Informational** (neutral, no action needed):
-
-- † (dagger)
-- ‡ (double dagger)
-- ⁑ (double asterisk)
-- 📌 (pushpin)
-
-**Problem** (needs remediation/investigation):
-
-- ⚠️ (yellow triangle)
-- ❗ (red exclamation)
-- 📣 (megaphone)
-- 🔔 (bell)
-
-The glyph *is* the cell content when the cell otherwise has no data; otherwise append it to the value.
-
-Within a given table or list, each ordinary footnote glyph maps to exactly one footnote. Evidence glyphs instead map to exactly one target across the entire document; they may be reassigned only in a different document.
+For citations and explanatory footnotes in tables or prose, use the neutral linked glyphs and document-wide unique-target mapping in [Evidence](#evidence); no separate table-footnote glyph vocabulary applies. Problem or question signals belong to [pending-work references](#cross-references-for-pending-workquestions), not citation markers.
 
 ### Table Cell Vocabulary
 

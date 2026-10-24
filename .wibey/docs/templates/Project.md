@@ -40,13 +40,27 @@
   - *Say why this work is really happening, identify charter boundaries and tensions, be frank about deadlines and pragmatic considerations and competing demands on the relevant teams and systems.*
   - *Avoid ruinous empathy (withholding hard truths), obnoxious aggression (candor without care), and manipulative insincerity (political positioning instead of honest assessment). Care means helping people confront reality and improve, not cushioning the message until it says nothing.*
 
+## Draft Next Comms
+
+*Optional.* Unsent outbound communications. Each draft uses a `###` target heading followed by a paste-ready body. Follow the complete [Drafting Comms](../../.wibey/skills/doc-audit/SKILL.md#drafting-comms) contract.
+
+## Next Daily Jira Update
+
+*Optional — include only if the project has a Jira ticket in [Summary → Where Tracked](#summary); delete this heading entirely for untracked work.* Standing daily-status bullets sized to paste directly as a Jira comment, terse and bullet-heavy — never prose:
+
+- **Done today**: one bullet per logical change finished today
+- **Status+Risks**: one status bullet, plus one bullet per risk/blocker
+- **Next**: the next 1–3 concrete steps
+
+**Overwrite in place each session** — this is not a log. Today's bullets replace yesterday's; the Work Log is the permanent record of history, this section is a live cache of "what would I post right now." When posted, prefix per team convention (e.g. `MM.DD.Dow:`) and *keep the section* for tomorrow's update — unlike [Draft Next Comms](#draft-next-comms), a sent update is not deleted, only overwritten next session. See [git2jira](../../.wibey/skills/git2jira/SKILL.md) for auto-generating these bullets from git history.
+
 ## Contents
 
 - [Summary](#summary)
+- [Draft Next Comms](#draft-next-comms) *(optional)*
+- [Next Daily Jira Update](#next-daily-jira-update) *(optional)*
 - [Tasks](#tasks)
 - [Active Work](#active-work)
-- [Next Daily Jira Update](#next-daily-jira-update) *(optional)*
-- [Draft Next Comms](#draft-next-comms) *(optional)*
 - [Pending Decisions](#pending-decisions)
 - [Decisions](#decisions)
 - [Pending Investigations](#pending-investigations)
@@ -77,6 +91,7 @@ Status glyphs and meanings: see [StatusVocabulary.md](../StatusVocabulary.md). F
 
 **Jira column rule:** Include the Jira column **only if this project involves two or more tickets.** Single-ticket projects omit this column; the ticket belongs in Summary § Where Tracked instead, not duplicated here. For multi-ticket projects, show only one ticket per row (the most relevant one; others go in Notes if necessary).
 
+
 | Task         | Jira                                                              | Status | Notes |
 | ------------ | ----------------------------------------------------------------- | ------ | ----- |
 | Example task | [CATGTRLSHP-NNN](https://jira.megacorp.com/browse/CATGTRLSHP-NNN) |        |       |
@@ -94,20 +109,6 @@ The mutable present: fine-grained subtasks and cached state for whichever [Tasks
 - **Untasked work is a red flag** — it is acceptable only for brief, truly ephemeral state (e.g., "waiting for CI to finish"). If untasked work persists across sessions, it belongs in the Tasks table.
 
 *(one `###` section per ▶️ task, subtask details here)*
-
-## Next Daily Jira Update
-
-*Optional — include only if the project has a Jira ticket in [Summary → Where Tracked](#summary); delete this heading entirely for untracked work.* Standing daily-status bullets sized to paste directly as a Jira comment, terse and bullet-heavy — never prose:
-
-- **Done today**: one bullet per logical change finished this session
-- **Status**: current state in one line (on-track / at-risk / blocked, and why)
-- **Next**: the next 1–3 concrete steps
-
-**Overwrite in place each session** — this is not a log. Today's bullets replace yesterday's; the Work Log is the permanent record of history, this section is a live cache of "what would I post right now." When posted, prefix per team convention (e.g. `MM.DD.Dow:`) and *keep the section* for tomorrow's update — unlike Draft Next Comms below, a sent update is not deleted, only overwritten next session. See [git2jira](../../.wibey/skills/git2jira/SKILL.md) for auto-generating these bullets from git history.
-
-## Draft Next Comms
-
-*Optional.* Unsent outbound communications. Each draft uses a `###` target heading followed by a paste-ready body. Follow the complete [Drafting Comms](../../.wibey/skills/doc-audit/SKILL.md#drafting-comms) contract.
 
 ## Pending Decisions
 

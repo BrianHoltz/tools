@@ -22,13 +22,26 @@
   - Routed: *(when the team handed off to the owning team — omit if your team owns the fix)*
   - Resolved: *(when the problem was fixed)*
 
+- **G-Rated Summary**: *Tell a simple story around one approachable example, using terse sub-bullets rather than paragraphs.*
+
+  - *Start with a customer shopping, a seller listing an item, or an engineer handling a request. Explain what stopped working, who was affected, and what mitigation or fix restores normal behavior; distinguish confirmed findings from the current hypothesis.*
+  - *Use plain language and terminology a Walmart engineer would recognize. Assume familiarity with only the most basic Catalog engineering concepts and systems.*
+- **Radically Candid Summary**: *Give the inside story via [Radical Candor](https://www.radicalcandor.com/).*
+
+  - *Explain the evidenced technical and operational conditions behind the incident, including detection gaps, ownership boundaries, and trade-offs in mitigation or remediation. Separate established causes from hypotheses; identify systemic contributors without guessing motives or assigning unsupported blame.*
+  - *Avoid ruinous empathy (withholding hard truths), obnoxious aggression (candor without care), and manipulative insincerity (political positioning instead of honest assessment). Care means helping people confront reality and improve, not cushioning the message until it says nothing.*
+
+## Draft Next Comms
+
+Unsent outbound communications. Each draft uses a `###` target heading followed by a paste-ready body. Follow the complete [Drafting Comms](../../.wibey/skills/doc-audit/SKILL.md#drafting-comms) contract.
+
 ## Contents
 
 - [Summary](#summary)
+- [Draft Next Comms](#draft-next-comms)
 - [Tasks](#tasks)
 - [Active Work](#active-work)
 - [Next Daily Jira Update](#next-daily-jira-update) *(optional — only if Jira-tracked)*
-- [Draft Next Comms](#draft-next-comms)
 - [Pending Decisions](#pending-decisions)
 - [Pending Investigations](#pending-investigations)
 - [Symptoms](#symptoms)
@@ -65,11 +78,7 @@ Current sub-steps, blockers, and partial results for the in-progress thread. Mut
 - **Status**: current state in one line (investigating / diagnosed / mitigated / resolved, and why)
 - **Next**: the next 1–3 concrete steps
 
-**Overwrite in place each session** — this is not a log. Today's bullets replace yesterday's; the Work Log is the permanent record. When posted, prefix per team convention (e.g. `MM.DD.Dow:`) and *keep the section* for tomorrow's update — unlike Draft Next Comms below, a sent update is not deleted, only overwritten next session.
-
-## Draft Next Comms
-
-Unsent outbound communications. Each draft uses a `###` target heading followed by a paste-ready body. Follow the complete [Drafting Comms](../../.wibey/skills/doc-audit/SKILL.md#drafting-comms) contract.
+**Overwrite in place each session** — this is not a log. Today's bullets replace yesterday's; the Work Log is the permanent record. When posted, prefix per team convention (e.g. `MM.DD.Dow:`) and *keep the section* for tomorrow's update — unlike [Draft Next Comms](#draft-next-comms), a sent update is not deleted, only overwritten next session.
 
 ## Pending Decisions
 
@@ -126,7 +135,7 @@ Name these for what was investigated, not for the conclusion. Common examples:
 - Code Path
 - Config State (CCM, YAML, feature flags)
 
-Each section: what was examined, what was found, what it means. Prefix unverified inferences with "Inference:". Every empirical claim gets a dagger footnote to Evidence.
+Each section: what was examined, what was found, what it means. Prefix unverified inferences with "Inference:". Every empirical claim gets a neutral linked Unicode citation to Evidence; follow [doc-audit Evidence](../../.wibey/skills/doc-audit/SKILL.md#evidence).
 
 ## Timeline
 
@@ -186,9 +195,9 @@ Team decisions archived for audit trail. Each entry states what was decided, why
 
 ## Evidence
 
-Every sourced claim uses a dagger footnote: `claim[†](#e-slug)`. Label unsourced claims "Inference:" until evidenced. See the doc-audit skill for the Evidence protocol. Entry format:
+Every sourced claim uses a neutral decorative Unicode citation: `claim[❀](#e-slug)`. Assign one glyph per unique evidence target, reuse it only for that target, and append it to the matching evidence heading. Keep descriptive anchors stable. Follow [doc-audit Evidence](../../.wibey/skills/doc-audit/SKILL.md#evidence); use inline primary-source links instead in external drafts. Label unsourced interpretations "Inference:". Entry format:
 
-### Brief description of what is being evidenced
+### Brief description of what is being evidenced ❀
 
 <a id="e-descriptive-slug"></a>
 
