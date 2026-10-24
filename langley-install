@@ -1,0 +1,185 @@
+#!/usr/bin/env python3
+"""Install a local Langley ZIP while IDEA is stopped; dry-run unless --apply.
+
+An agent must check other running agents through Langley before --apply, or
+obtain confirmation covering them. --agents-checked records that preflight;
+it does not discover agents. Detached runs survive the requesting IDE session.
+"""
+
+import argparse
+import fcntl
+import hashlib
+import io
+import json
+import os
+from pathlib import Path, PurePosixPath
+import shutil
+import stat
+import subprocess
+import sys
+import tempfile
+import time
+import xml.etree.ElementTree as ET
+from zipfile import ZipFile
+
+
+PLUGIN_ID = "com.walmart.langley"
+
+
+def package_files(package):
+    """Validate the full archive before any IDE or installed-file mutation."""
+    files = {}
+    with ZipFile(package) as archive:
+        for entry in archive.infolist():
+            path = PurePosixPath(entry.filename)
+            if (path.is_absolute() or ".." in path.parts or not path.parts
+                    or path.parts[0] != "langley"
+                    or stat.S_ISLNK(entry.external_attr >> 16)):
+                raise ValueError(f"Unsafe archive entry: {entry.filename}")
+            if entry.is_dir():
+                continue
+            relative = Path(*path.parts[1:])
+            if not relative.parts or relative in files:
+                raise ValueError(f"Invalid/duplicate entry: {entry.filename}")
+            files[relative] = archive.read(entry)
+    descriptors = []
+    for path, data in files.items():
+        if path.suffix == ".jar":
+            with ZipFile(io.BytesIO(data)) as jar:
+                if "META-INF/plugin.xml" in jar.namelist():
+                    descriptors.append(ET.fromstring(jar.read("META-INF/plugin.xml")))
+    if len(descriptors) != 1 or descriptors[0].findtext("id") != PLUGIN_ID:
+        raise ValueError("Expected exactly one Langley plugin descriptor")
+    if not descriptors[0].findtext("version"):
+        raise ValueError("Missing plugin version")
+    return files, descriptors[0].findtext("version")
+
+
+def verify_tree(folder, files):
+    actual = {p.relative_to(folder) for p in folder.rglob("*") if p.is_file()}
+    if actual != set(files) or any((folder / p).read_bytes() != data for p, data in files.items()):
+        raise ValueError(f"Installed contents do not match package: {folder}")
+
+
+def install_staged(staged, destination, backup, files):
+    """Preserve the old plugin and restore it on a failed replacement."""
+    if backup.exists():
+        raise FileExistsError(backup)
+    destination.rename(backup)
+    try:
+        staged.rename(destination)
+        verify_tree(destination, files)
+    except Exception:
+        if destination.exists():
+            destination.rename(staged)
+        backup.rename(destination)
+        raise
+
+
+def idea_pids(app):
+    executable = str(app / "Contents/MacOS/idea")
+    output = subprocess.check_output(["ps", "-axo", "pid=,comm="], text=True)
+    return [int(parts[0]) for line in output.splitlines()
+            if len(parts := line.strip().split(None, 1)) == 2 and parts[1] == executable]
+
+
+def wait_until(predicate, timeout, message):
+    deadline = time.monotonic() + timeout
+    while not predicate():
+        if time.monotonic() >= deadline:
+            raise TimeoutError(message)
+        time.sleep(1)
+
+
+def execute(args, files, run_dir):
+    app = args.app.resolve()
+    destination = args.plugins.resolve() / "langley"
+    if not (app / "Contents/MacOS/idea").is_file():
+        raise FileNotFoundError(f"IDE executable missing: {app}")
+    if not destination.is_dir() or destination.is_symlink():
+        raise ValueError("Expected an existing, non-symlink Langley installation")
+    staged = run_dir / "langley"
+    staged.mkdir()
+    for path, data in files.items():
+        target = staged / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
+    verify_tree(staged, files)
+    backup = run_dir / "previous-langley"
+    old_pids = idea_pids(app)
+    print(f"Validated staging. Original IDEA PIDs: {old_pids}", flush=True)
+    if old_pids:
+        # Normal quit: IDEA may save state, ask about tasks, or cancel shutdown.
+        subprocess.run(["osascript", "-e", 'on run argv', "-e",
+                        'tell application (item 1 of argv) to quit', "-e", 'end run',
+                        str(app)], check=True, timeout=args.timeout)
+    wait_until(lambda: not idea_pids(app), args.timeout,
+               "IDEA did not exit; installed plugin left unchanged")
+    install_staged(staged, destination, backup, files)
+    print(f"Installed and verified. Previous plugin preserved at {backup}", flush=True)
+    subprocess.run(["open", "-a", str(app)], check=True, timeout=30)
+    wait_until(lambda: bool(idea_pids(app)), args.timeout,
+               "Plugin installed, but IDEA relaunch was not observed")
+    verify_tree(destination, files)
+    print("IDEA relaunched; disk installation verified. Live plugin behavior is not verified.", flush=True)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("package", type=Path)
+    parser.add_argument("--app", type=Path, default=Path("/Applications/IntelliJ IDEA.app"))
+    parser.add_argument("--plugins", type=Path, default=Path.home() /
+                        "Library/Application Support/JetBrains/IntelliJIdea2026.2/plugins")
+    parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--agents-checked", action="store_true",
+                        help="Attest other agents were checked/required confirmation obtained")
+    parser.add_argument("--detach", action="store_true")
+    parser.add_argument("--timeout", type=int, default=180)
+    parser.add_argument("--run-dir", type=Path, help=argparse.SUPPRESS)
+    args = parser.parse_args()
+    args.package = args.package.resolve()
+    files, version = package_files(args.package)
+    digest = hashlib.sha256(args.package.read_bytes()).hexdigest()
+    print(f"Package: {args.package}\nLangley version: {version}; files: {len(files)}", flush=True)
+    if not args.apply:
+        print("Dry run: would quit IDEA normally, back up Langley, replace it and relaunch.")
+        return 0
+    if not args.agents_checked:
+        parser.error("--apply requires --agents-checked after the agent-state preflight")
+    root = Path.home() / "Library/Logs/langley-install"
+    root.mkdir(parents=True, exist_ok=True)
+    run_dir = args.run_dir or Path(tempfile.mkdtemp(prefix="run-", dir=root))
+    if args.detach:
+        # Pin the validated ZIP so a later Downloads cleanup cannot change this run.
+        pinned = run_dir / args.package.name
+        shutil.copyfile(args.package, pinned)
+        if hashlib.sha256(pinned.read_bytes()).hexdigest() != digest:
+            raise ValueError("Package changed during staging")
+        command = [sys.executable, str(Path(__file__).resolve()), str(pinned), "--apply",
+                   "--agents-checked", "--app", str(args.app), "--plugins", str(args.plugins),
+                   "--timeout", str(args.timeout), "--run-dir", str(run_dir)]
+        with (run_dir / "install.log").open("x") as log:
+            process = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=log,
+                                       stderr=subprocess.STDOUT, start_new_session=True)
+        print(f"Detached installer PID: {process.pid}\nLog: {run_dir / 'install.log'}")
+        return 0
+    status = {"package": str(args.package), "sha256": digest, "version": version,
+              "result": "running"}
+    status_path = run_dir / "status.json"
+    # One cooperating installer per plugin directory; no stale lock ownership.
+    with (args.plugins / ".langley-install.lock").open("a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        status_path.write_text(json.dumps(status, indent=2) + "\n")
+        try:
+            execute(args, files, run_dir)
+            status["result"] = "installed-and-relaunched"
+        except Exception as error:
+            status.update(result="failed", error=str(error))
+            raise
+        finally:
+            status_path.write_text(json.dumps(status, indent=2) + "\n")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
