@@ -19,6 +19,7 @@ This file is the global layer; a repo's AGENTS.md supplies project/team context,
   - [GitHub authentication by environment](#github-authentication-by-environment)
   - [Communication Signing](#communication-signing)
 - [Browser Automation](#browser-automation)
+- [Interpreting Prompts](#interpreting-prompts)
 - [Inferring Intended Files](#inferring-intended-files)
 - [Dates and Times](#dates-and-times)
   - [Always verify the current date](#always-verify-the-current-date)
@@ -229,6 +230,11 @@ Model lookup is best-effort, never heroic or blocking. Make one quick check of t
 - Avoid opening VS Code integrated browser tabs for agent work unless the user explicitly wants a human-view-only tab. Those tabs clutter the IDE and may not expose screenshot or DOM access to the agent.
 - If a VS Code browser tab was opened only for agent investigation and a CDP-capable browser is available, switch to CDP and stop adding more IDE tabs.
 - **Every CDP tab must open inside your own dedicated top-level browser window** — the one whose leftmost tab is your identification page. Commands such as `tab new`, direct `open`, and `curl /json/new` silently open tabs in whichever window the browser currently considers focused, which is almost never yours. Use whatever session-aware tab-creation helper your browser setup checklist provides (e.g., `cdp_ensure_tab`). Verify the tab belongs to your window before using it.
+
+## Interpreting Prompts
+
+- **Dictated prompts:** Brian often dictates prompts, so expect typos, homonyms, and rambling structure. Infer the intended meaning from context; ask only when plausible readings lead to materially different actions.
+- **Misdirected prompts:** Brian sometimes types into the wrong conversation. If a prompt seems disconnected from the current conversation, look for conversations he may have meant to target when your host allows, then ask him to confirm before acting.
 
 ## Inferring Intended Files
 
