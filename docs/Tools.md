@@ -2,55 +2,49 @@
 
 ## Local Modifications in Use
 
-- [Shuzijun](ToolMods.md#shuzijun-source-build)
-  - Keep search typing out of the document.
-  - Force-save from the toolbar.
-  - Reload with dirty-buffer confirmation.
-  - Follow IDE light/dark theme changes.
-  - Match preview typography and IDE zoom.
+- [Shuzijun Markdown Editor — IDEA](ToolMods.md#shuzijun-source-build)
+  - Type in search without editing the document.
+  - Save immediately from the toolbar.
+  - Confirm before reloading unsaved work.
+  - Follow IDEA's light/dark theme changes.
+  - Match preview fonts and IDEA zoom.
   - Wrap tables within the pane.
-  - Preserve nested-list spacing on Backspace.
-  - Follow file links and heading anchors.
-  - Show a live search-match count.
-  - Fit toolbar controls into an overflow tray.
-  - Keep tooltips visible in narrow panes.
-  - Remember toolbar visibility.
-  - Toggle raw HTML without changing the file.
-  - Load with IDEA's JCEF dependency.
-  - Isolate cached assets between builds.
-- [Zaaack](ToolMods.md#zaaack-source-build)
-  - Find text across rich-editor modes.
-  - Navigate with the Explorer outline.
-  - Follow links and cross-file anchors.
-  - Keep independent editors per file.
-  - Match dark-theme text and code colors.
-  - Preserve nested-list spacing (source local.7).
-  - Fit toolbar controls into an overflow tray.
-  - Keep tooltips visible in narrow panes.
-  - Remember toolbar visibility.
-  - Toggle raw HTML without changing the file.
+  - Keep list spacing intact when deleting empty bullets.
+  - Jump to linked files and headings.
+  - See the number of search matches as you type.
+  - Reach hidden toolbar buttons through an overflow menu.
+  - Read tooltips even in narrow panes.
+  - Remember whether the toolbar is hidden.
+  - Hide raw HTML without changing the file.
+- [Zaaack Markdown Editor — VS Code](ToolMods.md#zaaack-source-build)
+  - Search text in each editing mode.
+  - Jump to headings from the Explorer outline.
+  - Follow links to files and headings.
+  - Keep each file in its own editor tab.
+  - Read text and code comfortably in dark themes.
+  - Keep list spacing intact (fix not yet installed).
+  - Reach hidden toolbar buttons through an overflow menu.
+  - Read tooltips even in narrow panes.
+  - Remember whether the toolbar is hidden.
+  - Hide raw HTML without changing the file.
   - Attach visual-editor files to Copilot.
-  - Bundle translated toolbar labels.
-- [Code Puppy](ToolMods.md#code-puppy-maintained-source-builds)
-  - Route native image/file paste correctly.
-  - Suggest the active file for attachment.
-  - Suggest distinct selections for attachment.
-  - Open VS Code file links in the editor.
-  - Use theme-aware VS Code link colors.
-  - Resolve the local JDK 21 when building.
+  - Show readable, translated toolbar labels.
+- [Code Puppy — IDEA / VS Code](ToolMods.md#code-puppy-maintained-source-builds)
+  - Paste images and files into IDEA chat.
+  - Offer the current file as a chat attachment.
+  - Offer each selected passage as a chat attachment.
+  - Open VS Code chat file links in the editor.
+  - Keep VS Code chat links readable in dark themes.
   - Keep terminal links readable in dark themes.
-- [TypeDown](ToolMods.md#typedown-patches)
-  - Preserve focus and selection on save echoes.
+- [TypeDown Markdown Editor — VS Code / Cursor](ToolMods.md#typedown-patches)
+  - Keep the cursor in place when saving.
   - Tighten prose line spacing.
-  - Reduce table padding and paragraph margins.
+  - Make table rows more compact.
   - Compact list spacing.
-- [Codex helper](ToolMods.md#codex-file-context) — personal Macs
-  - Attach files from visual-editor tabs.
-- [Wibey](ToolMods.md#wibey-jetbrains-source-build)
-  - Clear old VS Code chat on new conversation.
-  - Check ZIPs for required runtime libraries.
-  - Timestamp local JetBrains build versions.
-  - Resolve builds through corporate mirrors.
+- [Codex File Context — VS Code, personal Macs](ToolMods.md#codex-file-context)
+  - Attach the current file from visual-editor tabs.
+- [Wibey — VS Code](ToolMods.md#wibey-vs-code-new-conversation-patch)
+  - Start new chats without showing the old conversation.
 
 ## Contents
 
