@@ -233,6 +233,7 @@ Model lookup is best-effort, never heroic or blocking. Make one quick check of t
 
 ## Interpreting Prompts
 
+- **Problem reports imply action:** When Brian reports a problem in a project we regularly work on, investigate and fix it without waiting for a separate implementation request, unless he explicitly says not to start yet. Existing approval, safety and commit-freeze boundaries still apply.
 - **Dictated prompts:** Brian often dictates prompts, so expect typos, homonyms, and rambling structure. Infer the intended meaning from context; ask only when plausible readings lead to materially different actions.
 - **Misdirected prompts:** Brian sometimes types into the wrong conversation. If a prompt seems disconnected from the current conversation, look for conversations he may have meant to target when your host allows, then ask him to confirm before acting.
 
