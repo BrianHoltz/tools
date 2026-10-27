@@ -2,9 +2,9 @@
 name: ailert
 description: >-
   Get the user's attention with a macOS alert dialog, escalating sounds, and
-  text-to-speech. Use when an agent needs the user to act — login prompts,
-  task completion, review requests, or any blocking wait. macOS only; no
-  extra installs required.
+  text-to-speech only when user action blocks agent progress or the user may miss
+  a time-sensitive opportunity to advance a process. Never use for routine task
+  completion or end-of-turn announcements. macOS only; no extra installs required.
 allowed-tools:
   - Bash
 metadata:
@@ -12,11 +12,9 @@ metadata:
   platform: macOS
   tags: notification, alert, attention, macos, sound, tts
 sample-prompts:
-  - "Alert the user that the build finished"
-  - "Ask the user to log in to Grafana"
-  - "Notify them the PR is ready for review"
-  - "/ailert 15 Please check the deploy"
-  - "/ailert -joke Your tests passed"
+  - "Ask the user to log in to Grafana so I can continue"
+  - "Ask the user to approve the waiting CI/CD promotion"
+  - "/ailert 15 The CI/CD promotion is waiting for your approval"
 arguments:
   - <message> - optional, the alert message (default "Wibey needs your attention")
   - <timeout> - optional integer, seconds before speech escalation (default 30)
@@ -35,8 +33,7 @@ arguments:
 
 # ailert — macOS Alert + Escalating Sound + Speech
 
-Get the user's attention when an agent is blocked waiting for human action.
-Uses only built-in macOS tools (`osascript`, `afplay`, `say`) — zero dependencies.
+Get the user's attention only when human action blocks agent progress or the user may miss a time-sensitive opportunity to advance a process. Never use it merely to announce task completion or at the end of a turn. Uses only built-in macOS tools (`osascript`, `afplay`, `say`) — zero dependencies.
 
 ## Quick Start
 
@@ -50,32 +47,28 @@ end run
 APPLESCRIPT
 ```
 
-**Long task finished, user may have stepped away?**
-
-```bash
-TIMEOUT=90 MSG="Your build finished" bash ~/.wibey/skills/ailert/ailert.sh
-```
+**A CI/CD process is waiting for the user to approve its next stage?** Alert only if the opportunity is time-sensitive or the agent cannot continue without that approval. A completed task with no required next action is not a reason to alert.
 
 **Auth-wall protocol:** After launching the alert, remain in the same task and poll the blocked page every 5–10 seconds (for at most 5 minutes) for authenticated content. Resume the exact blocked operation as soon as authentication succeeds. Do not emit a routine status response or end the turn while that polling is possible. Stop only after the polling limit expires without user action, or when the user must make a substantive decision beyond authentication.
 
 **✅ USE ailert when:**
-- Agent is **blocked** on SSO/login/credential
-- User has **likely walked away** (long-running task done)
-- Agent needs **explicit decision** before proceeding (ambiguous input, approve/reject)
-- Agent **cannot proceed** without user action
+- User action **blocks agent progress**, such as SSO/login, a required credential, or an essential decision/approval
+- The user may miss a **time-sensitive opportunity to advance a process**, such as a CI/CD gate waiting for approval or promotion
 
 **❌ DON'T use ailert for:**
-- Routine status updates ("I'm working on X")
-- Informational messages that don't require action
+- Routine status updates ("I'm working on X") or information that requires no action
+- Announcing that a task/build is done when no blocking action or time-sensitive process opportunity exists
+- End-of-turn completion announcements
 - Multiple rapid alerts (cap at 1 per task)
 - Just to get user attention for curiosity
 
 ## When to use
 
 - Agent needs the user to **log in** (SSO, PingFed, Microsoft)
-- A **long-running task completed** and the user may have walked away
-- Agent needs a **decision or review** before proceeding
-- Any situation where the user may not be watching the terminal
+- A **decision or review is required** before the agent can proceed
+- A **time-sensitive process opportunity** (for example, a CI/CD approval or promotion) is waiting on the user
+
+The user merely being away, a task completing, or the agent reaching the end of a turn is not sufficient reason.
 
 Other skills can invoke ailert programmatically — see § Calling from other skills.
 

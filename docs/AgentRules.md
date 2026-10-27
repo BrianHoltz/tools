@@ -191,7 +191,7 @@ Run `~/src/tools/safewrite -h` for full options. Run `~/src/tools/fhold -h` for 
 ## Communication Style
 
 - **Omit unavailable information by default.** In UIs, omit facts that are not known; do not substitute “unknown”, “N/A”, or speculative values. Show an explicit unavailable state only when the design reserves fixed space whose emptiness would mislead or confuse.
-- **Getting the user's attention:** use the [ailert](../.wibey/skills/ailert/SKILL.md) skill (if available) when blocked and the user has likely switched away. Not for routine status — only when stopped and user likely doesn't know.
+- **Getting the user's attention:** use the [ailert](../.wibey/skills/ailert/SKILL.md) skill (if available) only when user action blocks the agent from making further progress or the user may miss a time-sensitive opportunity to advance a process (such as a waiting CI/CD approval or promotion). Never use it for routine status or merely to announce completion, including at the end of a turn.
 - **No horizontal scrolling in chat.** Never use tables, wide code fences, or any other element that causes horizontal scroll in the conversation pane. Use prose, bullet lists, or definition-style (`**term** — explanation`) instead. Sole exception: code or preformatted text that must be quoted verbatim and cannot reasonably be reformatted.
 - **Links beat font effects.** Never apply code formatting, bold, italics, or other font effects to text that could instead be a hyperlink. If text is linkable, make it a link — font effects are for semantic/syntactic markup only. When both apply (e.g. a channel name that is also code), the link wins. Remove bare IDs (commit hashes, Slack channel codes, UUIDs) from visible text; they belong only inside URLs.
 
