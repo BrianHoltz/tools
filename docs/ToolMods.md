@@ -105,18 +105,18 @@ After a deliberate legacy patch, run `node --check` on affected JavaScript, relo
 
 ## Code Puppy: Maintained Source Builds
 
-Walmart-internal; build only on the work laptop. Source: `~/src/code-puppy-ide`; JetBrains uses `feature/active-context-pill`, VS Code uses `brian/vscode-0.28.2-local`. Source root and installed JetBrains descriptor are `0.31.2`; VS Code registers `0.28.2`, Cursor `0.27.0` (2026.10.25).
+Walmart-internal; build only on the work laptop. Source: `~/src/code-puppy-ide`; JetBrains uses `feature/active-context-pill`, VS Code uses `brian/vscode-0.28.2-local`. Source root is `0.32.1` after merging upstream `main` (2026.10.27); the installed JetBrains descriptor remains `0.31.2`; VS Code and Cursor descriptors were checked 2026.10.25: `0.28.2` and `0.27.0`, respectively.
 
 ### Local patches still required
 
-- **Native paste dispatch:** `NativePaste.kt` provides IDEA `PasteProvider` support and a component-local action bound to the active keymap, preventing `EditorPaste`'s text-only adapter from swallowing images/files. Main and expanded prompt inputs reuse the existing transfer handler. Keep `AttachHandler`'s legacy Swing overload and disabled/read-only checks; do not restore duplicate image encoding/caching. Regression tests are in `NativePasteTest.kt` and `NativeAttachTest.kt`.
-- **Editor context:** opt-in active-file/selection suggestions have separate native JetBrains and VS Code webview implementations. Preserve selection identities and capture context before changing focus.
+- **Legacy paste compatibility:** keep `AttachHandler`'s Swing overload and disabled/read-only checks; delegate payload parsing to upstream, including its macOS pasteboard support and JPEG preparation. `NativeAttachTest.kt` covers the remaining adapter. Do not restore the removed duplicate `NativePaste.kt` or its superseded provider/action tests.
+- **Editor context:** opt-in active-file/selection suggestions have separate native JetBrains and VS Code webview implementations. Each suggestion has an accessible × dismissal control; dismissal neither attaches context nor changes the draft, and an unchanged suggestion stays hidden across refreshes. A different file/selection can appear. Preserve selection identities and capture context before changing focus.
 - **VS Code links:** `packages/webview/src/lib/editor-link.ts` handles absolute paths and supported editor URIs, with theme-aware Markdown link colors. JetBrains no longer uses this renderer.
 - **JDK resolution:** `scripts/gradle-jetbrains.sh` registers detected JDK 21 with Kotlin's toolchain resolver as well as setting `JAVA_HOME`.
 
 ### Upstream behavior: no local patch to reapply
 
-JetBrains is native: upstream owns image caching/forwarding, encoding, drops, theme-aware Markdown colors and IDEA-based fonts. JCEF callback adapters, origin fallbacks, repaint nudges and browser zoom patches are obsolete. Leave IDEA JCEF defaults alone.
+JetBrains is native: upstream 0.32.1 owns IDEA paste-provider/component-shortcut dispatch, image caching/forwarding, encoding, macOS file selection, drops, theme-aware Markdown colors and IDEA-based fonts. JCEF callback adapters, origin fallbacks, repaint nudges and browser zoom patches are obsolete. Leave IDEA JCEF defaults alone.
 
 The installed plugin contains native classes; metadata and packaging do not prove live paste, editor-link or zoom acceptance. Source includes queue UI; do not revive the old blanket “cannot enqueue” rating without checking the current host.
 
@@ -134,11 +134,13 @@ bash scripts/build-jetbrains.sh
 STAMP=$(date "+%Y%m%d.%a.%H%M")
 ```
 
-The build script runs clean packaging/structure validation and verifies one native artifact for IDE build 243+, without obsolete browser wiring. No React build or distinct legacy implementation is required. Keep the canonical ZIP in `releases/`; deposit under the [handoff](#local-build-artifact-rule), using `paste` for the latest local change. An updater's legacy filename is a compatibility alias, not another UI.
+The build script runs clean packaging/structure validation and verifies one native artifact for IDE build 243+, without obsolete browser wiring. No React build or distinct legacy implementation is required. Keep the canonical ZIP in `releases/`; deposit under the [handoff](#local-build-artifact-rule), using `dismiss` for the latest local change. Upstream no longer publishes the obsolete legacy ZIP alias.
 
 VS Code's isolated branch requires `pnpm --filter @code-puppy/webview build` before `pnpm --filter code-puppy-vscode package`. Verify the branch and package version rather than packaging from the JetBrains checkout. Install via the appropriate `code` or `cursor --install-extension "$OUT" --force`, and inspect each editor's registered version separately.
 
 For shared webview tests on Node 25, `NODE_OPTIONS=--no-experimental-webstorage` lets jsdom own localStorage. Run relevant Kotlin, TypeScript/webview and bridge checks for the changed scope; old passing-test counts are not current validation. Install the Downloads ZIP and restart IDEA before reporting loaded behavior. Marketplace updates can overwrite same-version local patches: inspect the installed JAR, not just its version label.
+
+The 0.32.1 local build passed 496 JetBrains, 1,174 webview, 632 VS Code and 87 shared tests, webview typechecks/lint, native package verification and Langley harness contracts. Installer: `~/Downloads/code-puppy-jetbrains-0.32.1-2026.10.27.Tue.0815-dismiss.zip`. Installation and live-IDE acceptance remain unverified.
 
 ### TODO: native follow-ups
 

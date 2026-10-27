@@ -105,7 +105,7 @@ The observations are not combined into a score: they cover different builds and 
 ## Agent Harnesses
 
 - **Voice input:** Brian preferred Claude Code's live, word-by-word text in VS Code over Copilot and Codex's record-then-transcribe experience, with a reported 2–3s delay (2026.10.12). This is a host-specific observation, not an accuracy benchmark.
-- **Current context:** the local Code Puppy builds suggest the active file or selection for explicit attachment. Suggestions are not automatic submission.
+- **Current context:** the local Code Puppy builds suggest the active file or selection for explicit attachment. Suggestions are not automatic submission. The maintained JetBrains 0.32.1 source build adds an × dismissal control; repeated editor refreshes do not restore a dismissed suggestion. The installed IDEA build remains 0.31.2 until installation/restart.
 - **Parallel work:** Wibey and Code Puppy support parallel conversations across the observed IDEs; exact behavior depends on the host/build.
 - **Follow-up prompts:** queuing waits until the current task ends; steering changes the running task. Do not treat them as interchangeable. Current native implementations include queue UI; installed-host interaction still needs confirmation.
 - **Permissions:** IDEA's JetBrains AI chat offers **Allow All**. Copilot's terminal confirmations depend on its host; no persistent IDEA bypass is established. [Configuration details](ToolMods.md#agent-permissions) are for maintenance, not a promise that OS or authentication prompts disappear.
