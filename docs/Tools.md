@@ -105,6 +105,7 @@ The observations are not combined into a score: they cover different builds and 
 ## Agent Harnesses
 
 - **Voice input:** Brian preferred Claude Code's live, word-by-word text in VS Code over Copilot and Codex's record-then-transcribe experience, with a reported 2–3s delay (2026.10.12). This is a host-specific observation, not an accuracy benchmark.
+- **Code Puppy rule loading:** Brian set `/set agents_md_max_chars=65536`, up from the 10,000-character default, during the 2026.10.30.Fri session to prevent long `AGENTS.md` files from being truncated. This records the session setting; persistence across new sessions remains to be verified.
 - **Current context:** the local Code Puppy builds suggest the active file or selection for explicit attachment. Suggestions are not automatic submission. The maintained JetBrains 0.32.1 source build adds an × dismissal control; repeated editor refreshes do not restore a dismissed suggestion. The installed IDEA build remains 0.31.2 until installation/restart.
 - **Parallel work:** Wibey and Code Puppy support parallel conversations across the observed IDEs; exact behavior depends on the host/build.
 - **Follow-up prompts:** queuing waits until the current task ends; steering changes the running task. Do not treat them as interchangeable. Current native implementations include queue UI; installed-host interaction still needs confirmation.
