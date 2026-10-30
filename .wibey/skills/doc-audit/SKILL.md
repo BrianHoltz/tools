@@ -6,9 +6,16 @@ description: Audit and improve maintained documentation for accuracy, structure,
 
 Consolidated reference for documentation authoring, project document formatting, and audit standards. Describes patterns for any repo: immortal (timeless) vs mortal (time-bound) docs, mortal doc structure, evidence, temporal writing, and consistency audits.
 
-## Governing rule
+## Prime Directive
 
 Laser-focus documents on empowering humans and agents to understand the current state and future paths. Ruthlessly remove stale material and historical narrative unless critical to that understanding; tombstone only when the deletion itself needs a durable pointer. Only closed task-table entries and Work Logs are exempt. Apply this test to every section, including evidence and resolved investigations. Lean toward compression/deletion: Git preserves the discussion. Commit messages must clearly tombstone removed topics and why they were retired, so readers can recover them without keeping a recap in the document.
+
+For design and implementation guides, default to deletion:
+
+- Retain only non-obvious current design knowledge that prevents a specific maintenance mistake; name that mistake when recommending retention.
+- Delete obvious, straightforward or uncontroversial explanations and facts readily recoverable from code, tests or the current UI.
+- Delete material already owned by Help or another canonical document; link only when that pointer itself prevents a likely mistake.
+- Historical interest, completeness and generic usefulness do not qualify. Preserve existing task and Work Log exceptions and explicit user keeps.
 
 ## Contents
 
@@ -321,6 +328,8 @@ Ruled-out theories never reach Decisions — their closure path is the Work Log 
 **Placement:** Dedicated `## Evidence` section near the bottom, above Work Log.
 
 **Inline evidence citations:** Choose a neutral decorative Unicode glyph (for example ❀, ✿, ❁ or ✧) for each unique evidence target in the document. The glyph identifies a source only; it must not imply a problem, question, warning, uncertainty, priority, approval, or task status. Do not use symbols such as ⚠️, ❗, ❓, 🔍, 🔔, ✅ or ❌ as citation markers. Append its linked glyph to the end of the supported claim, with no intervening space: `claim text[❀](#e-descriptive-slug)`. Never put the glyph at the start of a bullet or claim. Evidence-first prose states the evidence before the proposed action; its citation still follows the evidence claim.
+
+**Approved marker palette:** Use only these visually distinct glyphs: animal faces 🐵 🐶 🦊 🐱 🦁 🐯 🐴 🦄 🐮 🐷 🐭 🐹 🐰 🐻 🐨 🐼; musical instruments 🎷 🪗 🎸 🎹 🎺 🎻 🪕 🥁 🪘 🪇 🪈 🪉 📯; sports balls ⚽ ⚾ 🥎 🏀 🏐 🏈 🏉 🎾 🥏 🎱; side-profile vehicles 🚎 🚐 🚑 🚒 🚓 🚕 🚗 🚙 🛻 🚚 🚛 🚜 🏎️ 🏍️ 🛵; fruit and produce 🍇 🍈 🍉 🍊 🍋 🍋‍🟩 🍌 🍍 🥭 🍎 🍏 🍐 🍑 🍒 🍓 🫐 🥝 🍅 🫒 🥥 🥑 🥔 🥕 🌽 🌶️ 🫑 🥒 🥬 🥦 🧄 🧅 🫘 🍄 🥜 🌰 🫚 🫛.
 
 Append the same plain glyph to the end of the target evidence heading: `### Brief evidence description ❀`. Keep the explicit descriptive anchor stable. Repeated citations to that target reuse its glyph; different targets in the same document must have different glyphs, even across sections or tables. Do not use daggers, numbered markers, or task-status glyphs for evidence citations.
 
