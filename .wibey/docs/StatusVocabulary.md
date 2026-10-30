@@ -2,13 +2,15 @@
 
 ## Status Definitions
 
-**Task-table rule: unstarted tasks use a blank Status cell — never a glyph.** `⬜ UNSTARTED` and all other glyphs are for tasks that have entered their lifecycle (started, blocked, paused, canceled, done). A task that has not yet started has no lifecycle state to express; blank IS the status. Filling it with `⬜` or any other placeholder adds noise without adding information and is considered a formatting violation.
+**Task-table rule: unstarted tasks without a target date use a blank Status cell — never a glyph.** Use `🗓️ PLANNED` for an unstarted task with an aspirational target date and `📅 SCHEDULED` when the target date is coordinated or committed. `⬜ UNSTARTED` is reserved for test-matrix cells; it is not a task status.
 
 
 |      | Status        | Meaning                                                                | Jira                  | DX / Teflon                | PD / Statuspage    | SN / ITIL          | Google SRE |
 | ---- | ------------- | ---------------------------------------------------------------------- | --------------------- | -------------------------- | ------------------ | ------------------ | ---------- |
 |      | **Pending**   |                                                                        |                       |                            |                    |                    |            |
 | 🔮   | FUTURE        | Beyond current scope; aspirational or follow-on work                   | —                    | —                         | —                 | —                 | —         |
+| 🗓️   | PLANNED       | Unstarted work with an aspirational target date; no date commitment   | —                    | —                         | —                 | —                 | —         |
+| 📅   | SCHEDULED     | Unstarted work with a coordinated or committed target date            | —                    | —                         | —                 | —                 | —         |
 | 📣   | INVOKED       | Our team notified; our incident doc opened                             | —                    | Triage Initial Assessment  | Acknowledged       | Assigned           | Response   |
 | ➡️ | ROUTED        | Investigation handed off; incident still live                          | Won't Do (reassigned) | —                         | —                 | —                 | —         |
 |      | **Working**   |                                                                        |                       |                            |                    |                    |            |
