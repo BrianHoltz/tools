@@ -1,10 +1,10 @@
 ---
 name: ailert
 description: >-
-  Get the user's attention with a macOS alert dialog, escalating sounds, and
-  text-to-speech only when user action blocks agent progress or the user may miss
-  a time-sensitive opportunity to advance a process. Never use for routine task
-  completion or end-of-turn announcements. macOS only; no extra installs required.
+  Escalate attention exceptionally to an existing harness-native question or
+  approval when blocked-work opportunity cost, known urgency, or intrinsic
+  importance justifies interruption. Never replace the native interaction or
+  announce routine completion. macOS only; no extra installs required.
 allowed-tools:
   - Bash
 metadata:
@@ -33,42 +33,31 @@ arguments:
 
 # ailert — macOS Alert + Escalating Sound + Speech
 
-Get the user's attention only when human action blocks agent progress or the user may miss a time-sensitive opportunity to advance a process. Never use it merely to announce task completion or at the end of a turn. Uses only built-in macOS tools (`osascript`, `afplay`, `say`) — zero dependencies.
+Use the harness's standard interaction first; reserve macOS dialogs, sound and speech for exceptional attention escalation. Uses built-in macOS tools (`osascript`, `afplay`, `say`).
 
-## Quick Start
+## Ask through the harness first
 
-**Blocking on auth?** Stop immediately and use ailert:
+Use the harness's native question or approval mechanism whenever human input is required: Code Puppy's `ask_user_question`, Wibey's `AskUserQuestion`, or the host's native permission/review prompt. Keep approvals in their actual approval control; a question or alert cannot grant permission. Native pending interactions let Langley recognize that the agent is awaiting an answer or approval. Do not substitute a question buried in final prose, a “Your Next” bullet, a shell dialog, or ailert.
 
-```bash
-osascript - "Please log in to Grafana" <<'APPLESCRIPT' &
-on run argv
-  display alert "🌀 Wibey" message (item 1 of argv) giving up after 300
-end run
-APPLESCRIPT
-```
+If no native mechanism is available, ask one direct standalone question in the conversation and state the blocked action. Do not invent tool support or assume prose creates a native awaiting state. Do not ask routine permission to continue already-authorized work.
 
-**A CI/CD process is waiting for the user to approve its next stage?** Alert only if the opportunity is time-sensitive or the agent cannot continue without that approval. A completed task with no required next action is not a reason to alert.
+## Escalate attention only exceptionally
 
-**Auth-wall protocol:** After launching the alert, remain in the same task and poll the blocked page every 5–10 seconds (for at most 5 minutes) for authenticated content. Resume the exact blocked operation as soon as authentication succeeds. Do not emit a routine status response or end the turn while that polling is possible. Stop only after the polling limit expires without user action, or when the user must make a substantive decision beyond authentication.
+Ailert draws attention to an existing harness-native question or approval; it is not the question, an answer channel, or an approval. If the native call suspends the agent, leave it pending: do not replace it with a shell alert to keep executing. Schedule any justified attention cue only through supported host facilities that preserve the pending interaction; if unavailable, rely on the native prompt.
 
-**✅ USE ailert when:**
-- User action **blocks agent progress**, such as SSO/login, a required credential, or an essential decision/approval
-- The user may miss a **time-sensitive opportunity to advance a process**, such as a CI/CD gate waiting for approval or promotion
+Before escalating, weigh the cost of interrupting the user against:
 
-**❌ DON'T use ailert for:**
-- Routine status updates ("I'm working on X") or information that requires no action
-- Announcing that a task/build is done when no blocking action or time-sensitive process opportunity exists
-- End-of-turn completion announcements
-- Multiple rapid alerts (cap at 1 per task)
-- Just to get user attention for curiosity
+- **Opportunity cost:** how much useful authorized work is blocked, for how long, and whether independent work remains. One blocked minor follow-up is not equivalent to an entire stalled workflow.
+- **Known urgency:** a verified deadline, expiring approval/session, or closing process opportunity. Do not invent urgency from elapsed time alone.
+- **Intrinsic importance:** consequences of delay, such as operational harm, safety, security, or irreversible loss. Importance must attach to the required action, not merely the task's label.
 
-## When to use
+Escalate only when these facts justify an exceptional interruption. A blocker, auth wall, approval gate, absent user, or completed task is not sufficient by itself; no arbitrary waiting period automatically qualifies. Never bypass a blocked dependency or approval; continue independent authorized work where allowed, otherwise wait on the native interaction.
 
-- Agent needs the user to **log in** (SSO, PingFed, Microsoft)
-- A **decision or review is required** before the agent can proceed
-- A **time-sensitive process opportunity** (for example, a CI/CD approval or promotion) is waiting on the user
+Use one local alert per blocker, naming the conversation, required action and reason delay matters: “Answer the pending question in <conversation>; <workflow> is stalled.” Dismissing the alert does not answer or approve anything. External messages still require explicit authorization.
 
-The user merely being away, a task completing, or the agent reaching the end of a turn is not sufficient reason.
+## Authentication blockers
+
+Follow the applicable authentication-readiness protocol before asking for human intervention. Once a human-only challenge is verified, ask through the native interaction and stop the blocked operation. Auth does not automatically warrant ailert; apply the escalation criteria above. Where required and supported, poll the owned authentication target every 5–10 seconds for at most 5 minutes and resume the exact operation on success; do not route around authentication or require a “done” message when success is observable.
 
 Other skills can invoke ailert programmatically — see § Calling from other skills.
 
