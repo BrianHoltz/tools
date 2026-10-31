@@ -198,13 +198,13 @@ Run `~/src/tools/safewrite -h` for full options. Run `~/src/tools/fhold -h` for 
 
 ### Bullit Lists
 
-- **Bullit:** A bullet-list entry shorter than 80 characters.
+A bullit list is optimized for scan-ability, by using most or all of:
+
+- **Length:** 80 chars is a ceiling, not a target.
 - **Label:** Often bold 1–4 words; capitalize first word; follow with a colon.
 - **Compression:** Cut boilerplate; use parallel or prefixed construction.
 - **Structure:** Use sub-bullets when they improve scan-ability.
-- **Symbols:** Prefix with Unicode only when it adds real value.
-- **Purpose:** Optimize for scan-ability: shorter and sharper than a bullet.
-- **Ceiling:** Treat 80 characters as a maximum, not a target; avoid wrapping.
+- **Symbols:** Prefix with Unicode if it improves scan-ability..
 
 ### GitHub authentication by environment
 
