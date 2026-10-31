@@ -66,14 +66,14 @@ Builds, patches, configuration internals and verification belong in [ToolMods](T
 
 ### Installed work-laptop versions
 
-Disk metadata checked 2026.10.25.Sun; installed files do not prove which build an already-running editor has loaded.
+Disk metadata checked 2026.10.25.Sun; IDEA Markdown Editor rechecked 2026.10.31.Sat. Installed files do not prove which build an already-running editor has loaded.
 
 | Component | IDEA | VS Code | Cursor |
 | --- | --- | --- | --- |
 | IDE | 2026.2.3 | 1.143.1 | 3.21.13 |
 | Code Puppy | 0.31.2, native local build | 0.28.2, local build | 0.27.0 |
 | Wibey | 1.0.32_20261023.Fri.1532 | 1.0.31 | 1.0.18 |
-| Markdown Editor | Shuzijun 2.0.7-local.16 | Zaaack 0.1.22-local.6 | Zaaack 0.1.20 |
+| Markdown Editor | Shuzijun 2.0.7-local.22 | Zaaack 0.1.22-local.6 | Zaaack 0.1.20 |
 | TypeDown | — | 1.1.7 | 1.1.7 |
 
 Code Puppy and Wibey are Walmart-internal and maintained only on the work laptop. Their absence from the personal laptop is expected. Zaaack source is newer than the installed VS Code extension; see [build state](ToolMods.md#zaaack-source-build).
@@ -117,6 +117,7 @@ TODO: recheck queue/steer behavior and active-context shortcuts in the installed
 
 ### Shuzijun in IDEA
 
+- **Agent edits on disk:** local.22 polls visible local Markdown tabs every two seconds, including split panes and IDEA's built-in preview. Hidden tabs are skipped; no project scan runs. Unsaved-edit protections remain. Install local builds through **Settings → Plugins → ⚙ → Install Plugin from Disk**, then restart IDEA. See [build and validation](ToolMods.md#build-and-validation); live refresh latency is not yet measured.
 - **Search safely:** ⌘F focuses and selects the query; the count tracks visible literal matches. Brian confirmed the search-input fix in local.14 (2026.10.18); local.16 includes later list-editing and theme-refresh fixes.
 - **Save and reload:** the floppy disk force-saves; dim means saved, red means failure. Reload is immediately beside it. If the buffer is dirty, click reload again within three seconds to discard it.
 - **Read comfortably:** the upper-right toggle hides the toolbar, annotations and raw HTML. The toolbar also has an independent raw-HTML toggle, sometimes under `»`.

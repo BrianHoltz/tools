@@ -19,10 +19,11 @@ Maintainer reference for agents rebuilding or repairing Brian's toolchain. [Tool
 
 ## Shuzijun Source Build
 
-Source: `~/src/idea-markdown-editor`, branch `brian/markdown-ux`; [fork](https://github.com/BrianHoltz/markdown-editor), [upstream](https://github.com/shuzijun/markdown-editor). Keep `origin` at the fork and `upstream` at Shuzijun. Plugin ID remains `com.shuzijun.markdown-editor`. Source and installed descriptor are `2.0.7-local.16` (2026.10.25).
+Source: `~/src/idea-markdown-editor`, branch `brian/markdown-ux`; [fork](https://github.com/BrianHoltz/markdown-editor), [upstream](https://github.com/shuzijun/markdown-editor). Keep `origin` at the fork and `upstream` at Shuzijun. Plugin ID remains `com.shuzijun.markdown-editor`. Source and installed descriptor are `2.0.7-local.22` (2026.10.31); the running IDE's loaded version and live refresh latency remain unverified.
 
 ### Maintained modifications
 
+- **External disk updates:** `VisibleMarkdownRefresh` registers independently of the custom editor at project startup. Its two-second timer refreshes only visible local Markdown files, including IDEA's built-in preview and split panes. Deduplicate files and allow only one refresh in flight per project. Preserve `NewVirtualFile.markDirty()` before asynchronous, nonrecursive VFS refresh: refresh alone can trust a cached clean flag when native events lag. `ExternalFileSync` coalesces document notifications into JCEF updates; existing unsaved-edit and stale-response guards remain. Stop the watcher on project disposal; do not replace it with project scans or forced document reloads.
 - **Search input safety:** file editors use off-screen JCEF rendering, while non-file panels retain windowed rendering. On macOS, windowed JCEF can receive typed characters in the document despite Swing reporting the search field focused. Do not treat focus-owner assertions as proof of routing safety. Preserve OSR and the delayed focus/cancellation handling in `MarkdownHtmlPanel`.
 - **Save/reload safety:** `template/default.html` supplies force-save and adjacent reload controls with equal responsive-toolbar priority. Dirty reload arms a three-second second-click confirmation using `vditor.tip`; `window.confirm()` is suppressed without a JCEF dialog handler. Save displays saved/unsaved/saving/failure states.
 - **Theme and typography:** `vditor/style.css` maps rich text and tables to IDE/Vditor colors, overriding bundled light-content styles. `MarkdownPreviewFileEditor` listens for look-and-feel changes and refreshes reselected tabs (local.16). Preview font size and linear UI scale feed typography and browser zoom; do not pass CEF's logarithmic zoom value instead. Source stays monospace; tables wrap within pane width.
@@ -45,9 +46,9 @@ node --test test/*.test.cjs
 STAMP=$(date "+%Y%m%d.%a.%H%M")
 ```
 
-Read `pluginVersion` from `gradle.properties`, then deposit the matching `build/distributions/markdown-editor-<version>.zip` under the [artifact handoff](#local-build-artifact-rule), using `theme` for this source change. `set -e` prevents packaging/deposit after failed tests.
+Read `pluginVersion` from `gradle.properties`, then deposit the matching `build/distributions/markdown-editor-<version>.zip` under the [artifact handoff](#local-build-artifact-rule), using a short behavior-specific suffix such as `disksync`. `set -e` prevents packaging/deposit after failed tests.
 
-Node regressions cover search counts, focus cancellation, OSR selection, list Backspace, startup assets, typography and theme refresh. The deterministic Java/DOM harnesses do not emulate macOS native text routing or full JCEF geometry. Brian confirmed ⌘F in local.14 on 2026.10.18; later installed metadata alone does not extend that acceptance to every local.16 behavior.
+The local.22 build passes all 37 Node regressions and the clean Gradle plugin build. The verified installer is `~/Downloads/markdown-editor-2.0.7-local.22-20261031.Sat.0847-disksync.zip`. Node regressions cover visible-file filtering, split-pane deduplication, refresh coalescing and disposal, unsaved-edit protection, search counts, focus cancellation, OSR selection, list Backspace, startup assets, typography and theme refresh. The deterministic Java/DOM harnesses do not emulate macOS native text routing or full JCEF geometry. Brian confirmed ⌘F in local.14 on 2026.10.18; installed metadata alone does not establish live acceptance of local.22 or a five-second refresh bound.
 
 ### Legacy installed-JAR patch
 
