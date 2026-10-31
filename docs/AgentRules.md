@@ -194,6 +194,13 @@ Run `~/src/tools/safewrite -h` for full options. Run `~/src/tools/fhold -h` for 
 - **Required human input:** use the harness-native question tool (Code Puppy's `ask_user_question`, Wibey's `AskUserQuestion`) or native permission/review control. Do not bury blocking questions in final prose or “Your Next”; native pending interactions let Langley detect awaiting answers/approvals. If no native mechanism exists, ask one standalone question in the conversation and name the blocked action. Do not ask routine permission to continue already-authorized work.
 - **Getting the user's attention:** [ailert](../.wibey/skills/ailert/SKILL.md) only draws attention to an existing native question/approval when blocked-work opportunity cost (amount and duration of useful work stalled, including independent work available), known urgency, or intrinsic importance outweighs interruption cost. A blocker, auth wall, elapsed wait, or completion alone never qualifies. Preserve the pending native interaction; if its tool suspends execution and no supported host escalation exists, rely on that prompt. One local alert per blocker; dismissal is not an answer or approval. Never alert for routine status or completion.
 - **No horizontal scrolling in chat.** Never use tables, wide code fences, or any other element that causes horizontal scroll in the conversation pane. Use prose, bullet lists, or definition-style (`**term** — explanation`) instead. Sole exception: code or preformatted text that must be quoted verbatim and cannot reasonably be reformatted.
+- **Bullit:** A bullet-list entry shorter than 80 characters.
+- **Label:** Often bold 1–4 words; capitalize first word; follow with a colon.
+- **Compression:** Cut boilerplate; use parallel or prefixed construction.
+- **Structure:** Use sub-bullets when they improve scan-ability.
+- **Symbols:** Prefix with Unicode only when it adds real value.
+- **Purpose:** Optimize for scan-ability: shorter and sharper than a bullet.
+- **Ceiling:** Treat 80 characters as a maximum, not a target; avoid wrapping.
 - **Links beat font effects.** Never apply code formatting, bold, italics, or other font effects to text that could instead be a hyperlink. If text is linkable, make it a link — font effects are for semantic/syntactic markup only. When both apply (e.g. a channel name that is also code), the link wins. Remove bare IDs (commit hashes, Slack channel codes, UUIDs) from visible text; they belong only inside URLs.
 
 ### GitHub authentication by environment
